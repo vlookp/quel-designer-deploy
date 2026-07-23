@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quel designer êtes-vous ?</title>
+<style>
+  :root {
+    --ink: #111111;
+    --ink-soft: #888888;
+    --bg: #f5f5f3;
+    --white: #ffffff;
+    --border: #e2e2de;
+    --fill: #111111;
+    --fill-dim: #e0e0dc;
+    --fill-done: #c8c8c4;
+    --radius: 14px;
+    --red: #d32f2f;
+    --green: #1b6b2e;
+    --avatar-bg: #ece8e0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── LOGO ── */
+  .pdl-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 32px;
+    gap: 0;
+    pointer-events: none;
+    user-select: none;
+    width: 100%;
+  }
+  .pdl-logo .pdl-line {
+    background: var(--ink);
+    color: var(--white);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.2rem, 9vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1;
+    padding: 5px 18px 9px;
+    white-space: nowrap;
+  }
+  .pdl-logo .pdl-line:nth-child(1) { align-self: flex-end; }
+  .pdl-logo .pdl-line:nth-child(2) { /* full width — stretch is default */ }
+  .pdl-logo .pdl-line:nth-child(3) { align-self: flex-end; }
+  .pdl-logo-sm {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+
+  /* ── NAV ── */
+  .topbar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 50px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+  }
+  .topbar.visible { display: flex; }
+  .topbar-brand { display: flex; align-items: center; gap: 12px; }
+  .topbar-appname { font-size: 0.78rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .topbar-right { display: flex; gap: 10px; align-items: center; }
+  .topbar-user { font-size: 0.82rem; color: var(--ink-soft); }
+  .profile-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--fill-dim); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; flex-shrink: 0; border: 1.5px solid var(--border); transition: border-color .15s; }
+  .profile-circle:hover { border-color: var(--ink); }
+  .profile-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .profile-initial { font-size: 0.82rem; font-weight: 700; color: var(--ink); user-select: none; }
+  .btn-small {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: var(--ink);
+    font-weight: 600;
+    transition: border-color .15s;
+  }
+  .btn-small:hover { border-color: var(--ink); }
+  .btn-small.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; }
+  .padtop { padding-top: 50px; }
+  body.quiz-active #s-domains,
+  body.quiz-active #s-quiz,
+  body.quiz-active #s-continue { padding-top: 110px; }
+  @media (min-width: 560px) {
+    body.quiz-active #s-domains,
+    body.quiz-active #s-quiz,
+    body.quiz-active #s-continue { padding-top: 86px; }
+  }
+
+  /* ── AUTH ── */
+  #s-auth {
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+  .auth-wrap { width: 100%; max-width: 400px; }
+  .auth-wrap .auth-title {
+    font-family: Georgia, serif;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    text-align: center;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .auth-wrap .auth-sub {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin-bottom: 28px;
+    line-height: 1.55;
+  }
+  .auth-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+  }
+  .auth-tabs {
+    display: flex;
+    margin-bottom: 22px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 0;
+  }
+  .auth-tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: background .15s, color .15s;
+  }
+  .auth-tab.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .auth-field { margin-bottom: 14px; }
+  .auth-field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 5px; }
+  .auth-field input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    font-size: 0.95rem;
+    background: var(--white);
+    transition: border-color .15s;
+  }
+  .auth-field input:focus { outline: none; border-color: var(--ink); }
+  .auth-msg {
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .auth-msg.visible { display: block; }
+  .auth-msg.error { background: #fdecea; color: var(--red); }
+  .auth-msg.success { background: #e6f4ea; color: var(--green); }
+  .btn-auth {
+    width: 100%;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-auth:hover { opacity: 0.82; }
+  .btn-auth:disabled { opacity: 0.45; cursor: default; }
+
+  /* ── HOME ── */
+  #s-home {
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+  }
+  #s-home h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(2rem, 7vw, 4rem);
+    line-height: 1.12;
+    margin-bottom: 16px;
+    letter-spacing: -.02em;
+  }
+  #s-home p { color: var(--ink-soft); font-size: 1rem; max-width: 420px; margin: 0 auto 36px; line-height: 1.65; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: var(--ink); color: #fff;
+    border: none; padding: 15px 40px;
+    border-radius: 40px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-primary:hover { opacity: 0.8; }
+  .btn-secondary {
+    background: transparent; color: var(--ink-soft);
+    border: 1.5px solid var(--border);
+    padding: 12px 28px; border-radius: 40px;
+    font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── DOMAIN BARS ── */
+  #s-domains { padding: 70px 20px 48px; max-width: 600px; margin: 0 auto; width: 100%; }
+  #s-domains h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    margin-bottom: 8px;
+    margin-top: 24px;
+    letter-spacing: -.02em;
+  }
+  .pick-sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
+  .progress-global { display: flex; gap: 5px; margin-bottom: 24px; }
+  .progress-global span { flex: 1; height: 3px; border-radius: 3px; background: var(--fill-dim); }
+  .progress-global span.done { background: var(--ink); }
+
+  .domain-bars { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+  .domain-bar-row {
+    position: relative;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--fill-dim);
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .domain-bar-row:hover:not(.done) { opacity: 0.8; }
+  .domain-bar-row.done { cursor: default; }
+  .domain-bar-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: var(--fill);
+    border-radius: 8px;
+    transition: width .4s ease;
+  }
+  .domain-bar-row.done .domain-bar-fill { background: var(--fill-done); }
+  .domain-bar-label {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--white);
+    mix-blend-mode: normal;
+    z-index: 1;
+  }
+  .domain-bar-row.done .domain-bar-label { color: var(--ink); }
+  .domain-bar-check {
+    margin-left: auto;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .domain-bar-row.done .domain-bar-check { opacity: 1; }
+
+  /* ── QUIZ ── */
+  #s-quiz { min-height: 100vh; align-items: center; justify-content: center; padding: 70px 20px 40px; }
+  .quiz-wrap { width: 100%; max-width: 540px; }
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .domain-tag {
+    background: var(--ink); color: var(--white);
+    font-size: 0.76rem; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; letter-spacing: .04em;
+  }
+  .q-counter { font-size: 0.82rem; color: var(--ink-soft); }
+  .progress-bar-wrap { height: 2px; background: var(--fill-dim); border-radius: 4px; margin-bottom: 28px; }
+  .progress-bar-fill { height: 100%; background: var(--ink); border-radius: 4px; transition: width .3s ease; }
+  .question-card { background: var(--white); border-radius: 16px; padding: 28px; border: 1px solid var(--border); }
+  .question-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 24px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .option {
+    display: flex; align-items: center; gap: 14px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--ink); }
+  .option.selected { border-color: var(--ink); background: var(--fill-dim); }
+  .badge {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; color: transparent;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .option.selected .badge { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .opt-text { font-size: 0.88rem; line-height: 1.45; }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; }
+
+  /* ── CONTINUE ── */
+  #s-continue { min-height: 100vh; align-items: center; justify-content: center; padding: 70px 20px 48px; }
+  .continue-wrap { max-width: 600px; width: 100%; }
+  #s-continue h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    margin-bottom: 8px;
+    letter-spacing: -.02em;
+  }
+  #s-continue .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
+  .continue-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; align-items: center; }
+  .btn-results {
+    background: var(--ink); color: #fff; border: none;
+    padding: 15px 40px; border-radius: 40px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn-results:hover { opacity: 0.82; }
+
+  /* ── RESULTS ── */
+  #s-results { padding: 70px 20px 80px; align-items: center; }
+  .results-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
+  #s-results h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    margin-bottom: 6px;
+    letter-spacing: -.02em;
+  }
+  #s-results .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
+
+  /* Sorted result bars */
+  .result-bars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
+  .result-bar-row { position: relative; height: 44px; border-radius: 8px; overflow: hidden; background: var(--fill-dim); cursor: pointer; transition: opacity .15s; }
+  .result-bar-row:hover { opacity: .8; }
+  .result-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; border-radius: 8px; transition: width .6s ease; }
+  .result-bar-row.top .result-bar-fill { background: var(--fill); }
+  .result-bar-row.mid .result-bar-fill { background: #555; }
+  .result-bar-row.low .result-bar-fill { background: var(--fill-dim); }
+  .result-bar-label {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 14px; z-index: 1;
+    font-size: 0.88rem; font-weight: 600;
+  }
+  .result-bar-row.top .result-bar-label { color: var(--white); }
+  .result-bar-row.mid .result-bar-label { color: var(--white); }
+  .result-bar-row.low .result-bar-label { color: var(--ink); }
+  .result-bar-pct { font-size: 0.82rem; font-weight: 700; opacity: .75; }
+
+  /* avatar placeholder */
+  .avatar-card-placeholder {
+    width: 100%; border: 2px dashed var(--border); border-radius: 16px;
+    padding: 28px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; margin-bottom: 12px;
+    transition: border-color .15s, background .15s;
+  }
+  .avatar-card-placeholder:hover { border-color: var(--ink); background: var(--fill-dim); }
+  .placeholder-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 0.88rem; text-align: center; }
+  .placeholder-icon { font-size: 1.8rem; line-height: 1; }
+
+  /* ── AVATAR ── */
+  #s-avatar { padding: 70px 20px 80px; align-items: center; }
+  .avatar-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
+  #s-avatar h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    margin-bottom: 6px;
+    letter-spacing: -.02em;
+  }
+  #s-avatar .sub { color: var(--ink-soft); margin-bottom: 24px; font-size: 0.92rem; }
+  .name-input {
+    display: block; margin: 0 auto 20px; max-width: 300px; width: 100%;
+    padding: 11px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 1rem; text-align: center; background: var(--white);
+    transition: border-color .15s;
+  }
+  .name-input:focus { outline: none; border-color: var(--ink); }
+  .avatar-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+    gap: 8px;
+    max-height: 260px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px; margin-bottom: 24px;
+  }
+  .avatar-gallery img {
+    width: 100%; aspect-ratio: 240/324; object-fit: contain;
+    cursor: pointer; border-radius: 8px; border: 2px solid transparent;
+    padding: 4px; transition: border-color .15s, background .15s;
+    background: var(--white);
+  }
+  .avatar-gallery img:hover { background: var(--fill-dim); }
+  .avatar-gallery img.selected { border-color: var(--ink); background: var(--fill-dim); }
+  .avatar-card-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+  .avatar-card { width: 200px; border-radius: 16px; padding: 22px 16px 18px; text-align: center; }
+  .avatar-card img { width: 110px; height: auto; margin-bottom: 12px; display: none; }
+  .avatar-card .card-logo { width: 36px; height: auto; display: block !important; margin: 14px auto 0; }
+  #avatarCardText { display: none; }
+  .card-download-btn { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.15); background: rgba(255,255,255,0.7); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: background .15s, border-color .15s; }
+  .card-download-btn:hover { background: rgba(255,255,255,0.95); border-color: rgba(0,0,0,0.35); }
+  .avatar-card-wrap { position: relative; }
+  .avatar-card p { font-size: 0.82rem; font-weight: 600; color: var(--ink); line-height: 1.45; }
+  .bg-0 { background: #c9dff0; } .bg-1 { background: #f5cfc9; } .bg-2 { background: #f5e8a8; }
+  .bg-3 { background: #c9f0d8; } .bg-4 { background: #e8d0f0; } .bg-5 { background: #f0dfc9; }
+  .bg-6 { background: #c9f0ee; } .bg-7 { background: #f0d0e8; }
+  .avatar-actions { text-align: center; margin-bottom: 16px; }
+  .avatar-actions button {
+    background: transparent; color: var(--ink-soft);
+    border: 1.5px solid var(--border); padding: 9px 22px;
+    border-radius: 30px; font-size: 0.85rem; cursor: pointer;
+    transition: border-color .15s;
+  }
+  .avatar-actions button:hover { border-color: var(--ink); color: var(--ink); }
+  .avatar-btns { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+
+  /* ── PROGRESSION ── */
+  #s-progression { padding: 70px 20px 80px; align-items: center; }
+  .prog-wrap { max-width: 640px; width: 100%; margin: 0 auto; }
+  #s-progression h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    margin-bottom: 6px;
+    letter-spacing: -.02em;
+  }
+  #s-progression .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
+  .timeline {
+    display: flex; gap: 12px; overflow-x: auto;
+    padding-bottom: 8px; margin-bottom: 28px;
+    scrollbar-width: thin;
+  }
+  .timeline-card {
+    flex: 0 0 150px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 18px; padding: 16px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    position: relative;
+  }
+  .card-actions {
+    display: flex; gap: 6px; width: 100%; margin-top: auto;
+  }
+  .card-btn {
+    flex: 1; padding: 5px 4px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: transparent;
+    font-size: 0.72rem; font-weight: 600; cursor: pointer;
+    color: var(--ink-soft); transition: border-color .15s, color .15s, background .15s;
+    white-space: nowrap;
+  }
+  .card-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .card-btn.danger:hover { border-color: var(--red); color: var(--red); }
+  /* ── VERTICAL BAR CHART ── */
+  .prog-chart-wrap { width: 100%; margin-bottom: 24px; overflow-x: auto; scrollbar-width: thin; }
+  .prog-chart { display: flex; gap: 8px; align-items: flex-end; height: 220px; min-width: 420px; padding: 24px 0 0; }
+  .prog-domain-group { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+  .prog-bars-row { display: flex; gap: 3px; align-items: flex-end; height: 170px; width: 100%; }
+  .prog-vbar {
+    flex: 1; border-radius: 4px 4px 0 0; min-height: 3px;
+    position: relative;
+    transition: height .6s cubic-bezier(.34,1.1,.64,1);
+  }
+  .prog-vbar-pct {
+    position: absolute; top: -17px; left: 0; right: 0;
+    text-align: center; font-size: 0.58rem; font-weight: 700;
+    color: var(--ink-soft); white-space: nowrap;
+  }
+  .prog-domain-abbr {
+    font-size: 0.58rem; font-weight: 700; text-align: center;
+    color: var(--ink-soft); margin-top: 6px; line-height: 1.3;
+    width: 100%; padding: 0 2px;
+  }
+  .prog-chart-legend {
+    display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .prog-legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; color: var(--ink-soft);
+  }
+  .prog-legend-dot {
+    width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+  }
+  .prog-threshold-label {
+    font-size: 0.68rem; color: var(--ink-soft); margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .prog-threshold-label::before {
+    content: ''; display: inline-block; width: 24px; height: 1px;
+    background: repeating-linear-gradient(90deg,var(--ink-soft) 0,var(--ink-soft) 4px,transparent 4px,transparent 8px);
+  }
+  .timeline-card.future {
+    border: 2px dashed var(--border); background: transparent;
+    cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .timeline-card.future:hover { border-color: var(--ink); background: var(--fill-dim); }
+  .timeline-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
+  .timeline-date { font-size: 0.65rem; color: var(--ink-soft); text-align: center; }
+  .timeline-avatar-card {
+    width: 100%; border-radius: 12px;
+    padding: 12px 8px; display: flex; flex-direction: column;
+    align-items: center; gap: 6px; min-height: 110px;
+  }
+  .timeline-avatar-card img { width: 44px; height: 44px; object-fit: contain; }
+  .timeline-avatar-card .tac-name { font-size: 0.7rem; font-weight: 800; color: var(--ink); text-align: center; }
+  .timeline-avatar-card .tac-domains { font-size: 0.6rem; color: var(--ink-soft); text-align: center; line-height: 1.4; }
+  .timeline-empty { width: 100%; min-height: 110px; background: var(--fill-dim); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .timeline-empty-label { font-size: 1.4rem; color: var(--ink-soft); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.35);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px 28px 24px;
+    max-width: 320px; width: calc(100% - 48px);
+    box-shadow: 0 16px 48px rgba(0,0,0,.14);
+    transform: translateY(12px) scale(.97);
+    transition: transform .2s ease, opacity .2s ease;
+    opacity: 0;
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0) scale(1); opacity: 1; }
+  .modal-box h3 {
+    font-family: Georgia, serif;
+    font-size: 1.1rem; font-weight: 700;
+    margin-bottom: 10px; line-height: 1.3;
+  }
+  .modal-box p { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.55; margin-bottom: 24px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-cancel {
+    flex: 1; padding: 12px; border-radius: 40px;
+    background: transparent; border: 1.5px solid var(--border);
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    color: var(--ink-soft); transition: border-color .15s, color .15s;
+  }
+  .modal-cancel:hover { border-color: var(--ink); color: var(--ink); }
+  .modal-confirm {
+    flex: 1; padding: 12px; border-radius: 40px;
+    background: var(--ink); border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    color: var(--white); transition: opacity .15s;
+  }
+  .modal-confirm:hover { opacity: .8; }
+  .modal-confirm.danger { background: var(--red); }
+
+  /* ── DASHBOARD ── */
+  #s-dashboard { padding: 70px 20px 60px; align-items: center; }
+  #s-dashboard h2 { font-family: Georgia, serif; font-size: 2rem; text-align: center; margin-bottom: 8px; }
+  .dash-sub { text-align: center; color: var(--ink-soft); margin-bottom: 24px; font-size: 0.9rem; }
+  .dash-stats { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 110px; }
+  .stat-card .stat-val { font-size: 2rem; font-weight: 700; }
+  .stat-card .stat-label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 2px; }
+  .dash-table-wrap { max-width: 960px; width: 100%; overflow-x: auto; background: var(--white); border: 1px solid var(--border); border-radius: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  thead th { background: var(--bg); padding: 12px 16px; text-align: left; font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: var(--bg); }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  .badge-done { display: inline-block; background: #e6f4ea; color: var(--green); font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .badge-progress { display: inline-block; background: var(--fill-dim); color: var(--ink); font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .dash-refresh { display: flex; justify-content: flex-end; max-width: 960px; width: 100%; margin-bottom: 10px; }
+
+  /* ── GLOBAL QUIZ PROGRESS BAR ── */
+  #quizProgress {
+    position: fixed; top: 50px; left: 0; right: 0; z-index: 98;
+    display: none; padding: 8px 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 5px;
+    justify-content: center;
+  }
+  #quizProgress.visible { display: flex; }
+  .qp-chip {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: .02em;
+    padding: 3px 9px; border-radius: 20px;
+    background: var(--fill-dim); color: var(--ink-soft);
+    border: 1px solid transparent;
+    transition: background .3s, color .3s, border-color .3s;
+    white-space: nowrap;
+  }
+  .qp-chip.done {
+    background: var(--ink); color: var(--white);
+  }
+
+  /* ── DOMAIN TRANSITION OVERLAY ── */
+  #domainTransition {
+    position: fixed; inset: 0; z-index: 300;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  #domainTransition.show { opacity: 1; pointer-events: all; }
+  .dt-check {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--ink); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    transform: scale(.6);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  #domainTransition.show .dt-check { transform: scale(1); }
+  .dt-domain { font-size: 1rem; font-weight: 800; color: var(--ink); }
+  .dt-label { font-size: 0.82rem; color: var(--ink-soft); }
+  .dt-progress { display: flex; gap: 5px; margin-top: 8px; }
+  .dt-seg { width: 20px; height: 4px; border-radius: 2px; background: var(--fill-dim); transition: background .3s; }
+  .dt-seg.done { background: var(--ink); }
+
+  /* ── PROFILE SCREEN ── */
+  #s-profile { padding: 70px 20px 80px; align-items: center; }
+  .profile-wrap { max-width: 560px; width: 100%; margin: 0 auto; }
+  #s-profile h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; }
+  .profile-section { margin-bottom: 36px; }
+  .profile-section-title {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 14px;
+  }
+  .profile-avatar-preview {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  }
+  .profile-avatar-preview img {
+    width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--border);
+  }
+  .profile-avatar-placeholder {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--fill-dim); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; font-weight: 800; color: var(--ink-soft);
+  }
+  .profile-avatar-info { flex: 1; }
+  .profile-avatar-name { font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
+  .profile-avatar-sub { font-size: 0.78rem; color: var(--ink-soft); }
+  .profile-gallery-toggle {
+    font-size: 0.8rem; font-weight: 700; color: var(--ink);
+    background: none; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 7px 14px; cursor: pointer; transition: border-color .15s;
+  }
+  .profile-gallery-toggle:hover { border-color: var(--ink); }
+  .profile-gallery-wrap { display: none; margin-top: 12px; }
+  .profile-gallery-wrap.open { display: block; }
+  .btn-save-profile {
+    width: 100%; padding: 13px; background: var(--ink); color: var(--white);
+    border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; margin-top: 14px; transition: opacity .15s;
+  }
+  .btn-save-profile:hover { opacity: .8; }
+
+  /* ── SKILLS / MONTÉE EN COMPÉTENCE ── */
+  #s-skills { padding: 70px 20px 80px; align-items: center; }
+  #s-skills h2 { font-family: Georgia, serif; font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 800; margin-bottom: 6px; letter-spacing: -.02em; text-align: center; }
+  #s-skills .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; text-align: center; }
+  .skills-domain-block { width: 100%; max-width: 560px; margin-bottom: 28px; }
+  .skills-domain-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--ink);
+  }
+  .skills-score-badge {
+    font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+    background: #FFE4C4; color: #A0440A;
+  }
+  .skills-formation-card {
+    background: var(--fill-dim); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    text-decoration: none; color: var(--ink);
+    transition: background .15s, border-color .15s;
+  }
+  .skills-formation-card:hover { background: var(--ink); border-color: var(--ink); color: var(--white); }
+  .skills-formation-info { flex: 1; min-width: 0; }
+  .skills-formation-name { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+  .skills-formation-type {
+    font-size: 0.75rem; color: var(--ink-soft); font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .skills-formation-card:hover .skills-formation-type { color: rgba(255,255,255,0.6); }
+  .skills-type-tag {
+    font-size: 0.7rem; font-weight: 700; padding: 1px 7px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .skills-type-tag.formation { background: #E8F4FD; color: #1B6FA0; }
+  .skills-type-tag.workshop { background: #EDE9FE; color: #5B21B6; }
+  .skills-formation-card:hover .skills-type-tag.formation,
+  .skills-formation-card:hover .skills-type-tag.workshop { background: rgba(255,255,255,0.2); color: var(--white); }
+  .skills-arrow { font-size: 1rem; opacity: .5; flex-shrink: 0; }
+  .skills-formation-card:hover .skills-arrow { opacity: 1; }
+  .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
+  .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
+  .btn-skills { background: var(--ink); color: var(--white); border: none; border-radius: 10px; padding: 14px 28px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: block; margin: 0 auto; transition: opacity .15s; }
+  .btn-skills:hover { opacity: .8; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 480px) {
+    .question-card { padding: 20px 14px; }
+    .question-card h3 { font-size: 1rem; }
+    .quiz-wrap { padding: 0; }
+    .auth-card { padding: 22px 18px; }
+    #s-domains, #s-continue { padding-left: 16px; padding-right: 16px; }
+    .timeline-card { flex: 0 0 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- GLOBAL QUIZ PROGRESS BAR -->
+<div id="quizProgress"></div>
+
+<!-- DOMAIN TRANSITION OVERLAY -->
+<div id="domainTransition">
+  <div class="dt-check">✓</div>
+  <div class="dt-domain" id="dtDomain"></div>
+  <div class="dt-label">Domaine terminé !</div>
+  <div class="dt-progress" id="dtProgress"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="modalCancel">Annuler</button>
+      <button class="modal-confirm" id="modalConfirm">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<nav class="topbar" id="topbar">
+  <div class="topbar-brand">
+    <img src="data:image/png;base64,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" alt="Popup Design Lab" onclick="goHome()" style="height:34px;width:auto;cursor:pointer;">
+    <span class="topbar-appname">Quel Designer êtes-vous ?</span>
+  </div>
+  <div class="topbar-right">
+    <div class="profile-circle" id="profileCircle" onclick="showProfile()" title="Mon profil" style="display:none;">
+      <span class="profile-initial" id="profileInitial"></span>
+      <img id="profileAvatar" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+    </div>
+    <span class="topbar-user" id="topbarUser"></span>
+    <button class="btn-small dark" id="btnDashboard" style="display:none" onclick="showDashboard()">Dashboard</button>
+    <button class="btn-small" onclick="signOut()">Déconnexion</button>
+  </div>
+</nav>
+
+<!-- AUTH -->
+<section class="screen active" id="s-auth">
+  <div class="auth-wrap">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKoAAABvCAYAAAB8U1uFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAABHVSURBVHgB7Z09cxVHFoZHazY0cr7ItZuCgw0lnHgTJOcIp1sIE1uQG+EYBJsa5I2NCDYzcrJOLOkHWIoppB9gwQ+Q9cz4SOee293TM3dm7oxuv1UqCmm+eubt06fP51zWcyws/O3fZ//8N0uYafwlS0gYABJREwaBRNSEQeBKNkAsLCxk165d8/792rWFsd+9f39y9vM+/zk4OMgShoVBEvWbb9az1dU72STY39/L9vb2stevt7Ojo6Msod+Yy3oO165/aWkpu3VrObtx40Z2/fqN7OrVq2PnPX68kUtPAcfww7mLi0sjx25vv8qeP3+WCNtjDJKoFpDvxx+3R3736adh1WB9fVQqHx8fZ199tZrI2lNcis3U0dFxpeOPj4+yhw8fZM+ebZ7/Dp0Xsrukc8L0MdO7foiq1QPIurZ2L0voH2bePIV+qpGI2k/MPFEPDw9H/s/Sj/kroV8YpHmqSaCvWqAClG2qIDSbMY6dn7+anZy8zzdkh4cHudmrKtgQYsEASHmtkoiVQ9/n5593erfxa3MMM09UF3iRPmASe/Ro49zEJU4EMX8BPgL6r1UrBBzHdbiGfFy9idvaepn/y9+ePn3mdG7wDCGz2qtX22NmOMHr16+yBw8ejPyOSff06Wbmg7WidDEGjZknqkgADaSiC+ivvFwAGR8+XM+9XCI5+HBPnmzm//LRr1+/nttzLfi7Naf57sW1IT3SR553ff1B/uEh19LSTadZDaLwO7E1l4FVgHOEfGXoYgwal8KOil10d3d0uQ3ZUTVevtzKlyTBzs5O9vXXa2PH8WL5AWU2Vz4gkgQgMTCFaYg0KqTwfH7/5eXl82vfubOaj4dJcP/+Ped9XrzYGjlnZeXWyFKrwXEcL4A02jTnwps3OyME90nUrsYw05spCK5JCr77bsN5nJAU8JFDsx9iygtHYlhLAn9DgjEpILJImuJvJ9nm5mb+4XwfuLjH+vk9kEwi6V3wffwQ9Dk8i+vvoTFsbGxUHgMqgg8zS1TIhx6n4SMgxBHw8n2658UxRyPHQPJYRwLSiaW3bDLwgfU9mBBIuD5AJGzVMSBdZSWymDmi8iIgDkubKPi8MHRJ13IIobXOtre3m8WAoBcBJI21z/JMMZMBWNOaXR2mhTbGcGk3U+/eHY8tWXbnKTPaeqg0VldXR/5vX6wPBwejxyEtyvTCi3PjwhCtGazKPdpG/TGsODegl5aoItFE2Udv2t8/ypdlSMTOXu/YfbBLkc8iYMF9xGwFxHwToy9qaRwCY9Koco+2UXcMCBPXGC4tUdl1NgEbhB2ysVpoosq1YogeSzTXcfPz870gatNjSKkoJbDqwocP9UmAVyYGLm9ZLD7+ePjRXy7nQCJqwiCQiFoClw2xz5hE4vcFrneeiFoCawfELRoLazttOqnQXh+9rqlAFVeCZBuIHUMiagns5gcLQgx0kIpcp+lNjjXwx1okysBzh7J8m0TsGBJRS6Bdg2BpaTHqPGvWqhP6VwYbbLK9vZ01gS49XLFjSEQtAQTTJLt1ayXqPOth+eGHrSwWse5WCegAIU+QzSkru/7t282Y9mJgx7Cz88Z5XCJqBJ4/v/D2SMB0COh3+pgyn7fF3bvl7lbr2g15pMT5IAiF/cmzx7g/Q4ghu2sMlzZ6CuLoWSlg6W0qoxSJqolArEAoXUVHMrGBqurWlHgEHxiXDqghjrSMWFpScX1X8IcE6iDZ9Apg9e0YND2GQXqmICY/i4s3vUq/BPWinPPi6xBGQ86VgF+u//jxozzMTWCj/3Ej3ru3ltWB3MdGv0OAb7/dOB83H9jlGx9//me5H10IRywo5N3f38//jzUDSYpEI9b29PTiXM7Z3d3P36WE9cVsDJscwyADp4mer1PSJzaYOoSL6P1i+ZRUFKCjsSC2pGOUwaaBcB6k0tez92Dy2YkS8+wQ1De5mVjE0kIqVzC6ACLbzaEdA8/F/ZoawyAlKrOPWToNIJlXVpbPUzZu3LiwqxIHgJVg0h0+12CMkouk78HGSOpm1Xn2mzcXc1IhQcWl67omeu1nn13P/e4WJycnpfdiDGRKuMZQ5z0Nkqh6dk4LfPS2qwJai0NTiN0oNfGemxpD2vUnDAJXznTA/2f9xt+zhJkHS/8XWUJCz5EKUEwAyYVaWLiWbxCwPaayle0gEXUCYEvVfnFMSqHc9Fik0pfjSJupmoCgNngD+2DVgA6pyaRx+/Ydb9pwH+EaA/9v0jt4xXXTslItPmDALZLnDvJsTWxzs7YUxn4YKrRgh3UdL543gDeIOlFNhfA1iS7HMEZUjL8YYzHS+jwYodhKztOBBlwLT0sb9sBpQuyoWoIyUauMM/bDzfXYf9jVGObOzFOnvj9KfSHcbnrWuFxoGkhlome0m/MyNnSQXgAEqLCS4E9Pm6l2ECSqwJYwLCOqQKJxtG83NXRIqINWN1NIGXbBkqwlUUeponNCVbS+60eX1WUcU/eRhDroxI7KpgMdVXRW6T7SlzpJCZXw+9zc3H+yjtGZwZ9WjnpzBVGxBlQxjksjCCwL0ts0pn5UnWthWpEaoDGQorZVdv1VxiOVo1Gnyu4hm2DXtew9Jai8An5/9+54I+sYnRGVl6trMYn7MUaqSlqDr51kFYsC53MtJk3oWo8ePT6zA+86SRGqX0+sapnJhk0mNVd948H+zHvh3q4a+LY6c5GOs5LHmOqGD7qytLxvfuw9y3oO9AGdulBJfdBSNaZWPKkdUluUmY8/nQ/Jy5Za8FyTH4KNQ1H12gohH0dIJVWluY5O2bDQJdJdKKtUwvUZk1Ssc9W2572gxzNOfseYeF6JoOf5eUaIZUu7l42bayKVqU8gtvKi2vNm/kyxWQldo1Oi2lIt4mLzLd065cRVC7/wgB2cb84gQKh9jibpuE9+L7+Hrr/vAteHXASi2CxKEJLqqBM6XYOJpaUY4+HZKTLMeLg2Y+aY8fLqRZQ9aRyc53oexqkra1uzIn978eLludOC99fHtkCgU1+/q6aQr3QML01IWuTWbDiPk42awFcHXnpCgVBarq6/7wLE4HxcgpS2rOIWRJ0QINlcSy3STks1kd4cK/fiXMkzkkLE8jwakBmHBHDZvrmX7VnQZU5/FXRKVFu0FbiCOPidliAhYgFdNBYyuiSirhnleg4BHy+2CG1xrXBTBgHPpPXMUEKbazzcB/2XBMXY2q8s7UzQUF0B2Tvoc/qIjokatzu3HT7KiGOv69LZtM5Z9jHa0NOsihCqgWorm9StzQ9JY2rp6/cXW8O1a/QuzM/qWSx3VXUm18vWH4PlNNT8AXWCyWHr8DeJ0KS1JK5bWY/JeVls1b0jqk6rBVa6WGATjPFy2WJnSG2KKrjqA0AiltcmJavLnumD/duHD+Xpyb7rtJ0p2xU63fW7JIOVHnaJREfD5si50jhCfu+Dq86+pO1q/VXMMpAW0xlOibbCEe2mKyQlbSxE2WT1gcnRxzjWOuiUqC4pYkllj6EAgnxUnWce0vF8Oi07eh3Npe8ptti2IrzsRLErh4bVoZlAdTBJL4C+oWOJOkoQaRsegphfmgAfjkohYth3SWV+9+uve1H9QquCiSI2UspXLiy4vWnaocD4606aaRfpaBKd6qjjxW3juuA1DQiIDgpxfNK3bMNVB0XY43I+QSHr99+/HFnmxWmh43enVbqob+hMorJ8xyxp1haJx6UNFP1Ki56lEqlPO24tZSFrbOW6KveV+k94qn76aed8VdG+f+ysuqntrKMziWqlqa/Ql5VwTRigi8p0+14JCXmQrkhZbYiX4JOmUdQnXTwfG8/HjwSjoCMTw5tIeoFOJKpELGlYv71AQtPqtGYMAUmJ4TxkcoKwEARSi2QtNnLNWQIkqIXnSGk58eiEqFLQVRBy6UkjXS39qgRZo/P5ri2VlstMUJiqmtZP5f68C+lmPVB88mfN2kr46KO//u/t27e/ZzXROlHtpiRmN721tTUSL8r56LNl0gfpR/RTyFKAnbaMqKP+++YkntiIdWDzAPFJZgorR+KXs592iWqN0zHLoUgP+ThVqjAXqceb5z5/PiwEDC2VRQjds/w+IbtjDOlFn66ap18FsomSoBDZREqkvzQGm0Tlic1L08f1NZdtjKg8KB8KgrGMuiphQECX3iiNtHSUOaiT0w+htW4rSYGYtCCamHh4vqKe/1KUsb6M9HpyUbbbBR3drz1pPCOBzJCviBUYlZiujWLZZrGYLLtBr5k8j226wbV5HjaI0vbddY4N2PGdM02M5fVPUtJHIK67Ko0JfOBFEsdZ1kmO+6D3ue4l9ehtXXkhE+dgBsMILxPQBjULqrwfVwxoWYZACK4xVnmezz9fyidnnXMmxZmO+o8zHfVtVhNjRJX8mzpgyUYCtLGTRWddXFz8M4lu/vx+EK2sHrwQVYgjlVwK0hYxBFI3i7+Hkg6rvB9f7S3ue/fuWjDlxQcmm04/r/I8bBLFolL1nEnROFET2oGQA2mudWSR8DJhgDg5xEliyRxbqaZPmJSoqT5qR9C1VCGfSMWYphWc9+TJ5sj5l63oXBlSfdQOgNoiJEOtsHlKZYDISFFBX3fmbSJJ1A4gu/FJDP1iwqrbnlwKWGD+snlSQ8AZUed+yWYcc3PZJ6enp//MWsakzgORpDHB0NiLiXl1mcCGqONeOTo6/lc24ziTUl+ckbW1NkaQgjgDCBNy8YYgtuuiVXh5S0abIDl0JB21A2D/FM9T1bKbEqMqMQLaNBUC9k9fFFYorbuv6H3T3i5QSNTTEYlapKZUK8awvb3tTU22RY05js7OkmWr60iRfoPXSDo+iySFdHU8RbYQMz1Ou9ZRk3mqJYh7tgpCS7IOmGYCSI5WGaQqSpMB3EOMc00SNXNLVIHELYh00xASiQeqaglN8Yy5csma3J1bidpEO/iqSBK1ZUj2KISyRI0trePCRe3V2TLc10XaTCUMAomoCYNAImrCIJCIOgAUpYya8e/7bKhS27+vSJupHkLq7dv+AECi7ut2QdS1Ydkgrq2tnYcf6nuQt9ZULGoTSBK1ZyCAhXRtXWmaQBap9S/FeSk7VCdTQIjHNSgvJImXr1+/ys1s/J17UDzuzZufW6lrUAdJovYIkJS+s5DFFzgCcaRnAUSNKdTrugZEFG+XreuPlIXAkqfGs0w7dypJ1B5BavxDVF+VaQijM3mrBp/gIWMySCKkq64/Elx+z4SwTZungUTUnkDX+JfOhjarVKDD/KSNUSxIYOT6ZNiGdNznzy/qIsjzTBOJqD2Ba9PiI6A9tooeCbF1VxUfkKh6QrgaqXWJRNSeQHpMCcoKaUyCmHhWoJ9nkuzkJpA2Uz0COqOE9bXZmCy2XPrh4WizDSoQTqsNZSJqz1BGBGm4Owlid/C2H9c0e1AlovYcbLKwAEhyXhN6YqwRf7xk03w2LSSi9hCuTtBiL5XlWPdUnQUkonYMDOpISSkfZCFVCYWgkNMWSAs1Fb6sSETtGOL1wWVZVkBNOktPC1bNmGY7oGSe6hg+Ew86qCYpvv1pkhTYurjTdKMmonYIlnXxPtlufNYV2kbj4KrQHbmBbdPZJdLS3yFCWae2UXFoZ96VmYh2RgJf9W3Z+FGBcG9v31tqc1IkonYEllEdaKKJWLV7tC8GAEAa7jNpUTVd8Bj4eiIQCijH3b59J1cPvvyyXtv2ENLSPwGqEICGaxqhhha6VqoFRET6+iQuFoEy+2dMgIlWRSCfS1/WqowAgrdhlUhEDaDwby/nH5YO1xYs5XiKyn746HbZt14f61e3QdHyO67F8qp1WCpxA5HaVpe0ZOIaIbLyd1FFWPLv33cf63MAtBG8kgpQZO4CFHzINguN2VhQW/IH6KbG0vRDIv4BmQBCCshblJV8n1dkEfD3334rnASYu9ggCUkliop7FI1CFs5LxoOyNpeco58BcCxLv9VTJy6NniU4iYokDemCk4KcJGvukZ6srk2XtJ+05EbSC0GlVaYmifQvgODSLdHX+xVIoxB7Lx90MxDO4x4uM1YiagMIlfSZFoqmGlcb7Tflugaqie5m3VbEVirpc0nRpHE9RHKIOYR+rGkzlTAIJKImDAKJqAmDwB8+OgP2hcZUjQAAAABJRU5ErkJggg==" alt="Popup Design Lab" style="width:96px;height:auto;display:block;margin:0 auto 32px;">
+    <h1 class="auth-title">Quel designer<br>êtes-vous ?</h1>
+    <p class="auth-sub">Évaluez vos compétences design et découvrez votre profil.</p>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-signup" onclick="switchTab('signup')">S'inscrire</div>
+        <div class="auth-tab" id="tab-login" onclick="switchTab('login')">Se connecter</div>
+      </div>
+      <div class="auth-msg" id="authMsg"></div>
+      <div class="auth-field" id="field-name">
+        <label>Prénom</label>
+        <input type="text" id="authName" placeholder="Votre prénom">
+      </div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="votre@email.com">
+      </div>
+      <div class="auth-field">
+        <label>Mot de passe <span style="color:var(--ink-soft);font-weight:400">(min. 6 caractères)</span></label>
+        <input type="password" id="authPassword" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" id="authBtn" onclick="submitAuth()">Créer mon compte</button>
+    </div>
+  </div>
+</section>
+
+<!-- HOME -->
+<section class="screen padtop" id="s-home">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:48px 20px 60px;max-width:640px;margin:0 auto;width:100%;">
+    <img src="data:image/png;base64,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" alt="Popup Design Lab" id="homeLogo" style="height:56px;width:auto;margin-bottom:32px;display:none;">
+    <h1 style="text-align:center;margin-bottom:12px;">Quel designer<br>êtes-vous ?</h1>
+    <p style="text-align:center;color:var(--ink-soft);font-size:1rem;margin-bottom:32px;line-height:1.65;">Évaluez vos compétences dans 8 domaines du design et découvrez votre profil en T.</p>
+    <button class="btn-primary" onclick="_retakeQuiz()" style="margin-bottom:36px;">Commencer</button>
+    <div id="homeTimeline" style="display:none;width:100%;">
+      <p style="font-size:0.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;">Votre progression</p>
+      <div class="timeline" id="homeTimelineCards"></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMAIN PICKER -->
+<section class="screen padtop" id="s-domains">
+  <h2>Choisissez un domaine</h2>
+  <p class="pick-sub">Faites-les dans l'ordre que vous souhaitez</p>
+  <div class="domain-bars" id="domainGrid"></div>
+</section>
+
+<!-- QUIZ -->
+<section class="screen padtop" id="s-quiz">
+  <div class="quiz-wrap">
+    <div class="quiz-meta">
+      <span class="domain-tag" id="quizDomainTag"></span>
+      <span class="q-counter" id="quizCounter"></span>
+      <button onclick="quitQuiz()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;font-size:1rem;cursor:pointer;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s,color .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-soft)'">×</button>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="quizBar"></div></div>
+    <div class="question-card">
+      <h3 id="quizQuestion"></h3>
+      <div class="options" id="quizOptions"></div>
+      <div class="quiz-nav">
+        <button class="btn-secondary" id="quizBack" onclick="quizPrev()">← Retour</button>
+        <button class="btn-primary" id="quizNext" onclick="quizNext()">Suivant</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTINUE -->
+<section class="screen padtop" id="s-continue">
+  <div class="continue-wrap">
+    <h2>On continue ?</h2>
+    <p class="sub" id="continueMsg"></p>
+    <div class="domain-bars" id="continueGrid"></div>
+    <div class="continue-actions">
+      <button class="btn-results" id="btnResults" style="display:none" onclick="showResults()">Voir mes résultats</button>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="screen padtop" id="s-results">
+  <div class="results-wrap">
+    <h2>Vos résultats</h2>
+    <p class="sub">Vos compétences par domaine</p>
+    <div class="result-bars" id="resultBars"></div>
+    <div id="avatarPreview" onclick="continuerVersAvatar()" style="cursor:pointer;margin-bottom:12px;display:none;"></div>
+    <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Continuer</button>
+  </div>
+</section>
+
+<!-- AVATAR -->
+<section class="screen padtop" id="s-avatar">
+  <div class="avatar-wrap">
+    <h2>Mon avatar</h2>
+    <p class="sub">Choisissez une illustration et entrez votre prénom</p>
+    <input type="text" id="nameInput" class="name-input" placeholder="Votre prénom">
+    <div class="avatar-gallery" id="avatarGallery"></div>
+    <!-- Hidden card used as state holder for JS; not displayed on avatar screen -->
+    <div style="display:none;">
+      <div class="avatar-card bg-0" id="avatarCard">
+        <img id="avatarCardImg" src="" alt="avatar">
+        <p id="avatarCardText" style="display:none;">Choisissez un avatar et entrez votre prénom</p>
+        <img class="card-logo" src="data:image/png;base64,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" alt="Popup Design Lab">
+      </div>
+    </div>
+    <div class="avatar-btns">
+      <button class="btn-primary" style="width:100%;max-width:300px;" onclick="goToProgression()">Continuer</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESSION -->
+<section class="screen padtop" id="s-progression">
+  <div class="prog-wrap">
+    <h2>Votre progression</h2>
+    <p class="sub">Revenez régulièrement pour mesurer votre évolution</p>
+    <div id="progressionBars" style="display:none;margin-bottom:32px;"></div>
+    <div class="timeline" id="timeline"></div>
+    <button onclick="showSkills()" class="btn-skills" style="width:100%;max-width:400px;margin:12px auto 0;">Monter en compétence</button>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section class="screen padtop" id="s-profile">
+  <div class="profile-wrap">
+    <h2>Mon profil</h2>
+
+    <div class="profile-section" style="margin-top:24px;">
+      <div class="profile-avatar-preview" onclick="goToAvatarScreen()" style="cursor:pointer;" title="Modifier mon avatar">
+        <div id="profileAvatarCircle" class="profile-avatar-placeholder">?</div>
+        <div class="profile-avatar-info">
+          <div class="profile-avatar-name" id="profileDisplayName">—</div>
+          <div class="profile-avatar-sub">Cliquez pour changer d'avatar</div>
+        </div>
+        <span style="font-size:0.88rem;color:var(--ink-soft);">→</span>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">Mes formations recommandées</div>
+      <div id="profileSkillsContent"></div>
+    </div>
+
+    <button onclick="history.back ? showPreviousScreen() : goTo('s-progression')" style="background:none;border:none;font-size:0.88rem;font-weight:700;color:var(--ink-soft);cursor:pointer;padding:0;">← Retour</button>
+  </div>
+</section>
+
+<!-- SKILLS / FORMATIONS -->
+<section class="screen padtop" id="s-skills">
+  <h2>Nos recommandations</h2>
+  <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
+  <div id="skillsContent" style="width:100%;max-width:560px;"></div>
+  <button class="btn-skills" onclick="goTo('s-progression')" style="margin-top:12px;">← Retour</button>
+</section>
+
+<!-- DASHBOARD -->
+<section class="screen padtop" id="s-dashboard">
+  <h2>Tableau de bord</h2>
+  <p class="dash-sub">Progression des participants en temps réel</p>
+  <div class="dash-stats">
+    <div class="stat-card"><div class="stat-val" id="statTotal">—</div><div class="stat-label">Participants</div></div>
+    <div class="stat-card"><div class="stat-val" id="statDone">—</div><div class="stat-label">Terminés</div></div>
+    <div class="stat-card"><div class="stat-val" id="statProgress">—</div><div class="stat-label">En cours</div></div>
+  </div>
+  <div class="dash-refresh">
+    <button class="btn-small" onclick="loadDashboard()">↻ Actualiser</button>
+  </div>
+  <div class="dash-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Prénom</th>
+          <th>Email</th>
+          <th>Progression</th>
+          <th>Top 3 domaines</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody id="dashBody"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:20px;text-align:center;">
+    <button class="btn-secondary" onclick="showDomains()">← Retour au quiz</button>
+  </div>
+</section>
+
+<script src="avatars_data.js" defer></script>
+<script>
+// ── MODAL ──
+function showConfirm({ title, message, confirmLabel = 'Confirmer', danger = false, onConfirm }) {
+  document.getElementById('modalTitle').textContent = title || '';
+  document.getElementById('modalMsg').textContent = message || '';
+  const btn = document.getElementById('modalConfirm');
+  btn.textContent = confirmLabel;
+  btn.className = 'modal-confirm' + (danger ? ' danger' : '');
+  const overlay = document.getElementById('modal');
+  overlay.classList.add('open');
+  const close = () => overlay.classList.remove('open');
+  document.getElementById('modalCancel').onclick = close;
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  btn.onclick = () => { close(); onConfirm(); };
+}
+
+// ── CONFIG ──
+const SUPABASE_URL = 'https://pwosfdnirfnlgrhfwaqc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3b3NmZG5pcmZubGdyaGZ3YXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NDU2MzksImV4cCI6MjEwMDEyMTYzOX0.z865AaPz16lOZecYexpfVKRe0Ia9b2ivRvlfovr6Jn8';
+const TEACHER_EMAIL = 'valeriekoplewicz@gmail.com';
+const DOMAINS_COUNT = 8;
+
+window.onerror = function(msg, src, line) {
+  const el = document.getElementById('authMsg');
+  if (el) { el.textContent = 'Erreur JS : ' + msg + ' (ligne ' + line + ')'; el.className = 'auth-msg error visible'; }
+  return false;
+};
+
+// ── DATA ──
+const DATA = {
+  "Service Design":  ["Réaliser un service blueprint","Construire un business model canvas et formuler une proposition de valeur","Animer un atelier de cadrage projet avec les parties prenantes","Définir des indicateurs de succès pour un service (adoption, satisfaction, usage)","Réaliser une analyse concurrentielle","Animer des ateliers de design prospectif ou de design de fiction"],
+  "User Research":   ["Cadrer une recherche utilisateur","Réaliser des personae","Conduire des interviews utilisateur","Réaliser des experience maps","Mener des A/B tests","Analyser des données quantitatives (usage, comportement)"],
+  "UX Design":       ["Réaliser des wireframes","Conduire un audit ergonomique","Animer des ateliers de conception","Conduire et animer des tests d'utilisabilité","Rédiger des principes de design","Structurer la hiérarchie d'information"],
+  "UX Writing":      ["Réaliser un audit éditorial","Poser un tone of voice","Rédiger des microcopies","Formaliser une charte éditoriale / des guidelines de rédaction","Tester un contenu auprès des utilisateurs (UX Writing)","Rédaction de prompts système"],
+  "UI Design":       ["Maîtriser un outil de conception UI (Figma, Sketch…)","Adapter une interface à différents contextes (responsive, dark mode, multi-plateforme)","Connaître et appliquer les règles d'accessibilité","Gérer les micro-interactions","Concevoir des composants UI pour des interfaces conversationnelles (chatbots, assistants IA)","Réaliser une recette UI avec les développeurs (contrôle qualité avant livraison)"],
+  "Design Ops":      ["Structurer un onboarding designer","Animer une communauté de pratique","Outiller et faire évoluer la stack design de l'équipe","Mesurer l'impact de la practice design en interne (maturité, ROI, adoption)","Piloter un audit d'organisation design","Rédiger une offre d'emploi designer"],
+  "Design System":   ["Créer un token de design","Documenter un composant","Gouverner les contributions au Design System","Auditer la cohérence d'une interface","Versionner et maintenir un Design System","Mesurer l'adoption du Design System"],
+  "UI Engineer":     ["Implémenter une interface en HTML/CSS ou dans un framework front-end (React, Vue…)","Traduire les tokens de design en variables de code (CSS custom properties, thème)","Construire ou contribuer à une librairie de composants codés (Storybook, tests visuels)","Lire une maquette en Dev Mode et écrire un layout fidèle au design","Auditer l'accessibilité d'une interface codée (lecteur d'écran, contraste, ARIA, outils automatisés)","Optimiser les performances d'une interface (temps de chargement, poids des assets)"]
+};
+const DOMAINS = Object.keys(DATA);
+const OPTIONS = [
+  { value: 0,   label: "Ce n'est pas mon domaine de compétence" },
+  { value: 0.5, label: "Je vois à peu près comment faire…" },
+  { value: 1,   label: "Je sais faire, je sais estimer mon temps" },
+  { value: 2,   label: "Je peux challenger la méthode, l'adapter ou l'enseigner" }
+];
+
+// ── STATE ──
+let currentUser = null;
+let scores = {};
+const completedDomains = new Set();
+let currentDomain = null;
+let currentQIndex = 0;
+let selectedValue = null;
+let top3Domains = [];
+let isRetake = false;
+let authMode = 'signup';
+
+DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+
+// ── SUPABASE REST ──
+let SB_TOKEN = null;
+
+async function sbRest(path, opts = {}) {
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Content-Type': 'application/json',
+    ...(SB_TOKEN ? { 'Authorization': 'Bearer ' + SB_TOKEN } : {}),
+    ...(opts.headers || {})
+  };
+  const res = await fetch(SUPABASE_URL + path, { ...opts, headers });
+  const txt = await res.text();
+  let body; try { body = JSON.parse(txt); } catch { body = txt; }
+  if (!res.ok) {
+    const msg = body?.error_description || body?.message || body?.msg || body?.error || res.status + ' ' + res.statusText;
+    throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+  }
+  return body;
+}
+
+async function loadSession() {
+  try {
+    const rows = await sbRest(`/rest/v1/quiz_sessions?user_id=eq.${currentUser.id}&select=*`);
+    return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+  } catch { return null; }
+}
+
+async function saveSession(finished = false) {
+  try {
+    await sbRest('/rest/v1/quiz_sessions', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({
+        user_id: currentUser.id, scores,
+        completed_domains: Array.from(completedDomains),
+        finished, top3: top3Domains,
+        updated_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { console.warn('saveSession:', e.message); }
+}
+
+// ── NAVIGATION ──
+function goHome() {
+  if (currentUser) showHome();
+  else goTo('s-auth');
+}
+
+function showHome() {
+  const history = getHistory();
+  const tl = document.getElementById('homeTimeline');
+  const cards = document.getElementById('homeTimelineCards');
+  const homeLogo = document.getElementById('homeLogo');
+  if (history.length > 0) {
+    if (homeLogo) homeLogo.style.display = 'block';
+    tl.style.display = 'block';
+    // Personalized welcome
+    const lastEntry = history[history.length - 1];
+    const userName = lastEntry.name || document.getElementById('topbarUser').textContent || '';
+    const h1 = document.querySelector('#s-home h1');
+    const sub = document.querySelector('#s-home p[style*="color:var(--ink-soft)"]');
+    if (h1) h1.innerHTML = `Bonjour ${userName}&nbsp;👋`;
+    if (sub) sub.textContent = 'On est ravi de te revoir. Tu souhaites revoir la progression de tes expertises ? À toi de jouer';
+    cards.innerHTML = '';
+    history.forEach((entry, idx) => {
+      const col = ENTRY_COLORS[(entry.colorIdx ?? idx) % ENTRY_COLORS.length];
+      const domainsStr = (entry.domains || []).join(' · ');
+      const imgTag = entry.avatarSrc ? `<img src="${entry.avatarSrc}" alt="avatar">` : '';
+      const card = document.createElement('div');
+      card.className = 'timeline-card';
+      card.style.cursor = 'pointer';
+      card.innerHTML = `
+        <div class="timeline-label">${entry.date}</div>
+        <div class="timeline-avatar-card" style="background:${col.bg}">
+          ${imgTag}
+          <div class="tac-name">${entry.name}</div>
+          <div class="tac-domains">${domainsStr}</div>
+        </div>`;
+      card.onclick = () => showEntryResults(entry);
+      cards.appendChild(card);
+    });
+    // "Nouveau" slot
+    const newCard = document.createElement('div');
+    newCard.className = 'timeline-card future';
+    newCard.innerHTML = `
+      <div class="timeline-label">Nouveau</div>
+      <div class="timeline-empty"><span class="timeline-empty-label">＋</span></div>
+      <div class="timeline-date">Faire un nouveau bilan</div>`;
+    newCard.onclick = retakeQuiz;
+    cards.appendChild(newCard);
+  } else {
+    tl.style.display = 'none';
+    const h1 = document.querySelector('#s-home h1');
+    const sub = document.querySelector('#s-home p[style*="color:var(--ink-soft)"]');
+    if (h1) h1.innerHTML = 'Quel designer<br>êtes-vous ?';
+    if (sub) sub.textContent = 'Voici une application pour évaluer ton niveau d\'expertise design. Cela pourra t\'aider à faire un bilan sur ton niveau d\'expertise et les actions à mener pour monter en compétence sur certain domaine. L\'idée n\'est pas d\'être "bon partout" mais de pouvoir se présenter avec au moins 3 expertises à mettre en avant. A toi de jouer !';
+  }
+  goTo('s-home');
+}
+
+function showProgressionFromHome() {
+  renderTimeline(getHistory());
+  goTo('s-progression');
+}
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  updateGlobalProgress(id);
+  if (currentUser) updateProfileCircle();
+}
+
+function updateGlobalProgress(screenId) {
+  const quizScreens = ['s-domains', 's-quiz', 's-continue'];
+  const bar = document.getElementById('quizProgress');
+  if (!bar) return;
+  if (quizScreens.includes(screenId)) {
+    bar.classList.add('visible');
+    document.body.classList.add('quiz-active');
+    bar.innerHTML = DOMAINS.map(d =>
+      `<span class="qp-chip${completedDomains.has(d) ? ' done' : ''}">${d}</span>`
+    ).join('');
+  } else {
+    bar.classList.remove('visible');
+    document.body.classList.remove('quiz-active');
+  }
+}
+
+function showTopbar(name, email) {
+  document.getElementById('topbar').classList.add('visible');
+  document.getElementById('topbarUser').textContent = name || email;
+  if (email === TEACHER_EMAIL) document.getElementById('btnDashboard').style.display = 'inline-block';
+  updateProfileCircle();
+}
+
+function updateProfileCircle() {
+  const circle = document.getElementById('profileCircle');
+  const initial = document.getElementById('profileInitial');
+  const avatarImg = document.getElementById('profileAvatar');
+  if (!circle) return;
+  circle.style.display = 'flex';
+  const name = document.getElementById('topbarUser').textContent || '';
+  if (selectedAvatar) {
+    avatarImg.src = selectedAvatar;
+    avatarImg.style.display = 'block';
+    initial.style.display = 'none';
+  } else {
+    avatarImg.style.display = 'none';
+    initial.style.display = 'block';
+    initial.textContent = name ? name[0].toUpperCase() : '?';
+  }
+}
+
+// ── AUTH UI ──
+function switchTab(mode) {
+  authMode = mode;
+  document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+  document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+  document.getElementById('field-name').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('authBtn').textContent = mode === 'signup' ? 'Créer mon compte' : 'Se connecter';
+  document.getElementById('authMsg').className = 'auth-msg';
+}
+
+function showAuthMsg(msg, type) {
+  const el = document.getElementById('authMsg');
+  el.textContent = msg;
+  el.className = 'auth-msg ' + type + ' visible';
+}
+
+async function submitAuth() {
+  const btn = document.getElementById('authBtn');
+  const email    = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const name     = document.getElementById('authName').value.trim();
+
+  if (!email || !password) return showAuthMsg('Veuillez remplir tous les champs.', 'error');
+  if (authMode === 'signup' && !name) return showAuthMsg('Veuillez entrer votre prénom.', 'error');
+
+  btn.disabled = true;
+  btn.textContent = '…';
+  document.getElementById('authMsg').className = 'auth-msg';
+
+  try {
+    if (authMode === 'signup') {
+      const res = await sbRest('/auth/v1/signup', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, data: { name } })
+      });
+      if (!res.access_token) {
+        showAuthMsg('Inscription réussie ! Vérifiez votre email puis connectez-vous.', 'success');
+        switchTab('login');
+        document.getElementById('authEmail').value = email;
+        btn.disabled = false; btn.textContent = 'Se connecter';
+        return;
+      }
+      SB_TOKEN = res.access_token;
+      currentUser = res.user;
+      localStorage.setItem('qd_token', SB_TOKEN);
+      localStorage.setItem('qd_user', JSON.stringify(res.user));
+      try { await sbRest(`/rest/v1/profiles?id=eq.${res.user.id}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ name }) }); } catch{}
+      await afterLogin(name);
+
+    } else {
+      const res = await sbRest('/auth/v1/token?grant_type=password', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+      SB_TOKEN = res.access_token;
+      currentUser = res.user;
+      localStorage.setItem('qd_token', SB_TOKEN);
+      localStorage.setItem('qd_user', JSON.stringify(res.user));
+      await afterLogin('');
+    }
+  } catch(e) {
+    showAuthMsg(e.message || 'Une erreur est survenue.', 'error');
+    btn.disabled = false;
+    btn.textContent = authMode === 'signup' ? 'Créer mon compte' : 'Se connecter';
+  }
+}
+
+async function afterLogin(fallbackName) {
+  let profileName = fallbackName || currentUser.user_metadata?.name || '';
+  try {
+    const rows = await sbRest(`/rest/v1/profiles?id=eq.${currentUser.id}&select=name`);
+    if (rows?.[0]?.name) profileName = rows[0].name;
+  } catch {}
+
+  showTopbar(profileName || currentUser.email, currentUser.email);
+  const ni = document.getElementById('nameInput');
+  if (ni && profileName) ni.value = profileName;
+
+  // Restore avatar from most recent history entry
+  const historyOnLogin = getHistory();
+  if (historyOnLogin.length > 0) {
+    const lastEntry = historyOnLogin[historyOnLogin.length - 1];
+    if (lastEntry.avatarSrc) {
+      selectedAvatar = lastEntry.avatarSrc;
+      const imgEl = document.getElementById('avatarCardImg');
+      if (imgEl) { imgEl.src = lastEntry.avatarSrc; imgEl.style.display = 'inline-block'; }
+      updateProfileCircle();
+    }
+    if (lastEntry.name && !document.getElementById('nameInput').value) {
+      document.getElementById('nameInput').value = lastEntry.name;
+    }
+  }
+
+  const session = await loadSession();
+  if (session) {
+    scores = session.scores || {};
+    (session.completed_domains || []).forEach(d => completedDomains.add(d));
+    top3Domains = session.top3 || [];
+    if (session.finished) {
+      const history = getHistory();
+      if (history.length > 0) renderTimeline(history);
+      // #20 — always land on home after login so user sees the welcome screen
+      pendingColorIdx = getHistory().length % ENTRY_COLORS.length;
+      showHome();
+      return;
+    }
+    if (completedDomains.size > 0) { pendingColorIdx = getHistory().length % ENTRY_COLORS.length; showContinue(); return; }
+  }
+  pendingColorIdx = getHistory().length % ENTRY_COLORS.length;
+  showHome();
+}
+
+function signOut() {
+  localStorage.removeItem('qd_token');
+  localStorage.removeItem('qd_user');
+  SB_TOKEN = null; currentUser = null; scores = {};
+  completedDomains.clear(); top3Domains = [];
+  selectedAvatar = null; selectedBg = 0;
+  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  document.getElementById('topbar').classList.remove('visible');
+  document.getElementById('btnDashboard').style.display = 'none';
+  const circle = document.getElementById('profileCircle');
+  if (circle) circle.style.display = 'none';
+  goTo('s-auth'); switchTab('signup');
+}
+
+// ── DOMAIN SCORES HELPER ──
+function getDomainScores() {
+  return DOMAINS.map(domain => {
+    let sum = 0;
+    DATA[domain].forEach((_, i) => sum += (scores[domain + '|' + i] || 0));
+    return { domain, sum, max: DATA[domain].length * 2 };
+  });
+}
+
+// ── DOMAIN BARS ──
+function buildDomainBars(containerId, clickable) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const domainScores = getDomainScores();
+
+  DOMAINS.forEach(domain => {
+    const isDone = completedDomains.has(domain);
+    const ds = domainScores.find(d => d.domain === domain);
+    const pct = isDone && ds ? Math.round(ds.sum / ds.max * 100) : 0;
+
+    const row = document.createElement('div');
+    row.className = 'domain-bar-row' + (isDone ? ' done' : '');
+
+    const fill = document.createElement('div');
+    fill.className = 'domain-bar-fill';
+    fill.style.width = isDone ? Math.max(pct, 20) + '%' : '30%';
+
+    const label = document.createElement('div');
+    label.className = 'domain-bar-label';
+    label.innerHTML = `<span>${domain}</span><span class="domain-bar-check">✓</span>`;
+
+    row.appendChild(fill);
+    row.appendChild(label);
+
+    if (clickable && !isDone) {
+      row.onclick = () => startQuiz(domain);
+    } else if (clickable && isDone) {
+      // Allow re-doing a domain from continue screen
+      row.title = `${domain} — ${pct}% — Cliquez pour refaire`;
+      row.style.cursor = 'pointer';
+      row.onclick = () => startQuiz(domain);
+    }
+
+    el.appendChild(row);
+
+    // Animate fill width after render
+    if (isDone) {
+      requestAnimationFrame(() => { fill.style.width = Math.max(pct, 20) + '%'; });
+    }
+  });
+}
+
+function buildProgressDots() {
+  // replaced by updateGlobalProgress chips — no-op
+}
+
+function showDomains() {
+  buildDomainBars('domainGrid', true);
+  buildProgressDots();
+  goTo('s-domains');
+}
+
+// ── QUIZ ──
+function startQuiz(domain) {
+  currentDomain = domain;
+  currentQIndex = 0;
+  selectedValue = scores[domain + '|0'] ?? 0;
+  renderQuestion();
+  goTo('s-quiz');
+}
+
+function renderQuestion() {
+  const items = DATA[currentDomain];
+  const total = items.length;
+  document.getElementById('quizDomainTag').textContent = currentDomain;
+  document.getElementById('quizCounter').textContent = `${currentQIndex + 1} / ${total}`;
+  document.getElementById('quizBar').style.width = (currentQIndex / total * 100) + '%';
+  document.getElementById('quizQuestion').textContent = items[currentQIndex];
+
+  selectedValue = scores[currentDomain + '|' + currentQIndex] ?? 0;
+
+  const optionsEl = document.getElementById('quizOptions');
+  optionsEl.innerHTML = '';
+  const previousValue = selectedValue;
+  OPTIONS.forEach(opt => {
+    const label = document.createElement('label');
+    const isSelected = selectedValue === opt.value;
+    const isPrevious = isRetake && isSelected && previousValue > 0;
+    label.className = 'option' + (isSelected ? ' selected' : '');
+    label.innerHTML = `<span class="badge">✓</span><span class="opt-text">${opt.label}</span>${isPrevious ? '<span style="font-size:0.68rem;color:var(--ink-soft);margin-left:auto;padding-left:8px;white-space:nowrap;flex-shrink:0;">Votre réponse ↩</span>' : ''}`;
+    label.onclick = () => selectOption(opt.value);
+    optionsEl.appendChild(label);
+  });
+
+  const nextBtn = document.getElementById('quizNext');
+  nextBtn.textContent = currentQIndex === total - 1 ? 'Terminer' : 'Suivant';
+  const backBtn = document.getElementById('quizBack');
+  if (currentQIndex === 0) {
+    backBtn.textContent = '← Domaines';
+    backBtn.onclick = showContinue;
+    backBtn.style.visibility = 'visible';
+  } else {
+    backBtn.textContent = '← Retour';
+    backBtn.onclick = quizPrev;
+    backBtn.style.visibility = 'visible';
+  }
+}
+
+function selectOption(value) {
+  selectedValue = value;
+  scores[currentDomain + '|' + currentQIndex] = value;
+  document.querySelectorAll('#quizOptions .option').forEach(el => el.classList.remove('selected'));
+  const idx = OPTIONS.findIndex(o => o.value === value);
+  document.querySelectorAll('#quizOptions .option')[idx]?.classList.add('selected');
+}
+
+async function quizNext() {
+  scores[currentDomain + '|' + currentQIndex] = selectedValue ?? 0;
+  const total = DATA[currentDomain].length;
+  if (currentQIndex < total - 1) {
+    currentQIndex++;
+    selectedValue = scores[currentDomain + '|' + currentQIndex] ?? 0;
+    renderQuestion();
+  } else {
+    completedDomains.add(currentDomain);
+    await saveSession(false);
+    await showDomainTransition(currentDomain);
+    showContinue();
+  }
+}
+
+function showDomainTransition(domain) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('domainTransition');
+    document.getElementById('dtDomain').textContent = domain;
+    // mini progress dots
+    const done = completedDomains.size;
+    document.getElementById('dtProgress').innerHTML = DOMAINS.map((_, i) =>
+      `<div class="dt-seg${i < done ? ' done' : ''}"></div>`
+    ).join('');
+    // show
+    overlay.classList.add('show');
+    // hide after 1.6s
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      setTimeout(resolve, 260); // wait for fade-out
+    }, 1600);
+  });
+}
+
+function quizPrev() {
+  if (currentQIndex > 0) {
+    currentQIndex--;
+    selectedValue = scores[currentDomain + '|' + currentQIndex] ?? 0;
+    renderQuestion();
+  } else {
+    showDomains();
+  }
+}
+
+// ── CONTINUE ──
+function showContinue() {
+  const done = completedDomains.size;
+  const total = DOMAINS.length;
+  const remaining = total - done;
+  const allDone = remaining <= 0;
+  document.getElementById('continueMsg').textContent = allDone
+    ? 'Vous avez évalué tous les domaines !'
+    : `Plus que ${remaining} domaine${remaining > 1 ? 's' : ''} à évaluer — cliquez sur un pour continuer.`;
+  buildDomainBars('continueGrid', true);
+  document.getElementById('btnResults').style.display = allDone ? 'inline-block' : 'none';
+  goTo('s-continue');
+  if (allDone) {
+    document.getElementById('quizProgress')?.classList.remove('visible');
+    document.body.classList.remove('quiz-active');
+  }
+}
+
+// ── RESULTS ──
+function computeAndShowResults() {
+  const domainScores = getDomainScores();
+  const sorted = [...domainScores].sort((a, b) => b.sum - a.sum);
+  top3Domains = sorted.slice(0, 3).map(d => d.domain);
+  const maxMax = sorted[0]?.max || 1;
+
+  const barsEl = document.getElementById('resultBars');
+  barsEl.innerHTML = '';
+  sorted.forEach((d, i) => {
+    const pct = Math.round(d.sum / d.max * 100);
+    const fillPct = Math.round(d.sum / maxMax * 100);
+    const tier = i < 3 ? (i === 0 ? 'top' : 'mid') : 'low';
+    const row = document.createElement('div');
+    row.className = 'result-bar-row ' + tier;
+    row.innerHTML = `
+      <div class="result-bar-fill" style="width:0%"></div>
+      <div class="result-bar-label">
+        <span>${d.domain}</span>
+        <span class="result-bar-pct">${pct}%</span>
+      </div>`;
+    row.onclick = () => startQuiz(d.domain);
+    barsEl.appendChild(row);
+    requestAnimationFrame(() => {
+      row.querySelector('.result-bar-fill').style.width = Math.max(fillPct, 4) + '%';
+    });
+  });
+
+  updateAvatarCardText();
+  updateResultsPreview();
+  goTo('s-results');
+}
+
+function updateResultsPreview() {
+  const preview = document.getElementById('avatarPreview');
+  const btn = document.getElementById('btnGoAvatar');
+  if (selectedAvatar) {
+    const col = ENTRY_COLORS[pendingColorIdx % ENTRY_COLORS.length];
+    const name = document.getElementById('nameInput').value.trim() || '';
+    const sentence = buildSentence();
+    const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    preview.innerHTML = `
+      <div class="avatar-card" style="position:relative;width:100%;max-width:220px;margin:0 auto;background:${col.bg};">
+        <button class="card-download-btn" onclick="event.stopPropagation();triggerDownload()" title="Télécharger ma carte">↓</button>
+        <div style="font-size:0.6rem;color:#888;text-align:center;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;">${dateStr}</div>
+        <img src="${selectedAvatar}" alt="avatar" style="display:inline-block;">
+        <p style="font-size:0.82rem;font-weight:500;color:#111;margin-top:8px;line-height:1.4;">${sentence}</p>
+        <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;">
+      </div>`;
+    preview.style.display = 'block';
+    preview.onclick = null;
+    btn.textContent = 'Continuer';
+  } else {
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+    btn.textContent = 'Continuer';
+  }
+}
+
+async function showResults() {
+  computeAndShowResults();
+  isRetake = false;
+  await saveSession(true);
+}
+
+// ── UNIFIED COLOR PALETTE ──
+const ENTRY_COLORS = [
+  { bg: '#dbeef8', stroke: '#4d8fb5' },
+  { bg: '#f8e0db', stroke: '#b55b4d' },
+  { bg: '#f8f2db', stroke: '#b5a44d' },
+  { bg: '#dbf5e8', stroke: '#4db57a' },
+  { bg: '#eedbf8', stroke: '#8a4db5' },
+  { bg: '#f8ecdb', stroke: '#b5844d' },
+  { bg: '#dbf5f4', stroke: '#4db5b2' },
+  { bg: '#f8dbf2', stroke: '#b54d99' },
+];
+const DOMAIN_LABELS = ['Service D.','User R.','UX','Writing','UI','Ops','DS','UI Eng.'];
+
+function drawProgressionBars(history) {
+  const el = document.getElementById('progressionBars');
+  const allEntries = history.filter(e => e.domainScores && e.domainScores.length);
+  if (!allEntries.length) { el.style.display = 'none'; return; }
+  // Show up to 3 most recent bilans
+  const entries = allEntries.slice(-3);
+  el.style.display = 'block';
+  el.innerHTML = '';
+
+  // Legend
+  const legend = document.createElement('div');
+  legend.className = 'prog-chart-legend';
+  entries.forEach((entry, ei) => {
+    const col = ENTRY_COLORS[(entry.colorIdx ?? ei) % ENTRY_COLORS.length];
+    const item = document.createElement('div');
+    item.className = 'prog-legend-item';
+    item.innerHTML = `<span class="prog-legend-dot" style="background:${col.bg};border:2px solid ${col.stroke};"></span>${entry.dateBase || entry.date}`;
+    legend.appendChild(item);
+  });
+  el.appendChild(legend);
+
+  // 60% threshold label
+  const thresholdLabel = document.createElement('div');
+  thresholdLabel.className = 'prog-threshold-label';
+  thresholdLabel.textContent = 'Seuil 60%';
+  el.appendChild(thresholdLabel);
+
+  // Scrollable chart
+  const chartWrap = document.createElement('div');
+  chartWrap.className = 'prog-chart-wrap';
+  const chart = document.createElement('div');
+  chart.className = 'prog-chart';
+  const CHART_H = 170; // px height of bar area
+
+  DOMAINS.forEach((domain, di) => {
+    const abbr = DOMAIN_LABELS[di] || domain;
+    const group = document.createElement('div');
+    group.className = 'prog-domain-group';
+
+    const barsRow = document.createElement('div');
+    barsRow.className = 'prog-bars-row';
+
+    const barEls = [];
+    entries.forEach((entry, ei) => {
+      const col = ENTRY_COLORS[(entry.colorIdx ?? ei) % ENTRY_COLORS.length];
+      const ds = entry.domainScores.find(d => d.domain === domain);
+      const pct = ds ? ds.pct : 0;
+      const barH = Math.max(pct * CHART_H / 100, pct > 0 ? 3 : 0);
+
+      const bar = document.createElement('div');
+      bar.className = 'prog-vbar';
+      bar.style.cssText = `height:0px;background:${col.bg};border:2px solid ${col.stroke};box-sizing:border-box;`;
+      bar.innerHTML = `<span class="prog-vbar-pct">${pct > 0 ? pct + '%' : ''}</span>`;
+      barsRow.appendChild(bar);
+      barEls.push({ bar, barH });
+    });
+
+    // threshold line at 60%
+    const thresholdH = CHART_H * 0.6;
+    barsRow.style.position = 'relative';
+    const thLine = document.createElement('div');
+    thLine.style.cssText = `position:absolute;bottom:${thresholdH}px;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,var(--ink-soft) 0,var(--ink-soft) 4px,transparent 4px,transparent 8px);pointer-events:none;`;
+    barsRow.appendChild(thLine);
+
+    const abbrEl = document.createElement('div');
+    abbrEl.className = 'prog-domain-abbr';
+    abbrEl.textContent = abbr;
+
+    group.appendChild(barsRow);
+    group.appendChild(abbrEl);
+    chart.appendChild(group);
+
+    requestAnimationFrame(() => {
+      barEls.forEach(({ bar, barH }) => { bar.style.height = barH + 'px'; });
+    });
+  });
+
+  chartWrap.appendChild(chart);
+  el.appendChild(chartWrap);
+}
+
+// ── PROGRESSION HISTORY ──
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('qd_history') || '[]'); } catch { return []; }
+}
+function saveHistory(h) {
+  localStorage.setItem('qd_history', JSON.stringify(h));
+}
+
+function goToProgression() {
+  const img = selectedAvatar || '';
+  const name = document.getElementById('nameInput').value.trim() || '';
+  const domains = top3Domains.slice(0, 3);
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+  const history = getHistory();
+  const hasSameDay = history.some(e => (e.dateBase || e.date) === dateStr);
+
+  const domainScores = getDomainScores().map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) }));
+
+  // If editing an existing entry, update it in place
+  if (editingHistoryIdx >= 0) {
+    history[editingHistoryIdx] = {
+      ...history[editingHistoryIdx],
+      name, domains, avatarSrc: img
+    };
+    editingHistoryIdx = -1;
+    saveHistory(history);
+    renderTimeline(history);
+    goTo('s-progression');
+    return;
+  }
+
+  const colorIdx = pendingColorIdx;
+  if (hasSameDay) {
+    history.forEach(e => {
+      if ((e.dateBase || e.date) === dateStr && !e.dateBase) {
+        e.dateBase = e.date;
+        e.date = e.date + ' · ' + (e.time || timeStr);
+      }
+    });
+    history.push({ date: dateStr + ' · ' + timeStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, avatarSrc: img, colorIdx });
+  } else {
+    history.push({ date: dateStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, avatarSrc: img, colorIdx });
+  }
+  saveHistory(history);
+
+  renderTimeline(history);
+  goTo('s-progression');
+}
+
+function renderTimeline(history) {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+
+  history.forEach((entry, idx) => {
+    const card = document.createElement('div');
+    card.className = 'timeline-card';
+    const col = ENTRY_COLORS[(entry.colorIdx ?? idx) % ENTRY_COLORS.length];
+    const domainsStr = (entry.domains || []).join(' · ');
+    const imgTag = entry.avatarSrc ? `<img src="${entry.avatarSrc}" alt="avatar">` : '';
+    // #22 — full card colored
+    card.style.background = col.bg;
+    card.style.borderColor = col.stroke + '55';
+    card.innerHTML = `
+      <div class="timeline-label">${entry.date}</div>
+      <div class="timeline-avatar-card" style="background:transparent">
+        ${imgTag}
+        <div class="tac-name">${entry.name}</div>
+        <div class="tac-domains">${domainsStr}</div>
+      </div>
+      <div class="card-actions">
+        <button class="card-btn danger">× Supprimer</button>
+      </div>`;
+    card.querySelector('.card-btn.danger').onclick = (e) => {
+      e.stopPropagation();
+      showConfirm({
+        title: 'Supprimer ce résultat ?',
+        message: 'Cette action est irréversible.',
+        confirmLabel: 'Supprimer',
+        danger: true,
+        onConfirm: () => deleteEntry(idx)
+      });
+    };
+    card.onclick = () => showEntryResults(entry);
+    tl.appendChild(card);
+  });
+
+  drawProgressionBars(history);
+
+  // "Nouveau" dashed card
+  const newCard = document.createElement('div');
+  newCard.className = 'timeline-card future';
+  const newBilanLabel = history.length === 0 ? 'Faire un bilan' : 'Faire un nouveau bilan';
+  newCard.title = newBilanLabel;
+  newCard.innerHTML = `
+    <div class="timeline-label">Nouveau</div>
+    <div class="timeline-empty"><span class="timeline-empty-label">＋</span></div>
+    <div class="timeline-date">${newBilanLabel}</div>`;
+  newCard.onclick = retakeQuiz;
+  tl.appendChild(newCard);
+}
+
+function showEntryResults(entry) {
+  top3Domains = entry.domains || [];
+  const barsEl = document.getElementById('resultBars');
+  barsEl.innerHTML = '';
+  const domains = entry.domains || [];
+  domains.forEach((domain, i) => {
+    const tier = i === 0 ? 'top' : 'mid';
+    const row = document.createElement('div');
+    row.className = 'result-bar-row ' + tier;
+    const fillPct = 100 - i * 20;
+    row.innerHTML = `
+      <div class="result-bar-fill" style="width:0%"></div>
+      <div class="result-bar-label">
+        <span>${domain}</span>
+        <span class="result-bar-pct">${['🥇','🥈','🥉'][i]}</span>
+      </div>`;
+    barsEl.appendChild(row);
+    requestAnimationFrame(() => {
+      row.querySelector('.result-bar-fill').style.width = fillPct + '%';
+    });
+  });
+
+  // Show avatar card with entry data
+  const preview = document.getElementById('avatarPreview');
+  const btn = document.getElementById('btnGoAvatar');
+  if (entry.avatarSrc) {
+    const desc = entry.domains?.join(' · ') || '';
+    preview.innerHTML = `
+      <div class="avatar-card bg-0" style="width:100%;max-width:300px;margin:0 auto;">
+        <img src="${entry.avatarSrc}" alt="avatar" style="display:inline-block;">
+        <p>${entry.name}<br><span style="font-weight:400;font-size:0.78rem;color:var(--ink-soft)">${desc}</span></p>
+      </div>`;
+    btn.textContent = 'Continuer';
+  } else {
+    preview.innerHTML = `
+      <div class="avatar-card-placeholder">
+        <div class="placeholder-inner">
+          <span class="placeholder-icon">＋</span>
+          <span>Créez votre carte designer</span>
+        </div>
+      </div>`;
+    btn.textContent = 'Continuer';
+  }
+
+  document.getElementById('s-results').querySelector('.sub').textContent = `Résultats du ${entry.date}`;
+  goTo('s-results');
+}
+
+let editingHistoryIdx = -1;
+
+function deleteEntry(idx) {
+  const cards = document.querySelectorAll('#timeline .timeline-card');
+  const cardEl = cards[idx];
+  if (cardEl) {
+    cardEl.style.transition = 'opacity .2s ease, transform .2s ease';
+    cardEl.style.opacity = '0';
+    cardEl.style.transform = 'scale(.92)';
+  }
+  setTimeout(() => {
+    const h = getHistory();
+    h.splice(idx, 1);
+    saveHistory(h);
+    renderTimeline(h);
+    if (document.getElementById('s-home').classList.contains('active')) showHome();
+  }, 200);
+}
+
+function editEntry(idx) {
+  const h = getHistory();
+  const entry = h[idx];
+  editingHistoryIdx = idx;
+  pendingColorIdx = entry.colorIdx ?? idx % ENTRY_COLORS.length;
+  top3Domains = entry.domains || [];
+  document.getElementById('nameInput').value = entry.name || '';
+  if (entry.avatarSrc) {
+    selectedAvatar = entry.avatarSrc;
+    const imgEl = document.getElementById('avatarCardImg');
+    imgEl.src = entry.avatarSrc;
+    imgEl.style.display = 'inline-block';
+  }
+  // Go to domain selection so user can redo their quiz
+  showContinue();
+}
+
+function goToAvatarScreen() {
+  buildAvatarGallery('avatarGallery');
+  // If gallery didn't build yet (AVATAR_URIS not loaded), retry once loaded
+  if (!document.getElementById('avatarGallery').dataset.built) {
+    const check = setInterval(() => {
+      if (typeof AVATAR_URIS !== 'undefined') {
+        clearInterval(check);
+        buildAvatarGallery('avatarGallery');
+        goTo('s-avatar');
+      }
+    }, 100);
+  } else {
+    goTo('s-avatar');
+  }
+}
+
+function continuerVersAvatar() {
+  if (selectedAvatar) {
+    goToProgression();
+  } else {
+    goToAvatarScreen();
+  }
+}
+
+function quitQuiz() {
+  showConfirm({
+    title: 'Quitter le quiz ?',
+    message: 'Votre progression sera sauvegardée.',
+    confirmLabel: 'Quitter',
+    danger: false,
+    onConfirm: () => { saveSession(false); showContinue(); }
+  });
+}
+
+function retakeQuiz() {
+  showConfirm({ title: 'Faire un nouveau bilan ?', message: 'Vos anciens résultats resteront dans votre progression.', confirmLabel: 'Commencer', onConfirm: _retakeQuiz }); }
+function _retakeQuiz() {
+  // Keep scores from previous session — they pre-fill quiz answers on retake
+  completedDomains.clear();
+  top3Domains = [];
+  isRetake = Object.values(scores).some(v => v > 0);
+  pendingColorIdx = getHistory().length % ENTRY_COLORS.length;
+  saveSession(false);
+  showDomains();
+}
+
+// ── AVATAR ──
+let selectedAvatar = null, selectedBg = 0;
+let pendingColorIdx = 0;
+function buildAvatarGallery(containerId) {
+  const gallery = document.getElementById(containerId || 'avatarGallery');
+  if (!gallery || gallery.dataset.built || typeof AVATAR_URIS === 'undefined') return;
+  gallery.dataset.built = '1';
+  for (let i = 1; i <= 105; i++) {
+    const img = document.createElement('img');
+    img.src = AVATAR_URIS[i-1]; img.dataset.index = i; img.alt = `Avatar ${i}`;
+    if (selectedAvatar && img.src === selectedAvatar) img.classList.add('selected');
+    gallery.appendChild(img);
+  }
+  gallery.addEventListener('click', e => {
+    const img = e.target.closest('img');
+    if (!img) return;
+    // sync selection across all galleries
+    document.querySelectorAll('.avatar-gallery img').forEach(el =>
+      el.classList.toggle('selected', el.src === img.src));
+    selectedAvatar = img.src;
+    selectedBg = parseInt(img.dataset.index) % 3;
+    updateAvatarCard();
+    updateProfileCircle();
+    // update profile avatar preview if open
+    const circle = document.getElementById('profileAvatarCircle');
+    if (circle) renderProfileAvatarPreview();
+  });
+}
+document.getElementById('nameInput').addEventListener('input', updateAvatarCardText);
+
+// ── FORMATIONS CATALOG ──
+const FORMATIONS = [
+  { nom: "Design Fiction",                                          type: "formation", duree: "1 jour",  domaines: ["Service Design"],            lien: "https://app.notion.com/120a94d34ac380efa851c3adfd98ec80" },
+  { nom: "Initiation au Design Thinking",                          type: "formation", duree: "1 jour",  domaines: ["Service Design"],            lien: "https://app.notion.com/1d2a94d34ac380d4b885d7badf951842" },
+  { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Service Design","Design Ops"],lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e" },
+  { nom: "DISC : Communiquer et Manager en couleur",               type: "formation", duree: "1 jour",  domaines: ["Service Design"],            lien: "https://app.notion.com/4a049ebd394542dba7389f1da37f3459" },
+  { nom: "User Research",                                          type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/aa9241d4d21d488bb884ad3ac58717d7" },
+  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/33da94d34ac3803daabfdc749b69e3fd" },
+  { nom: "User Research - Atelier 1 : User Research assistée par IA", type: "workshop", duree: "3h",   domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/userresearch_ia/" },
+  { nom: "Figma",                                                  type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design","UI Engineer"], lien: "https://app.notion.com/e8fc7cf842e5455aab1bef571181e3c4" },
+  { nom: "Design inclusif",                                        type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design"],     lien: "https://app.notion.com/ae477ad35af049deade6871e52495615" },
+  { nom: "Eco-conception",                                         type: "formation", duree: "1 jour",  domaines: ["UX Design"],                 lien: "https://app.notion.com/113a94d34ac38065ab4bd6d1c8bf5a3f" },
+  { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Engineer"],   lien: "https://app.notion.com/337a94d34ac380259b57ca6eb0a49678" },
+  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/" },
+  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/" },
+  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://app.notion.com/284a94d34ac38012a130f12c2f7f5e90" },
+  { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/" },
+  { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/" },
+  { nom: "Accessibilité",                                          type: "formation", duree: "1 jour",  domaines: ["UI Design","UI Engineer"],   lien: "https://app.notion.com/ceceb4577fa244f6b6eff25ca54232d3" },
+  { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Design Ops"],                lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e" },
+  { nom: "Design Ops 2 jours",                                     type: "formation", duree: "2 jours", domaines: ["Design Ops"],                lien: "https://app.notion.com/320a94d34ac38079b4adefddf8726ba3" },
+  { nom: "Design Ops - Atelier 1 : Audit & Organisation design",   type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_audit/" },
+  { nom: "Design Ops - Atelier 2 : Process Design & IA",           type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_processdesign_ia/" },
+  { nom: "Design Ops - Atelier 3 : Documentation & Rituels design",type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_documentation_rituels/" },
+  { nom: "Design Ops - Atelier 4 : Metrics & Performance",         type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_metrics_performance/" },
+  { nom: "Design System",                                          type: "formation", duree: "1 jour",  domaines: ["Design System"],             lien: "https://app.notion.com/9b154b4f13764bfd9a8f6c2dd81afd38" },
+  { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Design System"],             lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e" },
+];
+
+// ── PROFILE ──
+let profilePreviousScreen = 's-progression';
+
+function showProfile() {
+  profilePreviousScreen = document.querySelector('.screen.active')?.id || 's-progression';
+  renderProfileAvatarPreview();
+  // populate formations
+  const container = document.getElementById('profileSkillsContent');
+  buildSkillsContent(container);
+  // sync name input
+  const nameInput = document.getElementById('nameInput');
+  const profileNameInput = document.getElementById('profileNameInput');
+  if (profileNameInput) profileNameInput.value = nameInput?.value || '';
+  goTo('s-profile');
+}
+
+function renderProfileAvatarPreview() {
+  const circle = document.getElementById('profileAvatarCircle');
+  const nameEl = document.getElementById('profileDisplayName');
+  const name = document.getElementById('nameInput')?.value.trim() || document.getElementById('topbarUser')?.textContent || '';
+  if (!circle) return;
+  if (selectedAvatar) {
+    circle.innerHTML = `<img src="${selectedAvatar}" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">`;
+  } else {
+    circle.textContent = name ? name[0].toUpperCase() : '?';
+    circle.innerHTML = `<span style="font-size:1.6rem;font-weight:800;color:var(--ink-soft);">${name ? name[0].toUpperCase() : '?'}</span>`;
+  }
+  if (nameEl) nameEl.textContent = name || 'Votre prénom';
+}
+
+function toggleProfileGallery() {
+  const wrap = document.getElementById('profileGalleryWrap');
+  const isOpen = wrap.classList.toggle('open');
+  if (isOpen) buildAvatarGallery('profileGallery');
+  document.querySelector('.profile-gallery-toggle').textContent = isOpen ? 'Fermer ↑' : 'Changer ↓';
+}
+
+function saveProfile() {
+  updateProfileCircle();
+  updateAvatarCardText();
+  updateResultsPreview();
+  renderProfileAvatarPreview();
+}
+
+function showPreviousScreen() { goTo(profilePreviousScreen); }
+
+function buildSkillsContent(container) {
+  const domainScores = getDomainScores();
+  const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
+  if (weakDomains.length === 0) {
+    container.innerHTML = `<div class="skills-all-good"><span>🎉</span>Tous vos domaines sont au-dessus de 60% — continuez comme ça !</div>`;
+    return;
+  }
+  const seen = new Set();
+  container.innerHTML = weakDomains.map(d => {
+    const pct = Math.round(d.sum / d.max * 100);
+    const recs = FORMATIONS.filter(f => f.domaines.includes(d.domain) && !seen.has(f.nom));
+    recs.forEach(f => seen.add(f.nom));
+    if (!recs.length) return '';
+    const ordered = [...recs.filter(f=>f.type==='formation'), ...recs.filter(f=>f.type==='workshop')];
+    return `<div class="skills-domain-block">
+      <div class="skills-domain-title">${d.domain}<span class="skills-score-badge">${pct}%</span></div>
+      ${ordered.map(f=>`
+        <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+          <div class="skills-formation-info">
+            <div class="skills-formation-name">${f.nom}</div>
+            <div class="skills-formation-type">
+              <span class="skills-type-tag ${f.type==='workshop'?'workshop':'formation'}">${f.type==='workshop'?'Workshop 3h':'Formation '+f.duree}</span>
+            </div>
+          </div>
+          <span class="skills-arrow">→</span>
+        </a>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function showSkills() {
+  buildSkillsContent(document.getElementById('skillsContent'));
+  goTo('s-skills');
+}
+
+function buildSentence() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name || top3Domains.length < 3) return 'Choisissez un avatar et entrez votre prénom';
+  return `Je suis ${name}, ${top3Domains[0]} avec une bonne maîtrise en ${top3Domains[1]} et une bonne connaissance en ${top3Domains[2]}.`;
+}
+function updateAvatarCardText() { document.getElementById('avatarCardText').textContent = buildSentence(); }
+function updateAvatarCard() {
+  const card = document.getElementById('avatarCard');
+  card.style.background = ENTRY_COLORS[pendingColorIdx % ENTRY_COLORS.length].bg;
+  card.classList.remove('bg-0','bg-1','bg-2');
+  const img = document.getElementById('avatarCardImg');
+  if (selectedAvatar) { img.src = selectedAvatar; img.style.display = 'inline-block'; }
+  updateAvatarCardText();
+  updateProfileCircle();
+}
+
+const BG_COLORS = ['#c9dff0','#f5cfc9','#f5e8a8'];
+const LOGO_B64 = 'data:image/png;base64,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';
+function roundRectPath(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function wrapText(ctx,text,x,y,maxW,lh){ const words=text.split(' '); let line=''; const lines=[]; words.forEach(w=>{ const t=line?line+' '+w:w; if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;}else line=t; }); if(line)lines.push(line); const sy=y-((lines.length-1)*lh)/2; lines.forEach((l,i)=>ctx.fillText(l,x,sy+i*lh)); }
+function triggerDownload() {
+  if (!selectedAvatar){ alert("Choisissez d'abord un avatar."); return; }
+  const sc=3,W=220*sc,H=360*sc,canvas=document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  roundRectPath(ctx,0,0,W,H,20*sc); ctx.fillStyle=ENTRY_COLORS[pendingColorIdx % ENTRY_COLORS.length].bg; ctx.fill();
+  const ai=new Image();
+  ai.onload=()=>{
+    const iw=130*sc,ih=iw*(ai.height/ai.width),ix=(W-iw)/2,iy=28*sc;
+    ctx.drawImage(ai,ix,iy,iw,ih);
+    ctx.fillStyle='#111111'; ctx.font=`600 ${11*sc}px -apple-system,Helvetica,Arial,sans-serif`; ctx.textAlign='center';
+    const sentence = buildSentence();
+    wrapText(ctx,sentence,W/2,iy+ih+44*sc,W-48*sc,16*sc);
+    const logoImg=new Image();
+    logoImg.onload=()=>{
+      const lw=40*sc,lh=lw*(logoImg.height/logoImg.width),lx=(W-lw)/2,ly=H-lh-18*sc;
+      ctx.drawImage(logoImg,lx,ly,lw,lh);
+      canvas.toBlob(blob=>{ const url=URL.createObjectURL(blob),link=document.createElement('a'); const n=document.getElementById('nameInput').value.trim()||'mon-avatar'; link.download=`avatar-${n.toLowerCase().replace(/\s+/g,'-')}.png`; link.href=url; link.click(); URL.revokeObjectURL(url); },'image/png');
+    };
+    logoImg.src=LOGO_B64;
+  };
+  ai.src=selectedAvatar;
+}
+
+// ── DASHBOARD ──
+async function showDashboard() {
+  goTo('s-dashboard');
+  await loadDashboard();
+}
+
+async function loadDashboard() {
+  document.getElementById('dashBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);padding:24px">Chargement…</td></tr>';
+  let profiles, sessions;
+  try {
+    [profiles, sessions] = await Promise.all([
+      sbRest('/rest/v1/profiles?select=id,name,email&order=created_at.asc'),
+      sbRest('/rest/v1/quiz_sessions?select=*')
+    ]);
+  } catch(e) {
+    document.getElementById('dashBody').innerHTML = `<tr><td colspan="5" style="color:var(--red);padding:16px">Erreur : ${e.message}</td></tr>`;
+    return;
+  }
+  const sessMap = {};
+  sessions.forEach(s => sessMap[s.user_id] = s);
+
+  const participants = profiles.filter(p => p.email !== TEACHER_EMAIL);
+  const finished     = participants.filter(p => sessMap[p.id]?.finished).length;
+  const inprogress   = participants.filter(p => sessMap[p.id] && !sessMap[p.id].finished).length;
+
+  document.getElementById('statTotal').textContent    = participants.length;
+  document.getElementById('statDone').textContent     = finished;
+  document.getElementById('statProgress').textContent = inprogress;
+
+  if (participants.length === 0) {
+    document.getElementById('dashBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);padding:24px">Aucun participant pour l&#39;instant</td></tr>';
+    return;
+  }
+
+  document.getElementById('dashBody').innerHTML = participants.map(p => {
+    const s = sessMap[p.id];
+    const cd = s?.completed_domains?.length || 0;
+    const top3 = s?.top3?.join(' · ') || '—';
+    const badge = s?.finished
+      ? `<span class="badge-done">Terminé</span>`
+      : cd > 0
+        ? `<span class="badge-progress">${cd}/${DOMAINS_COUNT} domaines</span>`
+        : `<span style="color:var(--ink-soft);font-size:0.8rem">Pas commencé</span>`;
+    return `<tr>
+      <td><strong>${p.name || '—'}</strong></td>
+      <td style="color:var(--ink-soft)">${p.email}</td>
+      <td>${cd} / ${DOMAINS_COUNT}</td>
+      <td style="font-size:0.82rem">${top3}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── INIT ──
+async function init() {
+  if (localStorage.getItem('qd_visited')) switchTab('login');
+  localStorage.setItem('qd_visited', '1');
+  goTo('s-auth');
+  const token = localStorage.getItem('qd_token');
+  const user  = localStorage.getItem('qd_user');
+  if (token && user) {
+    SB_TOKEN = token;
+    currentUser = JSON.parse(user);
+    try { await afterLogin(''); }
+    catch { localStorage.removeItem('qd_token'); localStorage.removeItem('qd_user'); goTo('s-auth'); }
+  }
+}
+
+init();
+</script>
+</body>
+</html>
