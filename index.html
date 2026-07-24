@@ -1076,6 +1076,8 @@ let selectedValue = null;
 let top3Domains = [];
 let isRetake = false;
 let authMode = 'signup';
+let selectedAvatar = null, selectedBg = 0;
+let pendingColorIdx = 0;
 
 DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
 
@@ -1939,16 +1941,15 @@ function _commitDelete() {
   renderTimeline(h);
   if (document.getElementById('s-home').classList.contains('active')) showHome();
 }
-document.getElementById('toast-cancel').onclick = () => {
+function _cancelDelete() {
   if (!_pendingDelete) return;
   clearTimeout(_toastTimer); _toastTimer = null;
   _pendingDelete = null;
   document.getElementById('toast').classList.remove('show');
-  // restore cards
   document.querySelectorAll('.timeline-card, .tac-card').forEach(el => {
     el.style.opacity = ''; el.style.transform = '';
   });
-};
+}
 function deleteEntry(idx) { showDeleteToast(idx); }
 
 function editEntry(idx) {
@@ -2034,8 +2035,6 @@ function _retakeQuiz() {
 }
 
 // ── AVATAR ──
-let selectedAvatar = null, selectedBg = 0;
-let pendingColorIdx = 0;
 function buildAvatarGallery(containerId) {
   const gallery = document.getElementById(containerId || 'avatarGallery');
   if (!gallery || gallery.dataset.built || typeof AVATAR_URIS === 'undefined') return;
@@ -2357,6 +2356,6 @@ init();
     </div>
   </div>
 </div>
-<div id="toast"><span id="toast-msg"></span><button id="toast-cancel">Annuler</button></div>
+<div id="toast"><span id="toast-msg"></span><button id="toast-cancel" onclick="_cancelDelete()">Annuler</button></div>
 </body>
 </html>
