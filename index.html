@@ -1148,9 +1148,10 @@ function showHome() {
     // #37 — show only last 3 bilans on home
     const displayHistory = history.slice(-3);
     const homeOffset = history.length - displayHistory.length;
+    const homeColors = resolveDisplayColors(displayHistory);
     displayHistory.forEach((entry, displayIdx) => {
       const realIdx = homeOffset + displayIdx;
-      const col = ENTRY_COLORS[(entry.colorIdx ?? realIdx) % ENTRY_COLORS.length];
+      const col = ENTRY_COLORS[homeColors[displayIdx]];
       const domainsStr = (entry.domains || []).join(' · ');
       const imgTag = entry.avatarSrc ? `<img src="${entry.avatarSrc}" alt="avatar">` : '';
       const card = document.createElement('div');
@@ -1650,6 +1651,16 @@ async function showResults() {
 }
 
 // ── UNIFIED COLOR PALETTE ──
+function resolveDisplayColors(entries) {
+  const used = new Set();
+  return entries.map(entry => {
+    let idx = (entry.colorIdx ?? 0) % ENTRY_COLORS.length;
+    while (used.has(idx)) idx = (idx + 1) % ENTRY_COLORS.length;
+    used.add(idx);
+    return idx;
+  });
+}
+
 function getNextColorIdx() {
   const history = getHistory();
   const lastColorIdx = history.length > 0 ? (history[history.length - 1].colorIdx ?? -1) : -1;
@@ -1679,11 +1690,13 @@ function drawProgressionBars(history) {
   el.style.display = 'block';
   el.innerHTML = '';
 
+  const chartColors = resolveDisplayColors(entries);
+
   // Legend
   const legend = document.createElement('div');
   legend.className = 'prog-chart-legend';
   entries.forEach((entry, ei) => {
-    const col = ENTRY_COLORS[(entry.colorIdx ?? ei) % ENTRY_COLORS.length];
+    const col = ENTRY_COLORS[chartColors[ei]];
     const item = document.createElement('div');
     item.className = 'prog-legend-item';
     item.innerHTML = `<span class="prog-legend-dot" style="background:${col.bg};border:2px solid ${col.stroke};"></span>${entry.dateBase || entry.date}`;
@@ -1714,7 +1727,7 @@ function drawProgressionBars(history) {
 
     const barEls = [];
     entries.forEach((entry, ei) => {
-      const col = ENTRY_COLORS[(entry.colorIdx ?? ei) % ENTRY_COLORS.length];
+      const col = ENTRY_COLORS[chartColors[ei]];
       const ds = entry.domainScores.find(d => d.domain === domain);
       const pct = ds ? ds.pct : 0;
       const barH = Math.max(pct * CHART_H / 100, pct > 0 ? 3 : 0);
@@ -1811,12 +1824,13 @@ function renderTimeline(history) {
   // #38 — show only last 3 bilans
   const displayEntries = history.slice(-3);
   const offset = history.length - displayEntries.length;
+  const timelineColors = resolveDisplayColors(displayEntries);
 
   displayEntries.forEach((entry, displayIdx) => {
     const realIdx = offset + displayIdx;
     const card = document.createElement('div');
     card.className = 'timeline-card';
-    const col = ENTRY_COLORS[(entry.colorIdx ?? realIdx) % ENTRY_COLORS.length];
+    const col = ENTRY_COLORS[timelineColors[displayIdx]];
     const domainsStr = (entry.domains || []).join(' · ');
     const imgTag = entry.avatarSrc ? `<img src="${entry.avatarSrc}" alt="avatar">` : '';
     card.style.background = col.bg;
