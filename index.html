@@ -1494,7 +1494,9 @@ function getDraftCardData() {
 function resumeDraft() {
   const draft = getDraftCardData();
   if (!draft) return;
-  scores = { ...scores, ...draft.scores };
+  // Reset scores entirely then apply draft — prevents bleed from previous bilan
+  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  Object.assign(scores, draft.scores);
   completedDomains.clear();
   draft.completedDomains.forEach(d => completedDomains.add(d));
   startQuiz(draft.currentDomain, draft.currentQIndex || 0);
