@@ -520,6 +520,14 @@
     cursor: pointer; transition: border-color .15s, background .15s;
   }
   .timeline-card.future:hover { border-color: var(--ink); background: var(--fill-dim); }
+  .timeline-card.draft-card { border: 2px dashed #f59e0b; background: #fffbeb; cursor: pointer; transition: border-color .15s, background .15s; }
+  @media (prefers-color-scheme: dark) { .timeline-card.draft-card { background: #1c1700; } }
+  :root[data-theme="dark"] .timeline-card.draft-card { background: #1c1700; }
+  :root[data-theme="light"] .timeline-card.draft-card { background: #fffbeb; }
+  .timeline-card.draft-card:hover { border-color: #d97706; background: #fef3c7; }
+  .en-cours-tag { color: #d97706 !important; font-weight: 700 !important; }
+  .draft-progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; }
+  .draft-progress-fill { height: 100%; background: #f59e0b; border-radius: 2px; transition: width .4s; }
   .timeline-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); }
   .timeline-date { font-size: 0.65rem; color: var(--ink-soft); text-align: center; }
   .timeline-avatar-card {
@@ -1145,6 +1153,9 @@ function showHome() {
     if (h1) h1.innerHTML = `Bonjour ${userName}&nbsp;👋`;
     if (sub) sub.textContent = 'On est ravi de te revoir. Tu souhaites revoir la progression de tes expertises ? À toi de jouer';
     cards.innerHTML = '';
+    // #53/#54 — draft "En cours" card
+    const draftCard = buildDraftCard();
+    if (draftCard) cards.appendChild(draftCard);
     // #37 — show only last 3 bilans on home
     const displayHistory = history.slice(-3);
     const homeOffset = history.length - displayHistory.length;
@@ -1187,11 +1198,20 @@ function showHome() {
     newCard.onclick = retakeQuiz;
     cards.appendChild(newCard);
   } else {
-    tl.style.display = 'none';
     const h1 = document.querySelector('#s-home h1');
     const sub = document.querySelector('#s-home p[style*="color:var(--ink-soft)"]');
     if (h1) h1.innerHTML = 'Quel designer<br>êtes-vous ?';
     if (sub) sub.textContent = 'Voici une application pour évaluer ton niveau d\'expertise design. Cela pourra t\'aider à faire un bilan sur ton niveau d\'expertise et les actions à mener pour monter en compétence sur certain domaine. L\'idée n\'est pas d\'être "bon partout" mais de pouvoir se présenter avec au moins 3 expertises à mettre en avant. A toi de jouer !';
+    // Show draft card even if no completed history
+    const draftCard = buildDraftCard();
+    if (draftCard) {
+      cards.innerHTML = '';
+      cards.appendChild(draftCard);
+      tl.style.display = 'block';
+      if (homeLogo) homeLogo.style.display = 'block';
+    } else {
+      tl.style.display = 'none';
+    }
   }
   goTo('s-home');
 }
@@ -1457,10 +1477,51 @@ function showDomains() {
 
 // ── QUIZ ──
 function saveDraft() {
+  const existing = JSON.parse(localStorage.getItem('qd_draft') || 'null');
   localStorage.setItem('qd_draft', JSON.stringify({
     currentDomain, currentQIndex, scores,
-    completedDomains: Array.from(completedDomains)
+    completedDomains: Array.from(completedDomains),
+    startedAt: existing?.startedAt || new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
   }));
+}
+
+function getDraftCardData() {
+  const draft = JSON.parse(localStorage.getItem('qd_draft') || 'null');
+  if (!draft || !draft.currentDomain) return null;
+  return draft;
+}
+
+function resumeDraft() {
+  const draft = getDraftCardData();
+  if (!draft) return;
+  scores = { ...scores, ...draft.scores };
+  completedDomains.clear();
+  draft.completedDomains.forEach(d => completedDomains.add(d));
+  startQuiz(draft.currentDomain, draft.currentQIndex || 0);
+}
+
+function buildDraftCard() {
+  const draft = getDraftCardData();
+  if (!draft) return null;
+  const card = document.createElement('div');
+  card.className = 'timeline-card draft-card';
+  const doneDomains = draft.completedDomains || [];
+  const domainsStr = doneDomains.length > 0 ? doneDomains.join(' · ') : draft.currentDomain;
+  const pct = Math.round(doneDomains.length / DOMAINS.length * 100);
+  const dateStr = draft.startedAt || '';
+  card.innerHTML = `
+    <div class="timeline-label en-cours-tag">En cours</div>
+    <div class="timeline-avatar-card" style="background:transparent">
+      <div style="font-size:1.3rem;">⏳</div>
+      <div class="tac-name">Bilan en cours</div>
+      <div class="tac-domains">${domainsStr}</div>
+    </div>
+    <div style="padding:0 8px 8px">
+      <div class="draft-progress-bar"><div class="draft-progress-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:0.6rem;color:var(--ink-soft);text-align:center;margin-top:4px;">${doneDomains.length}/${DOMAINS.length} domaines · ${dateStr}</div>
+    </div>`;
+  card.onclick = resumeDraft;
+  return card;
 }
 
 function clearDraft() {
@@ -1820,6 +1881,10 @@ function goToProgression() {
 function renderTimeline(history) {
   const tl = document.getElementById('timeline');
   tl.innerHTML = '';
+
+  // #53/#54 — draft "En cours" card
+  const draftCard = buildDraftCard();
+  if (draftCard) tl.appendChild(draftCard);
 
   // #38 — show only last 3 bilans
   const displayEntries = history.slice(-3);
