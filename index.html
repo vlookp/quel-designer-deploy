@@ -411,6 +411,16 @@
   }
   .avatar-gallery img:hover { background: var(--fill-dim); }
   .avatar-gallery img.selected { border-color: var(--ink); background: var(--fill-dim); }
+  /* Avatar modal */
+  .avatar-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 300; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .avatar-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .avatar-modal-sheet { background: var(--bg); border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 520px; max-height: 80vh; display: flex; flex-direction: column; transform: translateY(40px); transition: transform .25s; }
+  .avatar-modal-overlay.open .avatar-modal-sheet { transform: translateY(0); }
+  .avatar-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .avatar-modal-title { font-size: 1rem; font-weight: 800; }
+  .avatar-modal-close { background: var(--fill-dim); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .avatar-modal-gallery { flex: 1; overflow-y: auto; }
+  .avatar-modal-gallery .avatar-gallery { max-height: none; margin-bottom: 0; border: none; border-radius: 0; }
   .avatar-card-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
   .avatar-card { width: 200px; border-radius: 16px; padding: 22px 16px 18px; text-align: center; }
   .avatar-card img { width: 110px; height: auto; margin-bottom: 12px; display: none; }
@@ -901,7 +911,7 @@
     <h2>Mon profil</h2>
 
     <div class="profile-section" style="margin-top:24px;">
-      <div class="profile-avatar-preview" onclick="goToAvatarScreen()" style="cursor:pointer;" title="Modifier mon avatar">
+      <div class="profile-avatar-preview" onclick="openAvatarModal()" style="cursor:pointer;" title="Modifier mon avatar">
         <div id="profileAvatarCircle" class="profile-avatar-placeholder">?</div>
         <div class="profile-avatar-info">
           <div class="profile-avatar-name" id="profileDisplayName">—</div>
@@ -1323,7 +1333,6 @@ async function afterLogin(fallbackName) {
 function signOut() {
   localStorage.removeItem('qd_token');
   localStorage.removeItem('qd_user');
-  clearDraft();
   SB_TOKEN = null; currentUser = null; scores = {};
   completedDomains.clear(); top3Domains = [];
   selectedAvatar = null; selectedBg = 0;
@@ -1823,16 +1832,13 @@ function showEntryResults(entry) {
     });
   });
 
-  // Show avatar card with entry data
+  // Show avatar card with entry data (with logo + download via updateResultsPreview)
   const preview = document.getElementById('avatarPreview');
   const btn = document.getElementById('btnGoAvatar');
   if (entry.avatarSrc) {
-    const desc = entry.domains?.join(' · ') || '';
-    preview.innerHTML = `
-      <div class="avatar-card bg-0" style="width:100%;max-width:300px;margin:0 auto;">
-        <img src="${entry.avatarSrc}" alt="avatar" style="display:inline-block;">
-        <p>${entry.name}<br><span style="font-weight:400;font-size:0.78rem;color:var(--ink-soft)">${desc}</span></p>
-      </div>`;
+    selectedAvatar = entry.avatarSrc;
+    pendingColorIdx = entry.colorIdx ?? 0;
+    updateResultsPreview();
     btn.textContent = 'Continuer';
   } else {
     preview.innerHTML = `
@@ -1887,7 +1893,6 @@ function editEntry(idx) {
 
 function goToAvatarScreen() {
   buildAvatarGallery('avatarGallery');
-  // If gallery didn't build yet (AVATAR_URIS not loaded), retry once loaded
   if (!document.getElementById('avatarGallery').dataset.built) {
     const check = setInterval(() => {
       if (typeof AVATAR_URIS !== 'undefined') {
@@ -1899,6 +1904,26 @@ function goToAvatarScreen() {
   } else {
     goTo('s-avatar');
   }
+}
+
+function openAvatarModal() {
+  const overlay = document.getElementById('avatarModalOverlay');
+  overlay.classList.add('open');
+  if (typeof AVATAR_URIS !== 'undefined') {
+    buildAvatarGallery('avatarModalGallery');
+  } else {
+    const check = setInterval(() => {
+      if (typeof AVATAR_URIS !== 'undefined') {
+        clearInterval(check);
+        buildAvatarGallery('avatarModalGallery');
+      }
+    }, 100);
+  }
+}
+
+function closeAvatarModal() {
+  document.getElementById('avatarModalOverlay').classList.remove('open');
+  saveProfile();
 }
 
 function continuerVersAvatar() {
@@ -1922,13 +1947,13 @@ function quitQuiz() {
 function retakeQuiz() {
   showConfirm({ title: 'Faire un nouveau bilan ?', message: 'Vos anciens résultats resteront dans votre progression.', confirmLabel: 'Commencer', onConfirm: _retakeQuiz }); }
 function _retakeQuiz() {
-  // Keep scores from previous session — they pre-fill quiz answers on retake
-  completedDomains.clear();
   top3Domains = [];
   isRetake = Object.values(scores).some(v => v > 0);
+  // Mark all domains as completed so user can selectively re-evaluate
+  DOMAINS.forEach(d => completedDomains.add(d));
   pendingColorIdx = getHistory().length % ENTRY_COLORS.length;
   saveSession(false);
-  showDomains();
+  showContinue();
 }
 
 // ── AVATAR ──
@@ -1954,9 +1979,10 @@ function buildAvatarGallery(containerId) {
     selectedBg = parseInt(img.dataset.index) % 3;
     updateAvatarCard();
     updateProfileCircle();
-    // update profile avatar preview if open
     const circle = document.getElementById('profileAvatarCircle');
     if (circle) renderProfileAvatarPreview();
+    // auto-close modal if selection came from modal gallery
+    if (containerId === 'avatarModalGallery') closeAvatarModal();
   });
 }
 document.getElementById('nameInput').addEventListener('input', updateAvatarCardText);
@@ -2198,5 +2224,17 @@ async function init() {
 
 init();
 </script>
+<!-- Avatar modal -->
+<div id="avatarModalOverlay" class="avatar-modal-overlay" onclick="if(event.target===this)closeAvatarModal()">
+  <div class="avatar-modal-sheet">
+    <div class="avatar-modal-header">
+      <span class="avatar-modal-title">Choisir un personnage</span>
+      <button class="avatar-modal-close" onclick="closeAvatarModal()">✕</button>
+    </div>
+    <div class="avatar-modal-gallery">
+      <div class="avatar-gallery" id="avatarModalGallery"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
