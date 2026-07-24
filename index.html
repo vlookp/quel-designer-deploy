@@ -694,22 +694,23 @@
     font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
     background: #FFE4C4; color: #A0440A;
   }
-  /* formations layout */
-  .skills-domain-section { width: 100%; margin-bottom: 32px; }
-  .skills-formation-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; }
-  .skills-formation-row::-webkit-scrollbar { height: 4px; }
-  .skills-formation-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .skills-workshop-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-  .skills-workshop-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); margin-top: 14px; margin-bottom: 6px; }
+  /* formations layout — 3-column per domain */
+  .skills-domain-section { width: 100%; margin-bottom: 28px; display: grid; grid-template-columns: 140px 1fr 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 600px) { .skills-domain-section { grid-template-columns: 1fr; } }
+  .skills-domain-col { }
+  .skills-col-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+  .skills-formation-row { display: flex; flex-direction: column; gap: 8px; }
+  .skills-workshop-row { display: flex; flex-direction: column; gap: 8px; }
+  .skills-workshop-label { display: none; }
 
-  /* formation card — fixed width, vertical */
+  /* formation card — full width in column */
   .skills-formation-card {
     background: var(--fill-dim); border: 1px solid var(--border);
     border-radius: 12px; padding: 14px 16px;
     display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
     text-decoration: none; color: var(--ink);
     transition: background .15s, border-color .15s;
-    min-width: 210px; max-width: 210px; flex-shrink: 0;
+    width: 100%;
   }
   .skills-formation-card:hover { background: var(--ink); border-color: var(--ink); color: var(--white); }
   .skills-formation-info { flex: 1; min-width: 0; }
@@ -847,6 +848,10 @@
       <div class="auth-field">
         <label>Mot de passe <span style="color:var(--ink-soft);font-weight:400">(min. 6 caractères)</span></label>
         <input type="password" id="authPassword" placeholder="••••••••">
+      </div>
+      <div class="auth-field" id="field-rgpd" style="flex-direction:row;align-items:flex-start;gap:10px;padding:0;">
+        <input type="checkbox" id="rgpdCheck" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;">
+        <label for="rgpdCheck" style="font-size:0.78rem;color:var(--ink-soft);line-height:1.5;cursor:pointer;">J'accepte que mes données (prénom, email, résultats) soient utilisées dans le cadre de cette formation par Popup Design Lab.</label>
       </div>
       <button class="btn-auth" id="authBtn" onclick="submitAuth()">Créer mon compte</button>
     </div>
@@ -1248,6 +1253,7 @@ function switchTab(mode) {
   document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
   document.getElementById('tab-login').classList.toggle('active', mode === 'login');
   document.getElementById('field-name').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('field-rgpd').style.display = mode === 'signup' ? 'flex' : 'none';
   document.getElementById('authBtn').textContent = mode === 'signup' ? 'Créer mon compte' : 'Se connecter';
   document.getElementById('authMsg').className = 'auth-msg';
 }
@@ -1266,6 +1272,7 @@ async function submitAuth() {
 
   if (!email || !password) return showAuthMsg('Veuillez remplir tous les champs.', 'error');
   if (authMode === 'signup' && !name) return showAuthMsg('Veuillez entrer votre prénom.', 'error');
+  if (authMode === 'signup' && !document.getElementById('rgpdCheck').checked) return showAuthMsg('Veuillez accepter les conditions pour continuer.', 'error');
 
   btn.disabled = true;
   btn.textContent = '…';
@@ -2136,15 +2143,31 @@ function buildSkillsContent(container) {
   const domainScores = getDomainScores();
   const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
 
-  // result card at top
+  // result card with avatar + top3 percentages
   const top3 = top3Domains.slice(0, 3);
+  const top3WithPct = top3.map(domain => {
+    const ds = domainScores.find(d => d.domain === domain);
+    const pct = ds ? Math.round(ds.sum / ds.max * 100) : 0;
+    return { domain, pct };
+  });
+  const avatarHtml = selectedAvatar
+    ? `<img src="${selectedAvatar}" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.12);flex-shrink:0;">`
+    : '';
   const resultCard = top3.length > 0 ? `
-    <div style="margin-bottom:28px;padding:20px;background:var(--fill-dim);border-radius:16px;text-align:center;">
-      <div class="skills-domain-title" style="justify-content:center;margin-bottom:12px;">Vos 3 expertises</div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
-        ${top3.map((d,i)=>`<span style="background:var(--ink);color:var(--white);border-radius:20px;padding:6px 14px;font-size:0.82rem;font-weight:700;">${['🥇','🥈','🥉'][i]} ${d}</span>`).join('')}
+    <div style="margin-bottom:28px;padding:20px;background:var(--fill-dim);border-radius:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      ${avatarHtml}
+      <div style="flex:1;min-width:180px;">
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;">Vos 3 expertises</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${top3WithPct.map((d,i)=>`
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:0.8rem;">${['🥇','🥈','🥉'][i]}</span>
+              <span style="font-size:0.85rem;font-weight:700;flex:1;">${d.domain}</span>
+              <span style="font-size:0.82rem;font-weight:700;color:var(--ink-soft);">${d.pct}%</span>
+            </div>`).join('')}
+        </div>
       </div>
-      <button onclick="computeAndShowResults()" style="background:none;border:1.5px solid var(--ink);border-radius:10px;padding:10px 22px;font-size:0.85rem;font-weight:700;cursor:pointer;color:var(--ink);">Voir mes résultats complets</button>
+      <button onclick="computeAndShowResults()" style="background:none;border:1.5px solid var(--ink);border-radius:10px;padding:10px 20px;font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--ink);white-space:nowrap;">Voir mes résultats</button>
     </div>` : '';
 
   if (weakDomains.length === 0) {
@@ -2173,25 +2196,30 @@ function buildSkillsContent(container) {
           </div>
         </div>
         <span class="skills-arrow">→</span>
-      </a>`).join('');
+      </a>`).join('') || '<p style="font-size:0.82rem;color:var(--ink-soft);">–</p>';
 
-    const workshopCards = workshops.length ? `
-      <div class="skills-workshop-label">⚡ Ateliers</div>
-      <div class="skills-workshop-row">
-        ${workshops.map(f => `
-          <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
-            <span class="skills-workshop-icon">🗓</span>
-            <div class="skills-workshop-info">
-              <div class="skills-workshop-name">${f.nom}</div>
-              <div class="skills-workshop-dur">${f.duree}</div>
-            </div>
-          </a>`).join('')}
-      </div>` : '';
+    const workshopCards = workshops.map(f => `
+      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+        <span class="skills-workshop-icon">🗓</span>
+        <div class="skills-workshop-info">
+          <div class="skills-workshop-name">${f.nom}</div>
+          <div class="skills-workshop-dur">${f.duree}</div>
+        </div>
+      </a>`).join('') || '<p style="font-size:0.82rem;color:var(--ink-soft);">–</p>';
 
     return `<div class="skills-domain-section">
-      <div class="skills-domain-title">${d.domain}<span class="skills-score-badge">${pct}%</span></div>
-      <div class="skills-formation-row">${formationCards}</div>
-      ${workshopCards}
+      <div class="skills-domain-col">
+        <div style="font-weight:800;font-size:0.9rem;line-height:1.3;margin-bottom:6px;">${d.domain}</div>
+        <span class="skills-score-badge">${pct}%</span>
+      </div>
+      <div class="skills-domain-col">
+        <div class="skills-col-label">Formations</div>
+        <div class="skills-formation-row">${formationCards}</div>
+      </div>
+      <div class="skills-domain-col">
+        <div class="skills-col-label">⚡ Ateliers</div>
+        <div class="skills-workshop-row">${workshopCards}</div>
+      </div>
     </div>`;
   }).join('');
 
