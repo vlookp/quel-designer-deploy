@@ -1488,6 +1488,8 @@ function saveDraft() {
 function getDraftCardData() {
   const draft = JSON.parse(localStorage.getItem('qd_draft') || 'null');
   if (!draft || !draft.currentDomain) return null;
+  // Only show if there are genuinely incomplete domains left
+  if ((draft.completedDomains || []).length >= DOMAINS.length) return null;
   return draft;
 }
 
