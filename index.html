@@ -2027,8 +2027,12 @@ function retakeQuiz() {
 function _retakeQuiz() {
   top3Domains = [];
   isRetake = Object.values(scores).some(v => v > 0);
-  // Mark all domains as completed so user can selectively re-evaluate
-  DOMAINS.forEach(d => completedDomains.add(d));
+  // Mark only domains that were actually evaluated (sum > 0) as completed
+  DOMAINS.forEach(d => {
+    const sum = DATA[d].reduce((acc, _, i) => acc + (scores[d + '|' + i] || 0), 0);
+    if (sum > 0) completedDomains.add(d);
+    else completedDomains.delete(d);
+  });
   pendingColorIdx = getNextColorIdx();
   saveSession(false);
   showContinue();
