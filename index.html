@@ -1371,6 +1371,20 @@ function switchTab(mode) {
   document.getElementById('authMsg').className = 'auth-msg';
 }
 
+function _translateAuthError(msg) {
+  if (!msg) return 'Une erreur est survenue.';
+  const m = msg.toLowerCase();
+  if (m.includes('invalid login credentials') || m.includes('invalid email or password')) return 'Email ou mot de passe incorrect.';
+  if (m.includes('email not confirmed')) return 'Votre email n\'est pas confirmé. Vérifiez votre boîte mail.';
+  if (m.includes('user already registered') || m.includes('already been registered')) return 'Un compte existe déjà avec cet email.';
+  if (m.includes('password should be at least')) return 'Le mot de passe doit contenir au moins 6 caractères.';
+  if (m.includes('unable to validate email address') || m.includes('invalid email')) return 'Adresse email invalide.';
+  if (m.includes('email rate limit') || m.includes('too many requests') || m.includes('rate limit')) return 'Trop de tentatives. Veuillez patienter quelques minutes.';
+  if (m.includes('network') || m.includes('fetch')) return 'Erreur réseau. Vérifiez votre connexion.';
+  if (m.includes('signup is disabled')) return 'Les inscriptions sont temporairement désactivées.';
+  return 'Une erreur est survenue. Veuillez réessayer.';
+}
+
 function showAuthMsg(msg, type) {
   const el = document.getElementById('authMsg');
   el.textContent = msg;
@@ -1423,7 +1437,7 @@ async function submitAuth() {
       await afterLogin('');
     }
   } catch(e) {
-    showAuthMsg(e.message || 'Une erreur est survenue.', 'error');
+    showAuthMsg(_translateAuthError(e.message), 'error');
     btn.disabled = false;
     btn.textContent = authMode === 'signup' ? 'Créer mon compte' : 'Se connecter';
   }
