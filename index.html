@@ -990,7 +990,6 @@
     <p class="sub">Vos compétences par domaine</p>
     <div class="result-bars" id="resultBars"></div>
     <div id="avatarPreview" onclick="continuerVersAvatar()" style="cursor:pointer;margin-bottom:12px;display:none;"></div>
-    <button id="btnModifierResultat" onclick="enableResultsEditMode()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:8px 16px;font-size:0.8rem;font-weight:700;color:var(--ink-soft);cursor:pointer;margin-bottom:12px;transition:border-color .15s,color .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-soft)'">✏️ Modifier un résultat</button>
     <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Continuer</button>
   </div>
 </section>
@@ -1909,7 +1908,14 @@ function computeAndShowResults() {
         <span>${d.domain}</span>
         <span class="result-bar-pct">${pct}%</span>
       </div>`;
-    row.onclick = () => startQuiz(d.domain);
+    row.style.cursor = 'pointer';
+    row.onclick = () => showConfirm({
+      title: `Revoir les Expertises en ${d.domain} ?`,
+      message: 'Vous allez répondre aux questions de ce domaine. Vos résultats seront mis à jour.',
+      confirmLabel: 'Oui',
+      danger: false,
+      onConfirm: () => { isEditingFromResults = true; startQuiz(d.domain); }
+    });
     barsEl.appendChild(row);
     requestAnimationFrame(() => {
       row.querySelector('.result-bar-fill').style.width = Math.max(fillPct, 4) + '%';
@@ -1931,7 +1937,7 @@ function updateResultsPreview() {
     const dateStr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
     preview.innerHTML = `
       <div class="avatar-card" style="position:relative;width:100%;max-width:220px;margin:0 auto;background:${col.bg};">
-        <button class="card-download-btn" onclick="event.stopPropagation();triggerDownload()" title="Télécharger ma carte">↓</button>
+        <button class="card-download-btn" onclick="event.stopPropagation();triggerDownload()" title="Télécharger ma carte"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v8M4 6l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div style="font-size:0.6rem;color:#888;text-align:center;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;">${dateStr}</div>
         <img src="${selectedAvatar}" alt="avatar" style="display:inline-block;">
         <p style="font-size:0.82rem;font-weight:500;color:#111;margin-top:8px;line-height:1.4;">${sentence}</p>
@@ -2308,7 +2314,10 @@ function goToAvatarScreen() {
   }
 }
 
+let _avatarModalPrev = null;
+
 function openAvatarModal() {
+  _avatarModalPrev = selectedAvatar;
   const overlay = document.getElementById('avatarModalOverlay');
   overlay.classList.add('open');
   if (typeof AVATAR_URIS !== 'undefined') {
@@ -2326,6 +2335,28 @@ function openAvatarModal() {
 function closeAvatarModal() {
   document.getElementById('avatarModalOverlay').classList.remove('open');
   saveProfile();
+}
+
+function applyAvatarFromModal() {
+  const selected = document.querySelector('#avatarModalGallery img.selected');
+  if (selected) {
+    selectedAvatar = selected.src;
+    selectedBg = parseInt(selected.dataset.index) % 3;
+    document.querySelectorAll('.avatar-gallery img').forEach(el =>
+      el.classList.toggle('selected', el.src === selectedAvatar));
+    updateAvatarCard();
+    updateProfileCircle();
+    const circle = document.getElementById('profileAvatarCircle');
+    if (circle) renderProfileAvatarPreview();
+  }
+  closeAvatarModal();
+}
+
+function cancelAvatarModal() {
+  selectedAvatar = _avatarModalPrev;
+  document.querySelectorAll('#avatarModalGallery img').forEach(el =>
+    el.classList.toggle('selected', el.src === selectedAvatar));
+  document.getElementById('avatarModalOverlay').classList.remove('open');
 }
 
 function continuerVersAvatar() {
@@ -2405,7 +2436,11 @@ function buildAvatarGallery(containerId) {
   gallery.addEventListener('click', e => {
     const img = e.target.closest('img');
     if (!img) return;
-    // sync selection across all galleries
+    if (containerId === 'avatarModalGallery') {
+      document.querySelectorAll('#avatarModalGallery img').forEach(el =>
+        el.classList.toggle('selected', el.src === img.src));
+      return;
+    }
     document.querySelectorAll('.avatar-gallery img').forEach(el =>
       el.classList.toggle('selected', el.src === img.src));
     selectedAvatar = img.src;
@@ -2414,8 +2449,6 @@ function buildAvatarGallery(containerId) {
     updateProfileCircle();
     const circle = document.getElementById('profileAvatarCircle');
     if (circle) renderProfileAvatarPreview();
-    // auto-close modal if selection came from modal gallery
-    if (containerId === 'avatarModalGallery') closeAvatarModal();
   });
 }
 document.getElementById('nameInput').addEventListener('input', updateAvatarCardText);
@@ -2786,14 +2819,18 @@ async function init() {
 init();
 </script>
 <!-- Avatar modal -->
-<div id="avatarModalOverlay" class="avatar-modal-overlay" onclick="if(event.target===this)closeAvatarModal()">
+<div id="avatarModalOverlay" class="avatar-modal-overlay" onclick="if(event.target===this)cancelAvatarModal()">
   <div class="avatar-modal-sheet">
     <div class="avatar-modal-header">
       <span class="avatar-modal-title">Choisir un personnage</span>
-      <button class="avatar-modal-close" onclick="closeAvatarModal()">✕</button>
+      <button class="avatar-modal-close" onclick="cancelAvatarModal()">✕</button>
     </div>
     <div class="avatar-modal-gallery">
       <div class="avatar-gallery" id="avatarModalGallery"></div>
+    </div>
+    <div style="position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;">
+      <button class="btn-primary" style="flex:1;" onclick="applyAvatarFromModal()">Modifier votre avatar</button>
+      <button class="btn-secondary" style="flex:1;" onclick="cancelAvatarModal()">Annuler</button>
     </div>
   </div>
 </div>
