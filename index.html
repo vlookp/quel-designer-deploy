@@ -835,6 +835,18 @@
   </div>
 </div>
 
+<!-- CHOICE MODAL (#65) -->
+<div class="modal-overlay" id="choiceModal">
+  <div class="modal-box">
+    <h3 id="choiceTitle"></h3>
+    <p id="choiceMsg"></p>
+    <div class="modal-actions" style="flex-direction:column;gap:8px;">
+      <button class="modal-confirm" id="choicePrimary" style="width:100%;"></button>
+      <button class="modal-cancel" id="choiceSecondary" style="width:100%;justify-content:center;"></button>
+    </div>
+  </div>
+</div>
+
 <!-- TOPBAR -->
 <nav class="topbar" id="topbar">
   <div class="topbar-brand">
@@ -930,7 +942,7 @@
 <!-- CONTINUE -->
 <section class="screen padtop" id="s-continue">
   <div class="continue-wrap">
-    <h2>On continue ?</h2>
+    <h2 id="continueTitle">On continue ?</h2>
     <p class="sub" id="continueMsg"></p>
     <div class="domain-bars" id="continueGrid"></div>
     <div class="continue-actions">
@@ -946,6 +958,7 @@
     <p class="sub">Vos compétences par domaine</p>
     <div class="result-bars" id="resultBars"></div>
     <div id="avatarPreview" onclick="continuerVersAvatar()" style="cursor:pointer;margin-bottom:12px;display:none;"></div>
+    <button id="btnModifierResultat" onclick="enableResultsEditMode()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:8px 16px;font-size:0.8rem;font-weight:700;color:var(--ink-soft);cursor:pointer;margin-bottom:12px;transition:border-color .15s,color .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-soft)'">✏️ Modifier un résultat</button>
     <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Continuer</button>
   </div>
 </section>
@@ -1053,6 +1066,21 @@
 <script src="avatars_data.js" defer></script>
 <script>
 // ── MODAL ──
+function showChoiceModal({ title, message, primaryLabel, primaryAction, secondaryLabel, secondaryAction }) {
+  document.getElementById('choiceTitle').textContent = title || '';
+  document.getElementById('choiceMsg').textContent = message || '';
+  const overlay = document.getElementById('choiceModal');
+  const close = () => overlay.classList.remove('open');
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  const primary = document.getElementById('choicePrimary');
+  primary.textContent = primaryLabel;
+  primary.onclick = () => { close(); primaryAction(); };
+  const secondary = document.getElementById('choiceSecondary');
+  secondary.textContent = secondaryLabel;
+  secondary.onclick = () => { close(); secondaryAction(); };
+  overlay.classList.add('open');
+}
+
 function showConfirm({ title, message, confirmLabel = 'Confirmer', danger = false, onConfirm }) {
   document.getElementById('modalTitle').textContent = title || '';
   document.getElementById('modalMsg').textContent = message || '';
@@ -1107,6 +1135,7 @@ let currentQIndex = 0;
 let selectedValue = null;
 let top3Domains = [];
 let isRetake = false;
+let isEditingFromResults = false;
 let authMode = 'signup';
 let selectedAvatar = null, selectedBg = 0;
 let pendingColorIdx = 0;
@@ -1657,8 +1686,18 @@ async function quizNext() {
     completedDomains.add(currentDomain);
     await saveSession(false);
     await showDomainTransition(currentDomain);
-    showContinue();
+    if (isEditingFromResults) {
+      isEditingFromResults = false;
+      computeAndShowResults();
+    } else {
+      showContinue();
+    }
   }
+}
+
+function enableResultsEditMode() {
+  isEditingFromResults = true;
+  showContinue();
 }
 
 function showDomainTransition(domain) {
@@ -1696,9 +1735,22 @@ function showContinue() {
   const total = DOMAINS.length;
   const remaining = total - done;
   const allDone = remaining <= 0;
+  // #57 — titre contextuel selon mode retake
+  const history = getHistory();
+  const titleEl = document.getElementById('continueTitle');
+  if (titleEl) {
+    if (isRetake && history.length > 0) {
+      const lastDate = history[history.length - 1].dateBase || history[history.length - 1].date || '';
+      titleEl.textContent = lastDate ? `Votre bilan du ${lastDate}` : 'Votre bilan précédent';
+    } else {
+      titleEl.textContent = 'On continue ?';
+    }
+  }
   document.getElementById('continueMsg').textContent = allDone
     ? 'Vous avez évalué tous les domaines !'
-    : `Plus que ${remaining} domaine${remaining > 1 ? 's' : ''} à évaluer — cliquez sur un pour continuer.`;
+    : isRetake
+      ? 'Cliquez sur un domaine pour mettre à jour votre évaluation.'
+      : `Plus que ${remaining} domaine${remaining > 1 ? 's' : ''} à évaluer — cliquez sur un pour continuer.`;
   buildDomainBars('continueGrid', true);
   document.getElementById('btnResults').style.display = allDone ? 'inline-block' : 'none';
   goTo('s-continue');
@@ -1931,9 +1983,9 @@ function goToProgression() {
         e.date = e.date + ' · ' + (e.time || timeStr);
       }
     });
-    history.push({ date: dateStr + ' · ' + timeStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, avatarSrc: img, colorIdx });
+    history.push({ date: dateStr + ' · ' + timeStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, questionScores: {...scores}, avatarSrc: img, colorIdx });
   } else {
-    history.push({ date: dateStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, avatarSrc: img, colorIdx });
+    history.push({ date: dateStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, questionScores: {...scores}, avatarSrc: img, colorIdx });
   }
   saveHistory(history);
 
@@ -2167,11 +2219,28 @@ function quitQuiz() {
 }
 
 function retakeQuiz() {
-  showConfirm({ title: 'Faire un nouveau bilan ?', message: 'Vos anciens résultats resteront dans votre progression.', confirmLabel: 'Commencer', onConfirm: _retakeQuiz }); }
-function _retakeQuiz() {
+  const history = getHistory();
+  if (history.length > 0) {
+    showChoiceModal({
+      title: 'Faire un nouveau bilan',
+      message: 'Voulez-vous repartir de vos réponses précédentes ou recommencer de zéro ?',
+      primaryLabel: 'Reprendre mes réponses',
+      primaryAction: retakeFromLastBilan,
+      secondaryLabel: 'Recommencer de zéro',
+      secondaryAction: retakeFromScratch
+    });
+  } else {
+    retakeFromScratch();
+  }
+}
+
+function retakeFromLastBilan() {
+  const history = getHistory();
+  const last = history[history.length - 1];
   top3Domains = [];
-  isRetake = Object.values(scores).some(v => v > 0);
-  // Mark only domains that were actually evaluated (sum > 0) as completed
+  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  if (last?.questionScores) Object.assign(scores, last.questionScores);
+  isRetake = true;
   DOMAINS.forEach(d => {
     const sum = DATA[d].reduce((acc, _, i) => acc + (scores[d + '|' + i] || 0), 0);
     if (sum > 0) completedDomains.add(d);
@@ -2181,6 +2250,18 @@ function _retakeQuiz() {
   saveSession(false);
   showContinue();
 }
+
+function retakeFromScratch() {
+  top3Domains = [];
+  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  completedDomains.clear();
+  isRetake = false;
+  pendingColorIdx = getNextColorIdx();
+  saveSession(false);
+  showContinue();
+}
+
+function _retakeQuiz() { retakeFromScratch(); }
 
 // ── AVATAR ──
 function buildAvatarGallery(containerId) {
