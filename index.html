@@ -94,6 +94,31 @@
   }
   .btn-small:hover { border-color: var(--ink); }
   .btn-small.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+  /* profile dropdown */
+  .profile-dropdown-wrap { position: relative; }
+  .profile-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 0;
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.10); min-width: 190px;
+    display: none; flex-direction: column; z-index: 1000; overflow: hidden;
+  }
+  .profile-dropdown.open { display: flex; }
+  .profile-dropdown button {
+    background: none; border: none; padding: 11px 16px; text-align: left;
+    font-size: 0.84rem; font-weight: 600; cursor: pointer; color: var(--ink);
+    transition: background .12s;
+  }
+  .profile-dropdown button:hover { background: var(--fill-dim); }
+  .profile-dropdown button.danger { color: #ef4444; }
+  .profile-dropdown hr { margin: 0; border: none; border-top: 1px solid var(--border); }
+  /* app footer */
+  .app-footer {
+    text-align: center; padding: 18px 16px 14px; font-size: 0.74rem; color: var(--ink-soft);
+    border-top: 1px solid var(--border); margin-top: auto; display: none;
+  }
+  .app-footer a { color: var(--ink-soft); text-decoration: underline; }
+  .app-footer a:hover { color: var(--ink); }
+  .app-footer.visible { display: block; }
 
   /* ── SCREENS ── */
   .screen { display: none; }
@@ -854,13 +879,19 @@
     <span class="topbar-appname">Quel Designer êtes-vous ?</span>
   </div>
   <div class="topbar-right">
-    <div class="profile-circle" id="profileCircle" onclick="showProfile()" title="Mon profil" style="display:none;">
-      <span class="profile-initial" id="profileInitial"></span>
-      <img id="profileAvatar" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
-    </div>
-    <span class="topbar-user" id="topbarUser"></span>
     <button class="btn-small dark" id="btnDashboard" style="display:none" onclick="showDashboard()">Dashboard</button>
-    <button class="btn-small" onclick="signOut()">Déconnexion</button>
+    <div class="profile-dropdown-wrap" id="profileDropdownWrap" style="display:none;">
+      <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()" title="Mon profil">
+        <span class="profile-initial" id="profileInitial"></span>
+        <img id="profileAvatar" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+      <div class="profile-dropdown" id="profileDropdown">
+        <button onclick="closeProfileDropdown();showProfile()">Mon profil</button>
+        <button onclick="closeProfileDropdown();retakeQuiz()">Faire un nouveau bilan</button>
+        <hr>
+        <button class="danger" onclick="closeProfileDropdown();signOut()">Se déconnecter</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1066,6 +1097,18 @@
 <script src="avatars_data.js" defer></script>
 <script>
 // ── MODAL ──
+function toggleProfileDropdown() {
+  const dd = document.getElementById('profileDropdown');
+  dd.classList.toggle('open');
+}
+function closeProfileDropdown() {
+  document.getElementById('profileDropdown')?.classList.remove('open');
+}
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('profileDropdownWrap');
+  if (wrap && !wrap.contains(e.target)) closeProfileDropdown();
+});
+
 function showChoiceModal({ title, message, primaryLabel, primaryAction, secondaryLabel, secondaryAction }) {
   document.getElementById('choiceTitle').textContent = title || '';
   document.getElementById('choiceMsg').textContent = message || '';
@@ -1269,6 +1312,9 @@ function goTo(id) {
   window.scrollTo(0, 0);
   updateGlobalProgress(id);
   if (currentUser) updateProfileCircle();
+  const noFooter = ['s-auth', 's-quiz', 's-domains'];
+  const footer = document.getElementById('appFooter');
+  if (footer) footer.classList.toggle('visible', !noFooter.includes(id));
 }
 
 function updateGlobalProgress(screenId) {
@@ -1299,6 +1345,7 @@ function updateProfileCircle() {
   const initial = document.getElementById('profileInitial');
   const avatarImg = document.getElementById('profileAvatar');
   if (!circle) return;
+  document.getElementById('profileDropdownWrap').style.display = 'block';
   circle.style.display = 'flex';
   const name = document.getElementById('topbarUser').textContent || '';
   if (selectedAvatar) {
@@ -1450,8 +1497,8 @@ function signOut() {
   DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
   document.getElementById('topbar').classList.remove('visible');
   document.getElementById('btnDashboard').style.display = 'none';
-  const circle = document.getElementById('profileCircle');
-  if (circle) circle.style.display = 'none';
+  const wrap = document.getElementById('profileDropdownWrap');
+  if (wrap) wrap.style.display = 'none';
   goTo('s-auth'); switchTab('signup');
 }
 
@@ -2661,5 +2708,12 @@ init();
   </div>
 </div>
 <div id="toast"><span id="toast-msg"></span><button id="toast-cancel" onclick="_cancelDelete()">Annuler</button></div>
+<footer class="app-footer" id="appFooter">
+  © Made by <a href="https://popupdesignlab.com" target="_blank" rel="noopener">Leflowdesign</a>
+  &nbsp;·&nbsp;
+  <a href="mailto:contact@popupdesignlab.com">contact@popupdesignlab.com</a>
+  &nbsp;·&nbsp;
+  <a href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener">Besoin d'être accompagné dans votre progression ? Réservez un call de 30 min →</a>
+</footer>
 </body>
 </html>
