@@ -376,7 +376,7 @@
   .result-bars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
   .result-bar-row { position: relative; height: 44px; border-radius: 8px; overflow: hidden; background: var(--fill-dim); cursor: pointer; transition: opacity .15s; }
   .result-bar-row:hover { opacity: .8; }
-  .result-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; border-radius: 8px; transition: width .6s ease; }
+  .result-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; border-radius: 8px; transition: width .6s ease; pointer-events: none; }
   .result-bar-row.top .result-bar-fill { background: var(--fill); }
   .result-bar-row.mid .result-bar-fill { background: #555; }
   .result-bar-row.low .result-bar-fill { background: var(--fill-dim); }
