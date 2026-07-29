@@ -920,9 +920,15 @@
         <label>Mot de passe <span style="color:var(--ink-soft);font-weight:400">(min. 6 caractères)</span></label>
         <input type="password" id="authPassword" placeholder="••••••••">
       </div>
-      <div class="auth-field" id="field-rgpd" style="flex-direction:row;align-items:flex-start;gap:10px;padding:0;">
-        <input type="checkbox" id="rgpdCheck" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;">
-        <label for="rgpdCheck" style="font-size:0.78rem;color:var(--ink-soft);line-height:1.5;cursor:pointer;">J'accepte que mes données (prénom, email, résultats) soient utilisées dans le cadre de cette formation par Popup Design Lab.</label>
+      <div class="auth-field" id="field-rgpd" style="flex-direction:column;gap:10px;padding:0;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" id="rgpdCheck" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;">
+          <label for="rgpdCheck" style="font-size:0.78rem;color:var(--ink-soft);line-height:1.5;cursor:pointer;">J'accepte que Popup Design Lab utilise mon prénom et mon email pour créer mon compte et suivre ma progression au test. <button onclick="event.preventDefault();showPolitique()" style="background:none;border:none;padding:0;font-size:0.78rem;color:var(--ink-soft);text-decoration:underline;cursor:pointer;">En savoir plus</button></label>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" id="newsletterCheck" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;">
+          <label for="newsletterCheck" style="font-size:0.78rem;color:var(--ink-soft);line-height:1.5;cursor:pointer;">Je souhaite recevoir les actualités de Popup Design Lab par email.</label>
+        </div>
       </div>
       <button class="btn-auth" id="authBtn" onclick="submitAuth()">Créer mon compte</button>
     </div>
