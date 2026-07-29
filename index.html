@@ -67,12 +67,10 @@
     height: 50px;
     background: var(--white);
     border-bottom: 1px solid var(--border);
-    padding: 0 20px;
-    align-items: center;
-    justify-content: space-between;
     z-index: 100;
   }
-  .topbar.visible { display: flex; }
+  .topbar.visible { display: flex; align-items: center; }
+  .topbar-inner { max-width: 680px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
   .topbar-brand { display: flex; align-items: center; gap: 12px; }
   .topbar-appname { font-size: 0.78rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
   .topbar-right { display: flex; gap: 10px; align-items: center; }
@@ -113,11 +111,12 @@
   .profile-dropdown hr { margin: 0; border: none; border-top: 1px solid var(--border); }
   /* app footer */
   .app-footer {
-    text-align: center; padding: 18px 16px 14px; font-size: 0.74rem; color: var(--ink-soft);
-    border-top: 1px solid var(--border); margin-top: auto; display: none;
+    text-align: center; padding: 18px 16px 14px; font-size: 0.74rem; color: rgba(255,255,255,.55);
+    background: var(--ink); border-top: none; margin-top: auto; display: none;
   }
-  .app-footer a { color: var(--ink-soft); text-decoration: underline; }
-  .app-footer a:hover { color: var(--ink); }
+  .app-footer a { color: rgba(255,255,255,.65); text-decoration: underline; }
+  .app-footer a:hover { color: #fff; }
+  .app-footer button { color: rgba(255,255,255,.55) !important; background: none !important; border: none !important; }
   .app-footer.visible { display: block; }
 
   /* ── SCREENS ── */
@@ -874,6 +873,7 @@
 
 <!-- TOPBAR -->
 <nav class="topbar" id="topbar">
+  <div class="topbar-inner">
   <div class="topbar-brand">
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKoAAABvCAYAAAB8U1uFAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAABHVSURBVHgB7Z09cxVHFoZHazY0cr7ItZuCgw0lnHgTJOcIp1sIE1uQG+EYBJsa5I2NCDYzcrJOLOkHWIoppB9gwQ+Q9cz4SOee293TM3dm7oxuv1UqCmm+eubt06fP51zWcyws/O3fZ//8N0uYafwlS0gYABJREwaBRNSEQeBKNkAsLCxk165d8/792rWFsd+9f39y9vM+/zk4OMgShoVBEvWbb9az1dU72STY39/L9vb2stevt7Ojo6Msod+Yy3oO165/aWkpu3VrObtx40Z2/fqN7OrVq2PnPX68kUtPAcfww7mLi0sjx25vv8qeP3+WCNtjDJKoFpDvxx+3R3736adh1WB9fVQqHx8fZ199tZrI2lNcis3U0dFxpeOPj4+yhw8fZM+ebZ7/Dp0Xsrukc8L0MdO7foiq1QPIurZ2L0voH2bePIV+qpGI2k/MPFEPDw9H/s/Sj/kroV8YpHmqSaCvWqAClG2qIDSbMY6dn7+anZy8zzdkh4cHudmrKtgQYsEASHmtkoiVQ9/n5593erfxa3MMM09UF3iRPmASe/Ro49zEJU4EMX8BPgL6r1UrBBzHdbiGfFy9idvaepn/y9+ePn3mdG7wDCGz2qtX22NmOMHr16+yBw8ejPyOSff06Wbmg7WidDEGjZknqkgADaSiC+ivvFwAGR8+XM+9XCI5+HBPnmzm//LRr1+/nttzLfi7Naf57sW1IT3SR553ff1B/uEh19LSTadZDaLwO7E1l4FVgHOEfGXoYgwal8KOil10d3d0uQ3ZUTVevtzKlyTBzs5O9vXXa2PH8WL5AWU2Vz4gkgQgMTCFaYg0KqTwfH7/5eXl82vfubOaj4dJcP/+Ped9XrzYGjlnZeXWyFKrwXEcL4A02jTnwps3OyME90nUrsYw05spCK5JCr77bsN5nJAU8JFDsx9iygtHYlhLAn9DgjEpILJImuJvJ9nm5mb+4XwfuLjH+vk9kEwi6V3wffwQ9Dk8i+vvoTFsbGxUHgMqgg8zS1TIhx6n4SMgxBHw8n2658UxRyPHQPJYRwLSiaW3bDLwgfU9mBBIuD5AJGzVMSBdZSWymDmi8iIgDkubKPi8MHRJ13IIobXOtre3m8WAoBcBJI21z/JMMZMBWNOaXR2mhTbGcGk3U+/eHY8tWXbnKTPaeqg0VldXR/5vX6wPBwejxyEtyvTCi3PjwhCtGazKPdpG/TGsODegl5aoItFE2Udv2t8/ypdlSMTOXu/YfbBLkc8iYMF9xGwFxHwToy9qaRwCY9Koco+2UXcMCBPXGC4tUdl1NgEbhB2ysVpoosq1YogeSzTXcfPz870gatNjSKkoJbDqwocP9UmAVyYGLm9ZLD7+ePjRXy7nQCJqwiCQiFoClw2xz5hE4vcFrneeiFoCawfELRoLazttOqnQXh+9rqlAFVeCZBuIHUMiagns5gcLQgx0kIpcp+lNjjXwx1okysBzh7J8m0TsGBJRS6Bdg2BpaTHqPGvWqhP6VwYbbLK9vZ01gS49XLFjSEQtAQTTJLt1ayXqPOth+eGHrSwWse5WCegAIU+QzSkru/7t282Y9mJgx7Cz88Z5XCJqBJ4/v/D2SMB0COh3+pgyn7fF3bvl7lbr2g15pMT5IAiF/cmzx7g/Q4ghu2sMlzZ6CuLoWSlg6W0qoxSJqolArEAoXUVHMrGBqurWlHgEHxiXDqghjrSMWFpScX1X8IcE6iDZ9Apg9e0YND2GQXqmICY/i4s3vUq/BPWinPPi6xBGQ86VgF+u//jxozzMTWCj/3Ej3ru3ltWB3MdGv0OAb7/dOB83H9jlGx9//me5H10IRywo5N3f38//jzUDSYpEI9b29PTiXM7Z3d3P36WE9cVsDJscwyADp4mer1PSJzaYOoSL6P1i+ZRUFKCjsSC2pGOUwaaBcB6k0tez92Dy2YkS8+wQ1De5mVjE0kIqVzC6ACLbzaEdA8/F/ZoawyAlKrOPWToNIJlXVpbPUzZu3LiwqxIHgJVg0h0+12CMkouk78HGSOpm1Xn2mzcXc1IhQcWl67omeu1nn13P/e4WJycnpfdiDGRKuMZQ5z0Nkqh6dk4LfPS2qwJai0NTiN0oNfGemxpD2vUnDAJXznTA/2f9xt+zhJkHS/8XWUJCz5EKUEwAyYVaWLiWbxCwPaayle0gEXUCYEvVfnFMSqHc9Fik0pfjSJupmoCgNngD+2DVgA6pyaRx+/Ydb9pwH+EaA/9v0jt4xXXTslItPmDALZLnDvJsTWxzs7YUxn4YKrRgh3UdL543gDeIOlFNhfA1iS7HMEZUjL8YYzHS+jwYodhKztOBBlwLT0sb9sBpQuyoWoIyUauMM/bDzfXYf9jVGObOzFOnvj9KfSHcbnrWuFxoGkhlome0m/MyNnSQXgAEqLCS4E9Pm6l2ECSqwJYwLCOqQKJxtG83NXRIqINWN1NIGXbBkqwlUUeponNCVbS+60eX1WUcU/eRhDroxI7KpgMdVXRW6T7SlzpJCZXw+9zc3H+yjtGZwZ9WjnpzBVGxBlQxjksjCCwL0ts0pn5UnWthWpEaoDGQorZVdv1VxiOVo1Gnyu4hm2DXtew9Jai8An5/9+54I+sYnRGVl6trMYn7MUaqSlqDr51kFYsC53MtJk3oWo8ePT6zA+86SRGqX0+sapnJhk0mNVd948H+zHvh3q4a+LY6c5GOs5LHmOqGD7qytLxvfuw9y3oO9AGdulBJfdBSNaZWPKkdUluUmY8/nQ/Jy5Za8FyTH4KNQ1H12gohH0dIJVWluY5O2bDQJdJdKKtUwvUZk1Ssc9W2572gxzNOfseYeF6JoOf5eUaIZUu7l42bayKVqU8gtvKi2vNm/kyxWQldo1Oi2lIt4mLzLd065cRVC7/wgB2cb84gQKh9jibpuE9+L7+Hrr/vAteHXASi2CxKEJLqqBM6XYOJpaUY4+HZKTLMeLg2Y+aY8fLqRZQ9aRyc53oexqkra1uzIn978eLludOC99fHtkCgU1+/q6aQr3QML01IWuTWbDiPk42awFcHXnpCgVBarq6/7wLE4HxcgpS2rOIWRJ0QINlcSy3STks1kd4cK/fiXMkzkkLE8jwakBmHBHDZvrmX7VnQZU5/FXRKVFu0FbiCOPidliAhYgFdNBYyuiSirhnleg4BHy+2CG1xrXBTBgHPpPXMUEKbazzcB/2XBMXY2q8s7UzQUF0B2Tvoc/qIjokatzu3HT7KiGOv69LZtM5Z9jHa0NOsihCqgWorm9StzQ9JY2rp6/cXW8O1a/QuzM/qWSx3VXUm18vWH4PlNNT8AXWCyWHr8DeJ0KS1JK5bWY/JeVls1b0jqk6rBVa6WGATjPFy2WJnSG2KKrjqA0AiltcmJavLnumD/duHD+Xpyb7rtJ0p2xU63fW7JIOVHnaJREfD5si50jhCfu+Dq86+pO1q/VXMMpAW0xlOibbCEe2mKyQlbSxE2WT1gcnRxzjWOuiUqC4pYkllj6EAgnxUnWce0vF8Oi07eh3Npe8ptti2IrzsRLErh4bVoZlAdTBJL4C+oWOJOkoQaRsegphfmgAfjkohYth3SWV+9+uve1H9QquCiSI2UspXLiy4vWnaocD4606aaRfpaBKd6qjjxW3juuA1DQiIDgpxfNK3bMNVB0XY43I+QSHr99+/HFnmxWmh43enVbqob+hMorJ8xyxp1haJx6UNFP1Ki56lEqlPO24tZSFrbOW6KveV+k94qn76aed8VdG+f+ysuqntrKMziWqlqa/Ql5VwTRigi8p0+14JCXmQrkhZbYiX4JOmUdQnXTwfG8/HjwSjoCMTw5tIeoFOJKpELGlYv71AQtPqtGYMAUmJ4TxkcoKwEARSi2QtNnLNWQIkqIXnSGk58eiEqFLQVRBy6UkjXS39qgRZo/P5ri2VlstMUJiqmtZP5f68C+lmPVB88mfN2kr46KO//u/t27e/ZzXROlHtpiRmN721tTUSL8r56LNl0gfpR/RTyFKAnbaMqKP+++YkntiIdWDzAPFJZgorR+KXs592iWqN0zHLoUgP+ThVqjAXqceb5z5/PiwEDC2VRQjds/w+IbtjDOlFn66ap18FsomSoBDZREqkvzQGm0Tlic1L08f1NZdtjKg8KB8KgrGMuiphQECX3iiNtHSUOaiT0w+htW4rSYGYtCCamHh4vqKe/1KUsb6M9HpyUbbbBR3drz1pPCOBzJCviBUYlZiujWLZZrGYLLtBr5k8j226wbV5HjaI0vbddY4N2PGdM02M5fVPUtJHIK67Ko0JfOBFEsdZ1kmO+6D3ue4l9ehtXXkhE+dgBsMILxPQBjULqrwfVwxoWYZACK4xVnmezz9fyidnnXMmxZmO+o8zHfVtVhNjRJX8mzpgyUYCtLGTRWddXFz8M4lu/vx+EK2sHrwQVYgjlVwK0hYxBFI3i7+Hkg6rvB9f7S3ue/fuWjDlxQcmm04/r/I8bBLFolL1nEnROFET2oGQA2mudWSR8DJhgDg5xEliyRxbqaZPmJSoqT5qR9C1VCGfSMWYphWc9+TJ5sj5l63oXBlSfdQOgNoiJEOtsHlKZYDISFFBX3fmbSJJ1A4gu/FJDP1iwqrbnlwKWGD+snlSQ8AZUed+yWYcc3PZJ6enp//MWsakzgORpDHB0NiLiXl1mcCGqONeOTo6/lc24ziTUl+ckbW1NkaQgjgDCBNy8YYgtuuiVXh5S0abIDl0JB21A2D/FM9T1bKbEqMqMQLaNBUC9k9fFFYorbuv6H3T3i5QSNTTEYlapKZUK8awvb3tTU22RY05js7OkmWr60iRfoPXSDo+iySFdHU8RbYQMz1Ou9ZRk3mqJYh7tgpCS7IOmGYCSI5WGaQqSpMB3EOMc00SNXNLVIHELYh00xASiQeqaglN8Yy5csma3J1bidpEO/iqSBK1ZUj2KISyRI0trePCRe3V2TLc10XaTCUMAomoCYNAImrCIJCIOgAUpYya8e/7bKhS27+vSJupHkLq7dv+AECi7ut2QdS1Ydkgrq2tnYcf6nuQt9ZULGoTSBK1ZyCAhXRtXWmaQBap9S/FeSk7VCdTQIjHNSgvJImXr1+/ys1s/J17UDzuzZufW6lrUAdJovYIkJS+s5DFFzgCcaRnAUSNKdTrugZEFG+XreuPlIXAkqfGs0w7dypJ1B5BavxDVF+VaQijM3mrBp/gIWMySCKkq64/Elx+z4SwTZungUTUnkDX+JfOhjarVKDD/KSNUSxIYOT6ZNiGdNznzy/qIsjzTBOJqD2Ba9PiI6A9tooeCbF1VxUfkKh6QrgaqXWJRNSeQHpMCcoKaUyCmHhWoJ9nkuzkJpA2Uz0COqOE9bXZmCy2XPrh4WizDSoQTqsNZSJqz1BGBGm4Owlid/C2H9c0e1AlovYcbLKwAEhyXhN6YqwRf7xk03w2LSSi9hCuTtBiL5XlWPdUnQUkonYMDOpISSkfZCFVCYWgkNMWSAs1Fb6sSETtGOL1wWVZVkBNOktPC1bNmGY7oGSe6hg+Ew86qCYpvv1pkhTYurjTdKMmonYIlnXxPtlufNYV2kbj4KrQHbmBbdPZJdLS3yFCWae2UXFoZ96VmYh2RgJf9W3Z+FGBcG9v31tqc1IkonYEllEdaKKJWLV7tC8GAEAa7jNpUTVd8Bj4eiIQCijH3b59J1cPvvyyXtv2ENLSPwGqEICGaxqhhha6VqoFRET6+iQuFoEy+2dMgIlWRSCfS1/WqowAgrdhlUhEDaDwby/nH5YO1xYs5XiKyn746HbZt14f61e3QdHyO67F8qp1WCpxA5HaVpe0ZOIaIbLyd1FFWPLv33cf63MAtBG8kgpQZO4CFHzINguN2VhQW/IH6KbG0vRDIv4BmQBCCshblJV8n1dkEfD3334rnASYu9ggCUkliop7FI1CFs5LxoOyNpeco58BcCxLv9VTJy6NniU4iYokDemCk4KcJGvukZ6srk2XtJ+05EbSC0GlVaYmifQvgODSLdHX+xVIoxB7Lx90MxDO4x4uM1YiagMIlfSZFoqmGlcb7Tflugaqie5m3VbEVirpc0nRpHE9RHKIOYR+rGkzlTAIJKImDAKJqAmDwB8+OgP2hcZUjQAAAABJRU5ErkJggg==" alt="Popup Design Lab" onclick="goHome()" style="height:34px;width:auto;cursor:pointer;">
     <span class="topbar-appname">Quel Designer êtes-vous ?</span>
@@ -887,12 +887,15 @@
         <img id="profileAvatar" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
       </div>
       <div class="profile-dropdown" id="profileDropdown">
-        <button onclick="closeProfileDropdown();showProfile()">Mon profil</button>
+        <button onclick="closeProfileDropdown();showProfile('reco')">Mon profil</button>
+        <button onclick="closeProfileDropdown();showProfile('reco')">Recommandations</button>
+        <button onclick="closeProfileDropdown();showProfile('history')">Mes bilans</button>
         <button onclick="closeProfileDropdown();retakeQuiz()">Faire un nouveau bilan</button>
         <hr>
         <button class="danger" onclick="closeProfileDropdown();signOut()">Se déconnecter</button>
       </div>
     </div>
+  </div>
   </div>
 </nav>
 
@@ -996,7 +999,7 @@
     <p class="sub">Vos compétences par domaine</p>
     <div class="result-bars" id="resultBars"></div>
     <div id="avatarPreview" onclick="continuerVersAvatar()" style="cursor:pointer;margin-bottom:12px;display:none;"></div>
-    <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Continuer</button>
+    <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Voir ma progression</button>
   </div>
 </section>
 
@@ -1029,7 +1032,7 @@
     <div id="progressionBars" style="display:none;margin-bottom:32px;"></div>
     <div class="timeline" id="timeline"></div>
     <p style="text-align:center;font-size:0.78rem;margin-top:14px;"><a onclick="showProfileHistory()" style="color:var(--ink-soft);text-decoration:underline;cursor:pointer;">Voir et organiser mes résultats →</a></p>
-    <button onclick="showSkills()" class="btn-skills" style="width:100%;max-width:400px;margin:12px auto 0;">Monter en compétence</button>
+    <button onclick="showSkills()" class="btn-skills" style="width:100%;max-width:400px;margin:12px auto 0;">Voir mes recommandations</button>
   </div>
 </section>
 
@@ -1331,7 +1334,10 @@ function showHome() {
     displayHistory.forEach((entry, displayIdx) => {
       const realIdx = homeOffset + displayIdx;
       const col = ENTRY_COLORS[homeColors[displayIdx]];
-      const domainsStr = (entry.domains || []).join(' · ');
+      const domainsStr = (entry.domains || []).map(d => {
+        const ds = (entry.domainScores || []).find(s => s.domain === d);
+        return ds ? `${d} ${ds.pct}%` : d;
+      }).join(' · ');
       const imgTag = entry.avatarSrc ? `<img src="${entry.avatarSrc}" alt="avatar">` : '';
       const card = document.createElement('div');
       card.className = 'timeline-card';
@@ -1556,22 +1562,7 @@ async function afterLogin(fallbackName) {
       return;
     }
   }
-  // #32 — restore interrupted quiz from localStorage draft
-  const draft = JSON.parse(localStorage.getItem('qd_draft') || 'null');
-  if (draft && draft.currentDomain) {
-    scores = { ...scores, ...draft.scores };
-    draft.completedDomains.forEach(d => completedDomains.add(d));
-    pendingColorIdx = getNextColorIdx();
-    if (!completedDomains.has(draft.currentDomain)) {
-      startQuiz(draft.currentDomain, draft.currentQIndex || 0);
-      return;
-    }
-    if (completedDomains.size > 0) { showContinue(); return; }
-  } else if (completedDomains.size > 0) {
-    pendingColorIdx = getNextColorIdx();
-    showContinue();
-    return;
-  }
+  // #79 — always land on home after login; draft card lets user choose to resume
   pendingColorIdx = getNextColorIdx();
   showHome();
 }
@@ -2153,7 +2144,10 @@ function renderTimeline(history) {
     const card = document.createElement('div');
     card.className = 'timeline-card';
     const col = ENTRY_COLORS[timelineColors[displayIdx]];
-    const domainsStr = (entry.domains || []).join(' · ');
+    const domainsStr = (entry.domains || []).map(d => {
+      const ds = (entry.domainScores || []).find(s => s.domain === d);
+      return ds ? `${d} ${ds.pct}%` : d;
+    }).join(' · ');
     const imgTag = entry.avatarSrc ? `<img src="${entry.avatarSrc}" alt="avatar">` : '';
     card.style.background = col.bg;
     card.style.borderColor = col.stroke + '55';
@@ -2480,22 +2474,22 @@ const FORMATIONS = [
   { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Service Design","Design Ops"],lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e",       desc: "Structurez vos processus et outils design pour gagner en efficacité collective et en cohérence d'équipe." },
   { nom: "DISC : Communiquer et Manager en couleur",               type: "formation", duree: "1 jour",  domaines: ["Service Design"],            lien: "https://app.notion.com/4a049ebd394542dba7389f1da37f3459",       desc: "Identifiez votre profil comportemental pour mieux communiquer, influencer et collaborer avec vos équipes." },
   { nom: "User Research",                                          type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/aa9241d4d21d488bb884ad3ac58717d7",       desc: "Maîtrisez les méthodes d'investigation terrain pour comprendre les besoins réels et les comportements de vos utilisateurs." },
-  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/33da94d34ac3803daabfdc749b69e3fd",       desc: "Augmentez votre capacité de recherche utilisateur grâce aux outils d'intelligence artificielle adaptés à chaque phase." },
-  { nom: "User Research - Atelier 1 : User Research assistée par IA", type: "workshop", duree: "3h",   domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/userresearch_ia/",            desc: "Intégrez l'IA dans votre processus de recherche utilisateur à travers des exercices pratiques et des cas concrets." },
+  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/33da94d34ac3803daabfdc749b69e3fd",       desc: "Augmentez votre capacité de recherche utilisateur grâce aux outils d'intelligence artificielle adaptés à chaque phase.", moduleIA: true },
+  { nom: "User Research - Atelier 1 : User Research assistée par IA", type: "workshop", duree: "3h",   domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/userresearch_ia/",            desc: "Intégrez l'IA dans votre processus de recherche utilisateur à travers des exercices pratiques et des cas concrets.", moduleIA: true },
   { nom: "Figma",                                                  type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design","UI Engineer"], lien: "https://app.notion.com/e8fc7cf842e5455aab1bef571181e3c4", desc: "Prenez en main le logiciel de référence pour créer, prototyper et collaborer efficacement en design d'interface." },
   { nom: "Design inclusif",                                        type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design"],     lien: "https://app.notion.com/ae477ad35af049deade6871e52495615",       desc: "Concevez des expériences accessibles et adaptées à tous les profils, en intégrant les standards d'accessibilité dès la conception." },
   { nom: "Eco-conception",                                         type: "formation", duree: "1 jour",  domaines: ["UX Design"],                 lien: "https://app.notion.com/113a94d34ac38065ab4bd6d1c8bf5a3f",       desc: "Réduisez l'empreinte environnementale de vos interfaces numériques en adoptant les bonnes pratiques d'éco-conception." },
-  { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Engineer"],   lien: "https://app.notion.com/337a94d34ac380259b57ca6eb0a49678",       desc: "Générez du code fonctionnel par le langage naturel et intégrez l'IA dans votre workflow créatif de designer." },
-  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs." },
-  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA." },
-  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://app.notion.com/284a94d34ac38012a130f12c2f7f5e90",       desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact." },
-  { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/", desc: "Posez les bases du UX Writing avec l'IA pour produire des micro-copies claires, utiles et adaptées au contexte." },
-  { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/", desc: "Construisez une stratégie de contenu cohérente et évolutive en tirant parti des capacités des outils IA." },
+  { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Engineer"],   lien: "https://app.notion.com/337a94d34ac380259b57ca6eb0a49678",       desc: "Générez du code fonctionnel par le langage naturel et intégrez l'IA dans votre workflow créatif de designer.", moduleIA: true },
+  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs.", moduleIA: true },
+  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA.", moduleIA: true },
+  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://app.notion.com/284a94d34ac38012a130f12c2f7f5e90",       desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact.", moduleIA: true },
+  { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/", desc: "Posez les bases du UX Writing avec l'IA pour produire des micro-copies claires, utiles et adaptées au contexte.", moduleIA: true },
+  { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/", desc: "Construisez une stratégie de contenu cohérente et évolutive en tirant parti des capacités des outils IA.", moduleIA: true },
   { nom: "Accessibilité",                                          type: "formation", duree: "1 jour",  domaines: ["UI Design","UI Engineer"],   lien: "https://app.notion.com/ceceb4577fa244f6b6eff25ca54232d3",       desc: "Apprenez les standards WCAG et les bonnes pratiques pour rendre vos interfaces accessibles à tous les utilisateurs." },
   { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Design Ops"],                lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e",       desc: "Structurez vos processus et outils design pour gagner en efficacité collective et en cohérence d'équipe." },
   { nom: "Design Ops 2 jours",                                     type: "formation", duree: "2 jours", domaines: ["Design Ops"],                lien: "https://app.notion.com/320a94d34ac38079b4adefddf8726ba3",       desc: "Parcours complet pour structurer, piloter et faire évoluer votre pratique Design Ops de A à Z." },
   { nom: "Design Ops - Atelier 1 : Audit & Organisation design",   type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_audit/",            desc: "Auditez et réorganisez votre pratique design pour identifier les frictions et gagner en clarté." },
-  { nom: "Design Ops - Atelier 2 : Process Design & IA",           type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_processdesign_ia/", desc: "Optimisez vos processus de production design avec l'IA pour livrer plus vite et avec plus de cohérence." },
+  { nom: "Design Ops - Atelier 2 : Process Design & IA",           type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_processdesign_ia/", desc: "Optimisez vos processus de production design avec l'IA pour livrer plus vite et avec plus de cohérence.", moduleIA: true },
   { nom: "Design Ops - Atelier 3 : Documentation & Rituels design",type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_documentation_rituels/", desc: "Créez une documentation vivante et des rituels d'équipe qui maintiennent la cohésion et la qualité dans le temps." },
   { nom: "Design Ops - Atelier 4 : Metrics & Performance",         type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_metrics_performance/", desc: "Définissez et suivez les indicateurs clés pour mesurer l'impact et la performance de votre design." },
   { nom: "Design System",                                          type: "formation", duree: "1 jour",  domaines: ["Design System"],             lien: "https://app.notion.com/9b154b4f13764bfd9a8f6c2dd81afd38",       desc: "Créez et maintenez un système de composants cohérent et scalable pour accélérer vos productions et unifier l'expérience." },
@@ -2671,7 +2665,7 @@ function buildSkillsContent(container) {
   const seen = new Set();
   const sections = weakDomains.map(d => {
     const pct = Math.round(d.sum / d.max * 100);
-    const recs = FORMATIONS.filter(f => f.domaines.includes(d.domain) && !seen.has(f.nom));
+    const recs = FORMATIONS.filter(f => f.domaines.includes(d.domain) && f.moduleIA && !seen.has(f.nom));
     recs.forEach(f => seen.add(f.nom));
     if (!recs.length) return '';
 
@@ -2856,7 +2850,7 @@ init();
 </div>
 <div id="toast"><span id="toast-msg"></span><button id="toast-cancel" onclick="_cancelDelete()">Annuler</button></div>
 <footer class="app-footer" id="appFooter">
-  © Made by <a href="https://popupdesignlab.com" target="_blank" rel="noopener">Leflowdesign</a>
+  © Made by <a href="https://leflowdesign.fr" target="_blank" rel="noopener">Leflowdesign</a>
   &nbsp;·&nbsp;
   <a href="mailto:contact@popupdesignlab.com">contact@popupdesignlab.com</a>
   &nbsp;·&nbsp;
