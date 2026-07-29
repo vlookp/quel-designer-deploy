@@ -1493,7 +1493,9 @@ async function submitAuth() {
       currentUser = res.user;
       localStorage.setItem('qd_token', SB_TOKEN);
       localStorage.setItem('qd_user', JSON.stringify(res.user));
-      try { await sbRest(`/rest/v1/profiles?id=eq.${res.user.id}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ name }) }); } catch{}
+      const newsletterConsent = document.getElementById('newsletterCheck')?.checked || false;
+      localStorage.setItem('qd_newsletter_consent', newsletterConsent ? '1' : '0');
+      try { await sbRest(`/rest/v1/profiles?id=eq.${res.user.id}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ name, newsletter_consent: newsletterConsent }) }); } catch{}
       await afterLogin(name);
 
     } else {
