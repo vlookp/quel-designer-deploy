@@ -2197,6 +2197,18 @@ function showEntryResults(entry) {
         <span>${d.domain}</span>
         <span class="result-bar-pct">${label}</span>
       </div>`;
+    row.style.cursor = 'pointer';
+    row.onclick = () => showConfirm({
+      title: `Revoir les Expertises en ${d.domain} ?`,
+      message: 'Vous allez répondre aux questions de ce domaine. Vos résultats seront mis à jour.',
+      confirmLabel: 'Oui',
+      danger: false,
+      onConfirm: () => {
+        if (entry.questionScores) Object.assign(scores, entry.questionScores);
+        isEditingFromResults = true;
+        startQuiz(d.domain);
+      }
+    });
     barsEl.appendChild(row);
     requestAnimationFrame(() => {
       row.querySelector('.result-bar-fill').style.width = Math.max(fillPct, 4) + '%';
