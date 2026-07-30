@@ -25,6 +25,8 @@
     background: var(--bg);
     color: var(--ink);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ── LOGO ── */
@@ -222,7 +224,7 @@
 
   /* ── SCREENS ── */
   .screen { display: none; }
-  .screen.active { display: flex; flex-direction: column; }
+  .screen.active { display: flex; flex-direction: column; flex: 1; }
   .padtop { padding-top: 50px; }
   body.quiz-active #s-domains,
   body.quiz-active #s-quiz,
@@ -358,7 +360,7 @@
   }
   .btn-primary:hover { opacity: 0.8; }
   .btn-secondary {
-    background: transparent; color: var(--ink-soft);
+    background: var(--bg); color: var(--ink-soft);
     border: 1.5px solid var(--border);
     padding: 12px 28px; border-radius: 40px;
     font-size: 0.88rem; font-weight: 600; cursor: pointer;
@@ -1221,7 +1223,7 @@
       </div>
     </div>
     <div class="avatar-btns">
-      <button class="btn-primary" style="width:100%;max-width:300px;" onclick="goToProgression()">Continuer</button>
+      <button class="btn-primary" style="width:100%;max-width:300px;" onclick="goToProgression()">Voir ma progression</button>
     </div>
   </div>
 </section>
@@ -1240,18 +1242,8 @@
 <!-- PROFILE -->
 <section class="screen padtop" id="s-profile">
   <div class="profile-wrap">
-    <div class="profile-avatar-preview" onclick="openAvatarModal()" style="cursor:pointer;margin-top:8px;" title="Modifier mon avatar">
-      <div id="profileAvatarCircle" class="profile-avatar-placeholder">?</div>
-      <div class="profile-avatar-info">
-        <div class="profile-avatar-name" id="profileDisplayName">—</div>
-        <div class="profile-avatar-sub">Cliquez pour changer d'avatar</div>
-      </div>
-      <span style="font-size:0.88rem;color:var(--ink-soft);">→</span>
-    </div>
-
+    <h2 style="font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,1.8rem);font-weight:800;letter-spacing:-.02em;margin-bottom:20px;">Mes bilans</h2>
     <div id="profileHistoryContent"></div>
-
-    <button onclick="showPreviousScreen()" style="background:none;border:none;font-size:0.88rem;font-weight:700;color:var(--ink-soft);cursor:pointer;padding:0;margin-top:8px;">← Retour</button>
   </div>
 </section>
 
@@ -1549,10 +1541,7 @@ function showHome() {
     if (h1) h1.innerHTML = `Bonjour ${userName}&nbsp;👋`;
     if (sub) sub.textContent = 'On est ravi de te revoir. Tu souhaites revoir la progression de tes expertises ? À toi de jouer';
     cards.innerHTML = '';
-    // #53/#54 — draft "En cours" card
-    const draftCard = buildDraftCard();
-    if (draftCard) cards.appendChild(draftCard);
-    // #37 — show only last 3 bilans on home
+    // #37 — show only last 3 bilans on home (chronological, oldest first)
     const displayHistory = history.slice(-3);
     const homeOffset = history.length - displayHistory.length;
     const homeColors = resolveDisplayColors(displayHistory);
@@ -1576,9 +1565,12 @@ function showHome() {
           <div class="tac-name">${entry.name}</div>
           <div class="tac-domains">${domainsStr}</div>
         </div>`;
-      card.onclick = () => showEntryResults(entry);
+      card.onclick = () => showEntryResults(entry, homeColors[displayIdx]);
       cards.appendChild(card);
     });
+    // #106 — draft card at end (most recent, chronological order)
+    const draftCard = buildDraftCard();
+    if (draftCard) cards.appendChild(draftCard);
     const manageLink = document.getElementById('homeManageLink');
     if (manageLink) manageLink.style.display = 'block';
     const btnNew = document.getElementById('homeBtnNewBilan');
@@ -1605,7 +1597,7 @@ function showHome() {
       if (sub) sub.textContent = 'Voici une application pour évaluer ton niveau d\'expertise design. Cela pourra t\'aider à faire un bilan sur ton niveau d\'expertise et les actions à mener pour monter en compétence sur certain domaine. L\'idée n\'est pas d\'être "bon partout" mais de pouvoir se présenter avec au moins 3 expertises à mettre en avant. A toi de jouer !';
       tl.style.display = 'none';
       const btnNew = document.getElementById('homeBtnNewBilan');
-      if (btnNew) { btnNew.textContent = 'Faire un nouveau bilan'; btnNew.style.display = 'block'; }
+      if (btnNew) { btnNew.textContent = 'Commencer'; btnNew.style.display = 'block'; }
     }
   }
   goTo('s-home');
@@ -2363,11 +2355,6 @@ function drawProgressionBars(history) {
   });
   el.appendChild(legend);
 
-  // 60% threshold label
-  const thresholdLabel = document.createElement('div');
-  thresholdLabel.className = 'prog-threshold-label';
-  thresholdLabel.textContent = 'Seuil 60%';
-  el.appendChild(thresholdLabel);
 
   // Scrollable chart
   const chartWrap = document.createElement('div');
@@ -2514,7 +2501,7 @@ function renderTimeline(history) {
         <div class="tac-name">${entry.name}</div>
         <div class="tac-domains">${domainsStr}</div>
       </div>`;
-    card.onclick = () => showEntryResults(entry);
+    card.onclick = () => showEntryResults(entry, timelineColors[displayIdx]);
     tl.appendChild(card);
   });
 
@@ -2533,7 +2520,7 @@ function renderTimeline(history) {
   tl.appendChild(newCard);
 }
 
-function showEntryResults(entry) {
+function showEntryResults(entry, colorIdxOverride) {
   top3Domains = entry.domains || [];
   const barsEl = document.getElementById('resultBars');
   barsEl.innerHTML = '';
@@ -2578,7 +2565,7 @@ function showEntryResults(entry) {
   const btn = document.getElementById('btnGoAvatar');
   if (entry.avatarSrc) {
     selectedAvatar = entry.avatarSrc;
-    pendingColorIdx = entry.colorIdx ?? 0;
+    pendingColorIdx = colorIdxOverride ?? entry.colorIdx ?? 0;
     updateResultsPreview();
     btn.textContent = 'Voir ma progression';
   } else {
@@ -2757,9 +2744,10 @@ function quitQuiz() {
     goTo('s-landing');
     return;
   }
+  const hasProgress = completedDomains.size > 0;
   showConfirm({
     title: 'Quitter le quiz ?',
-    message: 'Votre progression sera sauvegardée.',
+    message: hasProgress ? 'Votre progression sera sauvegardée.' : 'Êtes-vous sûr de vouloir quitter le quiz ?',
     confirmLabel: 'Quitter',
     danger: false,
     onConfirm: () => { saveSession(false); showHome(); }
@@ -2903,8 +2891,8 @@ const FORMATIONS = [
   { nom: "Design inclusif",                                        type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design"],     lien: "https://app.notion.com/ae477ad35af049deade6871e52495615",       desc: "Concevez des expériences accessibles et adaptées à tous les profils, en intégrant les standards d'accessibilité dès la conception." },
   { nom: "Eco-conception",                                         type: "formation", duree: "1 jour",  domaines: ["UX Design"],                 lien: "https://app.notion.com/113a94d34ac38065ab4bd6d1c8bf5a3f",       desc: "Réduisez l'empreinte environnementale de vos interfaces numériques en adoptant les bonnes pratiques d'éco-conception." },
   { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Engineer"],   lien: "https://app.notion.com/337a94d34ac380259b57ca6eb0a49678",       desc: "Générez du code fonctionnel par le langage naturel et intégrez l'IA dans votre workflow créatif de designer.", moduleIA: true },
-  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs.", moduleIA: true },
-  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA.", moduleIA: true },
+  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe-coding/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs.", moduleIA: true },
+  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe-coding/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA.", moduleIA: true },
   { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/ia_uxwritting/",              desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact.", moduleIA: true },
   { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/", desc: "Posez les bases du UX Writing avec l'IA pour produire des micro-copies claires, utiles et adaptées au contexte.", moduleIA: true },
   { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/", desc: "Construisez une stratégie de contenu cohérente et évolutive en tirant parti des capacités des outils IA.", moduleIA: true },
@@ -2971,12 +2959,18 @@ function renderProfileHistory() {
   }
   [...history].reverse().forEach((entry, reverseIdx) => {
     const realIdx = history.length - 1 - reverseIdx;
-    const domainsStr = (entry.domains || []).join(' · ');
+    const domainsStr = (entry.domains || []).map(d => {
+      const ds = (entry.domainScores || []).find(s => s.domain === d);
+      return ds ? `${d} ${ds.pct}%` : d;
+    }).join(' · ');
+    const entryCol = ENTRY_COLORS[(entry.colorIdx ?? 0) % ENTRY_COLORS.length];
     const row = document.createElement('div');
     row.className = 'profile-history-entry';
+    row.style.background = entryCol.bg;
+    row.style.borderColor = entryCol.stroke + '55';
     const avatarHtml = entry.avatarSrc
       ? `<img src="${entry.avatarSrc}" alt="avatar">`
-      : `<div class="profile-history-avatar-ph">${(entry.name || '?')[0].toUpperCase()}</div>`;
+      : `<div class="profile-history-avatar-ph" style="background:${entryCol.stroke}22;border-color:${entryCol.stroke}55;">${(entry.name || '?')[0].toUpperCase()}</div>`;
     row.innerHTML = `
       ${avatarHtml}
       <div class="profile-history-info">
