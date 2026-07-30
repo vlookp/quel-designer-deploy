@@ -1117,6 +1117,9 @@
     </div>
   </div>
   <div class="domain-bars" id="domainGrid"></div>
+  <div id="domainsSaveBtnWrap" style="display:none;padding:28px 0 8px;text-align:center;">
+    <button class="btn-primary" style="max-width:320px;width:100%;" onclick="saveDomainProgress()">Enregistrer</button>
+  </div>
 </section>
 
 <!-- QUIZ -->
@@ -1644,6 +1647,8 @@ function updateDomainsIntro() {
     title.textContent = 'On continue !';
     sub.textContent = completedDomains.size + ' domaine' + (completedDomains.size > 1 ? 's' : '') + ' complété' + (completedDomains.size > 1 ? 's' : '') + ' sur ' + DOMAINS.length;
   }
+  const saveWrap = document.getElementById('domainsSaveBtnWrap');
+  if (saveWrap) saveWrap.style.display = completedDomains.size >= 1 ? 'block' : 'none';
 }
 
 function showTopbar(name, email) {
@@ -2632,6 +2637,13 @@ function quitQuiz() {
     danger: false,
     onConfirm: () => { saveSession(false); showHome(); }
   });
+}
+
+async function saveDomainProgress() {
+  const finished = completedDomains.size >= 3;
+  await saveSession(finished);
+  localStorage.removeItem('qd_draft');
+  showProgressionFromHome();
 }
 
 function retakeQuiz() {
