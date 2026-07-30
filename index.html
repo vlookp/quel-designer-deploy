@@ -71,6 +71,18 @@
   }
   .topbar.visible { display: flex; align-items: center; }
   .topbar-inner { max-width: 680px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  .topbar-standard { display: flex; width: 100%; align-items: center; justify-content: space-between; }
+  body.quiz-active .topbar-standard { display: none !important; }
+  .topbar-quiz { display: none; width: 100%; align-items: center; gap: 14px; }
+  body.quiz-active .topbar-quiz { display: flex; }
+  .quiz-topbar-quit {
+    width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
+    background: none; font-size: 1.1rem; cursor: pointer; color: var(--ink-soft);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: border-color .15s, color .15s;
+  }
+  .quiz-topbar-quit:hover { border-color: var(--ink); color: var(--ink); }
+  .quiz-topbar-title { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
   .topbar-brand { display: flex; align-items: center; gap: 12px; }
   .topbar-appname { font-size: 0.78rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
   .topbar-right { display: flex; gap: 10px; align-items: center; }
@@ -970,6 +982,7 @@
 <!-- TOPBAR -->
 <nav class="topbar" id="topbar">
   <div class="topbar-inner">
+  <div class="topbar-standard">
   <button class="btn-hamburger" id="btnHamburger" onclick="toggleSidebar()" aria-label="Menu">
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="5" x2="16" y2="5"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="2" y1="13" x2="16" y2="13"/></svg>
   </button>
@@ -994,6 +1007,11 @@
         <button class="danger" onclick="closeProfileDropdown();signOut()">Se déconnecter</button>
       </div>
     </div>
+  </div>
+  </div>
+  <div class="topbar-quiz">
+    <button class="quiz-topbar-quit" onclick="quitQuiz()" title="Quitter le quiz">×</button>
+    <span class="quiz-topbar-title" id="quizTopbarDate"></span>
   </div>
   </div>
 </nav>
@@ -1027,7 +1045,6 @@
 </nav>
 
 <!-- QUIZ QUIT BUTTON (fixed position, shown via body.quiz-active) -->
-<button class="quiz-quit-btn" onclick="quitQuiz()" title="Quitter le quiz">×</button>
 
 <!-- AUTH -->
 <section class="screen active" id="s-auth">
@@ -1086,8 +1103,8 @@
 <section class="screen padtop" id="s-domains">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
     <div>
-      <h2 style="margin-bottom:0;">Choisissez un domaine</h2>
-      <p class="pick-sub">Faites-les dans l'ordre que vous souhaitez</p>
+      <h2 style="margin-bottom:0;" id="domainsTitle">Choisissez un domaine</h2>
+      <p class="pick-sub" id="domainsSub">Faites-les dans l'ordre que vous souhaitez</p>
     </div>
   </div>
   <div class="domain-bars" id="domainGrid"></div>
@@ -1562,9 +1579,32 @@ function updateGlobalProgress(screenId) {
     bar.innerHTML = DOMAINS.map(d =>
       `<span class="qp-chip${completedDomains.has(d) ? ' done' : ''}">${d}</span>`
     ).join('');
+    updateQuizTopbar();
+    if (screenId === 's-domains') updateDomainsIntro();
   } else {
     bar.classList.remove('visible');
     document.body.classList.remove('quiz-active');
+  }
+}
+
+function updateQuizTopbar() {
+  const el = document.getElementById('quizTopbarDate');
+  if (!el) return;
+  const draft = JSON.parse(localStorage.getItem('qd_draft') || 'null');
+  let date = draft?.startedAt ? new Date(draft.startedAt) : new Date();
+  el.textContent = 'Bilan du ' + date.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+
+function updateDomainsIntro() {
+  const title = document.getElementById('domainsTitle');
+  const sub = document.getElementById('domainsSub');
+  if (!title || !sub) return;
+  if (completedDomains.size === 0) {
+    title.textContent = 'On commence ?';
+    sub.textContent = 'Faites les domaines dans l\'ordre que vous souhaitez';
+  } else {
+    title.textContent = 'On continue !';
+    sub.textContent = completedDomains.size + ' domaine' + (completedDomains.size > 1 ? 's' : '') + ' complété' + (completedDomains.size > 1 ? 's' : '') + ' sur ' + DOMAINS.length;
   }
 }
 
