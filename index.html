@@ -1531,6 +1531,8 @@ function goTo(id) {
   window.scrollTo(0, 0);
   updateGlobalProgress(id);
   if (currentUser) updateProfileCircle();
+  const quizScreens_ = ['s-domains', 's-quiz', 's-continue'];
+  setQuizTopbarMode(quizScreens_.includes(id));
   const noFooter = ['s-auth', 's-quiz', 's-domains', 's-droits', 's-politique'];
   const footer = document.getElementById('appFooter');
   if (footer) footer.classList.toggle('visible', !noFooter.includes(id));
