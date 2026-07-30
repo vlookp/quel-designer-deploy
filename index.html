@@ -1517,8 +1517,8 @@ function closeAuthGate() {
 
 function authGateSignup() {
   closeAuthGate();
-  // Clear guest draft — it's not tied to any account
-  localStorage.removeItem('qd_draft');
+  // Save current guest progress so afterLogin can restore it as a draft
+  if (completedDomains.size > 0) saveDraft();
   goTo('s-auth');
   switchTab('signup');
 }
