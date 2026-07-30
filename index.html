@@ -1604,9 +1604,8 @@ function updateGlobalProgress(screenId) {
 
 let _quizTopbarSaved = [];
 function setQuizTopbarMode(active) {
-  const toHide = [
-    document.querySelector('.topbar-brand'),
-    document.getElementById('btnHamburger'),
+  // topbar-brand and btnHamburger are handled by CSS via body.quiz-active — no JS needed
+  const toSaveRestore = [
     document.getElementById('btnDashboard'),
     document.getElementById('btnFaireBilan'),
     document.getElementById('topbarUser')
@@ -1614,8 +1613,8 @@ function setQuizTopbarMode(active) {
   const quizBar = document.querySelector('.topbar-quiz');
   if (active) {
     if (_quizTopbarSaved.length === 0) {
-      _quizTopbarSaved = toHide.map(el => ({ el, d: el ? el.style.display : '' }));
-      toHide.forEach(el => { if (el) el.style.display = 'none'; });
+      _quizTopbarSaved = toSaveRestore.map(el => ({ el, d: el ? el.style.display : '' }));
+      toSaveRestore.forEach(el => { if (el) el.style.display = 'none'; });
     }
     if (quizBar) quizBar.style.display = 'flex';
     updateQuizTopbar();
