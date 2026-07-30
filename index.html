@@ -2003,7 +2003,12 @@ function resumeDraft() {
   const draft = getDraftCardData();
   if (!draft) return;
   _restoreDraftState(draft);
-  startQuiz(draft.currentDomain, draft.currentQIndex || 0);
+  // If the current domain is already completed, show the continue screen
+  if (draft.completedDomains.includes(draft.currentDomain)) {
+    showContinue();
+  } else {
+    startQuiz(draft.currentDomain, draft.currentQIndex || 0);
+  }
 }
 
 function resumeAndShowResults() {
