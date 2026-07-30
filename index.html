@@ -1600,7 +1600,7 @@ function showHome() {
       tl.style.display = 'block';
       if (homeLogo) homeLogo.style.display = currentUser ? 'none' : 'block';
       const btnNew = document.getElementById('homeBtnNewBilan');
-      if (btnNew) { btnNew.textContent = 'Continuer mon bilan'; btnNew.style.display = 'block'; }
+      if (btnNew) { btnNew.textContent = 'Continuer mon bilan'; btnNew.style.display = 'block'; btnNew.onclick = resumeDraft; }
     } else {
       if (h1) h1.innerHTML = 'Quel designer<br>êtes-vous ?';
       if (sub) sub.textContent = 'Voici une application pour évaluer ton niveau d\'expertise design. Cela pourra t\'aider à faire un bilan sur ton niveau d\'expertise et les actions à mener pour monter en compétence sur certain domaine. L\'idée n\'est pas d\'être "bon partout" mais de pouvoir se présenter avec au moins 3 expertises à mettre en avant. A toi de jouer !';
