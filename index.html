@@ -2780,6 +2780,17 @@ async function saveDomainProgress() {
   scores = {};
   top3Domains = [];
 
+  if (!currentUser) {
+    // Guest: show auth gate instead of progression
+    _authGateQuit = false;
+    const m = document.getElementById('authGateModal');
+    const h = m?.querySelector('h3');
+    const p = m?.querySelector('p');
+    if (h) h.textContent = 'Vos résultats sont prêts ! 🎉';
+    if (p) p.textContent = 'Créez un compte gratuit pour accéder à vos résultats et les retrouver plus tard.';
+    if (m) m.classList.add('open');
+    return;
+  }
   showProgressionFromHome();
 }
 
