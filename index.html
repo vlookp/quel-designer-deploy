@@ -2678,6 +2678,11 @@ async function saveDomainProgress() {
   }
   saveHistory(history);
 
+  // Reset quiz state to prevent duplicate saves if user navigates back
+  completedDomains.clear();
+  scores = {};
+  top3Domains = [];
+
   showProgressionFromHome();
 }
 
