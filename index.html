@@ -357,6 +357,17 @@
   #s-quiz { min-height: 100vh; align-items: center; justify-content: center; padding: 70px 20px 40px; }
   .quiz-wrap { width: 100%; max-width: 540px; }
   .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .quiz-quit-btn {
+    position: fixed; top: 60px; right: 16px;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: var(--white);
+    font-size: 1.1rem; cursor: pointer; color: var(--ink-soft);
+    display: none; align-items: center; justify-content: center;
+    z-index: 90; transition: border-color .15s, color .15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .quiz-quit-btn:hover { border-color: var(--ink); color: var(--ink); }
+  body.quiz-active .quiz-quit-btn { display: flex; }
   .domain-tag {
     background: var(--ink); color: var(--white);
     font-size: 0.76rem; font-weight: 700;
@@ -964,22 +975,25 @@
   </button>
   <button class="sidebar-item" id="sidebarBilans" onclick="closeSidebar();showProfile('history')">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="6" x2="11" y2="6"/><line x1="5" y1="9" x2="9" y2="9"/></svg>
-    Mes bilans
+    Bilans
   </button>
   <button class="sidebar-item" id="sidebarProgression" onclick="closeSidebar();showProgressionFromHome()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,12 6,8 9,10 14,4"/><line x1="12" y1="4" x2="14" y2="4"/><line x1="14" y1="4" x2="14" y2="6"/></svg>
-    Ma progression
+    Progression
   </button>
   <button class="sidebar-item" id="sidebarReco" onclick="closeSidebar();showSkills()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6 8l1.5 1.5L10.5 6"/></svg>
-    Nos recommandations
+    Recommandations
   </button>
   <div class="sidebar-divider"></div>
   <button class="sidebar-item disabled" disabled>
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h10a1 1 0 0 1 1 1v9.5L8 10.5 2 12.5V3a1 1 0 0 1 1-1z"/></svg>
-    Mes futures formations
+    Futures formations
   </button>
 </nav>
+
+<!-- QUIZ QUIT BUTTON (fixed position, shown via body.quiz-active) -->
+<button class="quiz-quit-btn" onclick="quitQuiz()" title="Quitter le quiz">×</button>
 
 <!-- AUTH -->
 <section class="screen active" id="s-auth">
@@ -1029,7 +1043,6 @@
     <div id="homeTimeline" style="display:none;width:100%;">
       <p style="font-size:0.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;">Votre progression</p>
       <div class="timeline" id="homeTimelineCards"></div>
-      <p id="homeManageLink" style="display:none;text-align:center;font-size:0.78rem;margin-top:14px;"><a onclick="showProfileHistory()" style="color:var(--ink-soft);text-decoration:underline;cursor:pointer;">Voir et organiser mes résultats →</a></p>
     </div>
     <button class="btn-primary" id="homeBtnNewBilan" onclick="_retakeQuiz()" style="display:none;margin-top:28px;width:100%;max-width:320px;">Faire un nouveau bilan</button>
   </div>
@@ -1042,7 +1055,6 @@
       <h2 style="margin-bottom:0;">Choisissez un domaine</h2>
       <p class="pick-sub">Faites-les dans l'ordre que vous souhaitez</p>
     </div>
-    <button onclick="quitQuiz()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;font-size:1rem;cursor:pointer;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s,color .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-soft)'">×</button>
   </div>
   <div class="domain-bars" id="domainGrid"></div>
 </section>
@@ -1053,7 +1065,6 @@
     <div class="quiz-meta">
       <span class="domain-tag" id="quizDomainTag"></span>
       <span class="q-counter" id="quizCounter"></span>
-      <button onclick="quitQuiz()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;font-size:1rem;cursor:pointer;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s,color .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-soft)'">×</button>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" id="quizBar"></div></div>
     <div class="question-card">
@@ -1118,8 +1129,7 @@
     <p class="sub">Revenez régulièrement pour mesurer votre évolution</p>
     <div id="progressionBars" style="display:none;margin-bottom:32px;"></div>
     <div class="timeline" id="timeline"></div>
-    <p style="text-align:center;font-size:0.78rem;margin-top:14px;"><a onclick="showProfileHistory()" style="color:var(--ink-soft);text-decoration:underline;cursor:pointer;">Voir et organiser mes résultats →</a></p>
-    <button onclick="showSkills()" class="btn-skills" style="width:100%;max-width:400px;margin:12px auto 0;">Voir mes recommandations</button>
+    <button onclick="showSkills()" class="btn-skills" style="width:100%;max-width:400px;margin:12px auto 0;">Voir les recommandations</button>
   </div>
 </section>
 
@@ -1143,10 +1153,9 @@
 
 <!-- SKILLS / FORMATIONS -->
 <section class="screen padtop" id="s-skills">
-  <h2>Nos recommandations</h2>
+  <h2>Recommandations</h2>
   <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
   <div id="skillsContent" style="width:100%;max-width:800px;"></div>
-  <button class="btn-skills" onclick="goTo('s-progression')" style="margin-top:12px;">← Retour</button>
 </section>
 
 <!-- DASHBOARD -->
