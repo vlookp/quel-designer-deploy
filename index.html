@@ -1582,12 +1582,25 @@ function updateGlobalProgress(screenId) {
     bar.innerHTML = DOMAINS.map(d =>
       `<span class="qp-chip${completedDomains.has(d) ? ' done' : ''}">${d}</span>`
     ).join('');
+    setQuizTopbarMode(true);
     updateQuizTopbar();
     if (screenId === 's-domains') updateDomainsIntro();
   } else {
     bar.classList.remove('visible');
     document.body.classList.remove('quiz-active');
+    setQuizTopbarMode(false);
   }
+}
+
+function setQuizTopbarMode(active) {
+  const brand = document.querySelector('.topbar-brand');
+  const right = document.querySelector('.topbar-right');
+  const hamburger = document.getElementById('btnHamburger');
+  const quizBar = document.querySelector('.topbar-quiz');
+  if (brand) brand.style.display = active ? 'none' : '';
+  if (right) right.style.display = active ? 'none' : '';
+  if (hamburger) hamburger.style.display = active ? 'none' : '';
+  if (quizBar) quizBar.style.display = active ? 'flex' : 'none';
 }
 
 function updateQuizTopbar() {
