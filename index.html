@@ -1589,7 +1589,6 @@ function updateGlobalProgress(screenId) {
       `<span class="qp-chip${completedDomains.has(d) ? ' done' : ''}">${d}</span>`
     ).join('');
     setQuizTopbarMode(true);
-    updateQuizTopbar();
     if (screenId === 's-domains') updateDomainsIntro();
   } else {
     bar.classList.remove('visible');
@@ -1612,6 +1611,7 @@ function setQuizTopbarMode(active) {
     _quizTopbarSaved = toHide.map(el => ({ el, d: el ? el.style.display : '' }));
     toHide.forEach(el => { if (el) el.style.display = 'none'; });
     if (quizBar) quizBar.style.display = 'flex';
+    updateQuizTopbar();
   } else {
     _quizTopbarSaved.forEach(({ el, d }) => { if (el) el.style.display = d; });
     if (quizBar) quizBar.style.display = 'none';
