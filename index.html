@@ -1150,6 +1150,7 @@
     <div class="continue-actions">
       <button class="btn-results" id="btnResults" style="display:none" onclick="showResults()">Voir mes résultats</button>
       <button class="btn-primary" id="continueSaveBtn" style="display:none;max-width:320px;width:100%;margin-top:12px;" onclick="saveDomainProgress()">Enregistrer</button>
+      <button class="btn-small" id="continueQuitBtn" style="display:none;max-width:320px;width:100%;margin-top:12px;" onclick="quitQuiz()">Quitter</button>
     </div>
   </div>
 </section>
@@ -1612,12 +1613,15 @@ function setQuizTopbarMode(active) {
   ];
   const quizBar = document.querySelector('.topbar-quiz');
   if (active) {
-    _quizTopbarSaved = toHide.map(el => ({ el, d: el ? el.style.display : '' }));
-    toHide.forEach(el => { if (el) el.style.display = 'none'; });
+    if (_quizTopbarSaved.length === 0) {
+      _quizTopbarSaved = toHide.map(el => ({ el, d: el ? el.style.display : '' }));
+      toHide.forEach(el => { if (el) el.style.display = 'none'; });
+    }
     if (quizBar) quizBar.style.display = 'flex';
     updateQuizTopbar();
   } else {
     _quizTopbarSaved.forEach(({ el, d }) => { if (el) el.style.display = d; });
+    _quizTopbarSaved = [];
     if (quizBar) quizBar.style.display = 'none';
   }
 }
@@ -2129,7 +2133,11 @@ function showContinue() {
   buildDomainBars('continueGrid', true);
   document.getElementById('btnResults').style.display = allDone ? 'inline-block' : 'none';
   const continueSaveBtn = document.getElementById('continueSaveBtn');
-  if (continueSaveBtn) continueSaveBtn.style.display = (!allDone && completedDomains.size >= 1) ? 'inline-block' : 'none';
+  const continueQuitBtn = document.getElementById('continueQuitBtn');
+  const canSave = !allDone && completedDomains.size >= 1;
+  const canEnregistrer = canSave && completedDomains.size >= 3;
+  if (continueSaveBtn) continueSaveBtn.style.display = canEnregistrer ? 'inline-block' : 'none';
+  if (continueQuitBtn) continueQuitBtn.style.display = (canSave && !canEnregistrer) ? 'inline-block' : 'none';
   goTo('s-continue');
   if (allDone) {
     document.getElementById('quizProgress')?.classList.remove('visible');
