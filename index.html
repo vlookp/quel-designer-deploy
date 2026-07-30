@@ -1591,8 +1591,15 @@ function updateQuizTopbar() {
   const el = document.getElementById('quizTopbarDate');
   if (!el) return;
   const draft = JSON.parse(localStorage.getItem('qd_draft') || 'null');
-  let date = draft?.startedAt ? new Date(draft.startedAt) : new Date();
-  el.textContent = 'Bilan du ' + date.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+  const iso = draft?.startedAtISO;
+  const today = new Date().toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+  if (iso) {
+    const d = new Date(iso);
+    const formatted = isNaN(d) ? today : d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+    el.textContent = 'Bilan du ' + formatted;
+  } else {
+    el.textContent = 'Nouveau bilan du ' + today;
+  }
 }
 
 function updateDomainsIntro() {
@@ -1853,7 +1860,8 @@ function saveDraft() {
   localStorage.setItem('qd_draft', JSON.stringify({
     currentDomain, currentQIndex, scores,
     completedDomains: Array.from(completedDomains),
-    startedAt: existing?.startedAt || new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+    startedAt: existing?.startedAt || new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }),
+    startedAtISO: existing?.startedAtISO || new Date().toISOString()
   }));
 }
 
