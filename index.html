@@ -1502,8 +1502,17 @@ function goHome() {
   else goTo('s-landing');
 }
 
+let _authGateQuit = false;
+
 function closeAuthGate() {
-  document.getElementById('authGateModal')?.classList.remove('open');
+  const m = document.getElementById('authGateModal');
+  if (m) m.classList.remove('open');
+  if (_authGateQuit) {
+    _authGateQuit = false;
+    setQuizTopbarMode(false);
+    document.body.classList.remove('quiz-active');
+    goTo('s-landing');
+  }
 }
 
 function authGateSignup() {
@@ -1518,6 +1527,7 @@ function startGuestQuiz() {
   top3Domains = [];
   isRetake = false;
   localStorage.removeItem('qd_draft');
+  document.getElementById('topbar').classList.add('visible');
   showDomains();
   setQuizTopbarMode(true);
 }
@@ -2711,6 +2721,7 @@ function continuerVersAvatar() {
 function quitQuiz() {
   if (!currentUser && completedDomains.size >= 1) {
     // Guest with progress: prompt to register so they can come back
+    _authGateQuit = true;
     const m = document.getElementById('authGateModal');
     const h = m?.querySelector('h3');
     const p = m?.querySelector('p');
