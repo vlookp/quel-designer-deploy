@@ -1461,7 +1461,7 @@ function showHome() {
   const cards = document.getElementById('homeTimelineCards');
   const homeLogo = document.getElementById('homeLogo');
   if (history.length > 0) {
-    if (homeLogo) homeLogo.style.display = 'block';
+    if (homeLogo) homeLogo.style.display = currentUser ? 'none' : 'block';
     tl.style.display = 'block';
     // Personalized welcome
     const lastEntry = history[history.length - 1];
@@ -1516,7 +1516,7 @@ function showHome() {
       cards.innerHTML = '';
       cards.appendChild(draftCard);
       tl.style.display = 'block';
-      if (homeLogo) homeLogo.style.display = 'block';
+      if (homeLogo) homeLogo.style.display = currentUser ? 'none' : 'block';
     } else {
       tl.style.display = 'none';
     }
