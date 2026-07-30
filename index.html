@@ -1034,6 +1034,8 @@
       <div class="profile-dropdown" id="profileDropdown">
         <button onclick="closeProfileDropdown();showProfile('reco')">Mon profil</button>
         <hr>
+        <button id="dropdownDashboard" style="display:none" onclick="closeProfileDropdown();showDashboard()">Dashboard</button>
+        <hr id="dropdownDashboardSep" style="display:none">
         <button onclick="closeProfileDropdown();openContactModal()">Nous contacter</button>
         <hr>
         <button class="danger" onclick="closeProfileDropdown();signOut()">Se déconnecter</button>
@@ -1130,6 +1132,9 @@
           <input type="checkbox" id="newsletterCheck" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;cursor:pointer;">
           <label for="newsletterCheck" style="font-size:0.78rem;color:var(--ink-soft);line-height:1.5;cursor:pointer;">Je souhaite recevoir les actualités de Popup Design Lab par email.</label>
         </div>
+      </div>
+      <div id="field-forgot" style="display:none;text-align:right;margin-top:-4px;margin-bottom:4px;">
+        <button onclick="forgotPassword()" style="background:none;border:none;padding:0;font-size:0.8rem;color:var(--ink-soft);cursor:pointer;text-decoration:underline;">J'ai oublié mon mot de passe</button>
       </div>
       <button class="btn-auth" id="authBtn" onclick="submitAuth()">Créer mon compte</button>
     </div>
@@ -1730,7 +1735,13 @@ function updateDomainsIntro() {
 function showTopbar(name, email) {
   document.getElementById('topbar').classList.add('visible');
   document.getElementById('topbarUser').textContent = name || email;
-  if (email === TEACHER_EMAIL) document.getElementById('btnDashboard').style.display = 'inline-block';
+  if (email === TEACHER_EMAIL) {
+    document.getElementById('btnDashboard').style.display = 'inline-block';
+    const dd = document.getElementById('dropdownDashboard');
+    const sep = document.getElementById('dropdownDashboardSep');
+    if (dd) dd.style.display = 'block';
+    if (sep) sep.style.display = 'block';
+  }
   document.getElementById('btnFaireBilan').style.display = 'inline-block';
   document.getElementById('btnHamburger').classList.add('visible');
   updateProfileCircle();
@@ -1762,6 +1773,7 @@ function switchTab(mode) {
   document.getElementById('tab-login').classList.toggle('active', mode === 'login');
   document.getElementById('field-name').style.display = mode === 'signup' ? 'block' : 'none';
   document.getElementById('field-rgpd').style.display = mode === 'signup' ? 'flex' : 'none';
+  document.getElementById('field-forgot').style.display = mode === 'login' ? 'block' : 'none';
   document.getElementById('authBtn').textContent = mode === 'signup' ? 'Créer mon compte' : 'Se connecter';
   document.getElementById('authMsg').className = 'auth-msg';
 }
@@ -2816,9 +2828,9 @@ function retakeQuiz() {
     showChoiceModal({
       title: 'Faire un nouveau bilan',
       message: 'Voulez-vous repartir de vos réponses précédentes ou recommencer de zéro ?',
-      primaryLabel: 'Reprendre mes réponses',
+      primaryLabel: 'Repartir de mon dernier bilan',
       primaryAction: retakeFromLastBilan,
-      secondaryLabel: 'Recommencer de zéro',
+      secondaryLabel: 'From scratch !',
       secondaryAction: retakeFromScratch
     });
   } else {
@@ -2853,7 +2865,19 @@ function retakeFromScratch() {
   showContinue();
 }
 
-function _retakeQuiz() { retakeFromScratch(); }
+function _retakeQuiz() { retakeQuiz(); }
+
+async function forgotPassword() {
+  const email = document.getElementById('authEmail').value.trim();
+  if (!email) return showAuthMsg('Entrez votre email pour recevoir le lien de réinitialisation.', 'error');
+  showAuthMsg('Envoi en cours…', '');
+  try {
+    await sbFetch('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email }) });
+    showAuthMsg('Un lien de réinitialisation vous a été envoyé par email.', 'success');
+  } catch(e) {
+    showAuthMsg('Une erreur est survenue. Vérifiez votre email et réessayez.', 'error');
+  }
+}
 
 // ── AVATAR ──
 function buildAvatarGallery(containerId) {
