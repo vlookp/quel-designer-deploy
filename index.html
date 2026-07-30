@@ -2435,6 +2435,12 @@ function saveHistory(h) {
 }
 
 function goToProgression() {
+  // Don't save a new entry if scores were already saved (completedDomains cleared)
+  if (completedDomains.size === 0 && editingHistoryIdx < 0) {
+    renderTimeline(getHistory());
+    goTo('s-progression');
+    return;
+  }
   const img = selectedAvatar || '';
   const name = document.getElementById('nameInput').value.trim() || '';
   const domains = top3Domains.slice(0, 3);
