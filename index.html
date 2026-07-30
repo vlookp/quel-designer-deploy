@@ -96,10 +96,11 @@
   .profile-dropdown-wrap { position: relative; }
   .profile-dropdown {
     position: absolute; top: calc(100% + 8px); right: 0;
-    background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.10); min-width: 190px;
+    background: var(--white); border: 1.5px solid var(--border); border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.18); min-width: 190px;
     display: none; flex-direction: column; z-index: 1000; overflow: hidden;
   }
+  .profile-dropdown button { color: var(--ink) !important; }
   .profile-dropdown.open { display: flex; }
   .profile-dropdown button {
     background: none; border: none; padding: 11px 16px; text-align: left;
@@ -389,7 +390,10 @@
   .result-bar-row.top .result-bar-label { color: var(--white); }
   .result-bar-row.mid .result-bar-label { color: var(--white); }
   .result-bar-row.low .result-bar-label { color: var(--ink); }
-  .result-bar-pct { font-size: 0.82rem; font-weight: 700; opacity: .75; }
+  .result-bar-pct { font-size: 0.82rem; font-weight: 700; }
+  .result-bar-row.top .result-bar-pct,
+  .result-bar-row.mid .result-bar-pct { color: #fff; }
+  .result-bar-row.low .result-bar-pct { color: var(--ink); opacity: .75; }
 
   /* avatar placeholder */
   .avatar-card-placeholder {
@@ -746,12 +750,13 @@
     background: #FFE4C4; color: #A0440A;
   }
   /* formations layout — 3-column per domain */
-  .skills-domain-section { width: 100%; margin-bottom: 28px; display: grid; grid-template-columns: 140px 1fr 1fr; gap: 16px; align-items: start; }
-  @media (max-width: 600px) { .skills-domain-section { grid-template-columns: 1fr; } }
+  .skills-domain-section { width: 100%; margin-bottom: 28px; border-top: 1px solid var(--border); padding-top: 20px; }
+  .skills-domain-section:first-child { border-top: none; padding-top: 0; }
   .skills-domain-col { }
-  .skills-col-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
-  .skills-formation-row { display: flex; flex-direction: column; gap: 8px; }
-  .skills-workshop-row { display: flex; flex-direction: column; gap: 8px; }
+  .skills-col-label { display: none; }
+  .skills-cards-list { display: flex; flex-direction: column; gap: 8px; }
+  .skills-formation-row { display: contents; }
+  .skills-workshop-row { display: contents; }
   .skills-workshop-label { display: none; }
 
   /* formation card — full width in column */
@@ -955,8 +960,13 @@
 
 <!-- DOMAIN PICKER -->
 <section class="screen padtop" id="s-domains">
-  <h2>Choisissez un domaine</h2>
-  <p class="pick-sub">Faites-les dans l'ordre que vous souhaitez</p>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+    <div>
+      <h2 style="margin-bottom:0;">Choisissez un domaine</h2>
+      <p class="pick-sub">Faites-les dans l'ordre que vous souhaitez</p>
+    </div>
+    <button onclick="quitQuiz()" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;font-size:1rem;cursor:pointer;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s,color .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-soft)'">×</button>
+  </div>
   <div class="domain-bars" id="domainGrid"></div>
 </section>
 
@@ -1164,7 +1174,8 @@
 
     <div style="background:var(--ink);color:#fff;border-radius:12px;padding:20px 24px;">
       <p style="font-size:0.88rem;font-weight:700;margin:0 0 10px;">Vos droits</p>
-      <p style="font-size:0.84rem;line-height:1.6;margin:0;">Accès, rectification, effacement, retrait du consentement : consultez le détail de vos droits et comment les exercer. <button onclick="showDroits()" style="background:none;border:none;color:#fff;text-decoration:underline;cursor:pointer;font-size:0.84rem;padding:0;">Voir la fiche Vos droits →</button></p>
+      <p style="font-size:0.84rem;line-height:1.6;margin:0;">Accès, rectification, effacement, retrait du consentement : consultez le détail de vos droits et comment les exercer. <button onclick="goTo('s-droits')" style="background:none;border:none;color:#fff;text-decoration:underline;cursor:pointer;font-size:0.84rem;padding:0;">Voir la fiche Vos droits →</button></p>
+
     </div>
   </div>
 </section>
@@ -1390,7 +1401,7 @@ function goTo(id) {
   window.scrollTo(0, 0);
   updateGlobalProgress(id);
   if (currentUser) updateProfileCircle();
-  const noFooter = ['s-auth', 's-quiz', 's-domains'];
+  const noFooter = ['s-auth', 's-quiz', 's-domains', 's-droits', 's-politique'];
   const footer = document.getElementById('appFooter');
   if (footer) footer.classList.toggle('visible', !noFooter.includes(id));
 }
@@ -2474,7 +2485,7 @@ const FORMATIONS = [
   { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Service Design","Design Ops"],lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e",       desc: "Structurez vos processus et outils design pour gagner en efficacité collective et en cohérence d'équipe." },
   { nom: "DISC : Communiquer et Manager en couleur",               type: "formation", duree: "1 jour",  domaines: ["Service Design"],            lien: "https://app.notion.com/4a049ebd394542dba7389f1da37f3459",       desc: "Identifiez votre profil comportemental pour mieux communiquer, influencer et collaborer avec vos équipes." },
   { nom: "User Research",                                          type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/aa9241d4d21d488bb884ad3ac58717d7",       desc: "Maîtrisez les méthodes d'investigation terrain pour comprendre les besoins réels et les comportements de vos utilisateurs." },
-  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://app.notion.com/33da94d34ac3803daabfdc749b69e3fd",       desc: "Augmentez votre capacité de recherche utilisateur grâce aux outils d'intelligence artificielle adaptés à chaque phase.", moduleIA: true },
+  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/ia_uxr/",                      desc: "Augmentez votre capacité de recherche utilisateur grâce aux outils d'intelligence artificielle adaptés à chaque phase.", moduleIA: true },
   { nom: "User Research - Atelier 1 : User Research assistée par IA", type: "workshop", duree: "3h",   domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/userresearch_ia/",            desc: "Intégrez l'IA dans votre processus de recherche utilisateur à travers des exercices pratiques et des cas concrets.", moduleIA: true },
   { nom: "Figma",                                                  type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design","UI Engineer"], lien: "https://app.notion.com/e8fc7cf842e5455aab1bef571181e3c4", desc: "Prenez en main le logiciel de référence pour créer, prototyper et collaborer efficacement en design d'interface." },
   { nom: "Design inclusif",                                        type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Design"],     lien: "https://app.notion.com/ae477ad35af049deade6871e52495615",       desc: "Concevez des expériences accessibles et adaptées à tous les profils, en intégrant les standards d'accessibilité dès la conception." },
@@ -2482,12 +2493,12 @@ const FORMATIONS = [
   { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UX Design","UI Engineer"],   lien: "https://app.notion.com/337a94d34ac380259b57ca6eb0a49678",       desc: "Générez du code fonctionnel par le langage naturel et intégrez l'IA dans votre workflow créatif de designer.", moduleIA: true },
   { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs.", moduleIA: true },
   { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UX Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA.", moduleIA: true },
-  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://app.notion.com/284a94d34ac38012a130f12c2f7f5e90",       desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact.", moduleIA: true },
+  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/ia_uxwritting/",              desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact.", moduleIA: true },
   { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/", desc: "Posez les bases du UX Writing avec l'IA pour produire des micro-copies claires, utiles et adaptées au contexte.", moduleIA: true },
   { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/", desc: "Construisez une stratégie de contenu cohérente et évolutive en tirant parti des capacités des outils IA.", moduleIA: true },
   { nom: "Accessibilité",                                          type: "formation", duree: "1 jour",  domaines: ["UI Design","UI Engineer"],   lien: "https://app.notion.com/ceceb4577fa244f6b6eff25ca54232d3",       desc: "Apprenez les standards WCAG et les bonnes pratiques pour rendre vos interfaces accessibles à tous les utilisateurs." },
   { nom: "Design Ops - 1 jour",                                    type: "formation", duree: "1 jour",  domaines: ["Design Ops"],                lien: "https://app.notion.com/b0350b9afa6b43dc8e828d619cb7692e",       desc: "Structurez vos processus et outils design pour gagner en efficacité collective et en cohérence d'équipe." },
-  { nom: "Design Ops 2 jours",                                     type: "formation", duree: "2 jours", domaines: ["Design Ops"],                lien: "https://app.notion.com/320a94d34ac38079b4adefddf8726ba3",       desc: "Parcours complet pour structurer, piloter et faire évoluer votre pratique Design Ops de A à Z." },
+  { nom: "Design Ops 2 jours",                                     type: "formation", duree: "2 jours", domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/design-ops/",                 desc: "Parcours complet pour structurer, piloter et faire évoluer votre pratique Design Ops de A à Z." },
   { nom: "Design Ops - Atelier 1 : Audit & Organisation design",   type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_audit/",            desc: "Auditez et réorganisez votre pratique design pour identifier les frictions et gagner en clarté." },
   { nom: "Design Ops - Atelier 2 : Process Design & IA",           type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_processdesign_ia/", desc: "Optimisez vos processus de production design avec l'IA pour livrer plus vite et avec plus de cohérence.", moduleIA: true },
   { nom: "Design Ops - Atelier 3 : Documentation & Rituels design",type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_documentation_rituels/", desc: "Créez une documentation vivante et des rituels d'équipe qui maintiennent la cohésion et la qualité dans le temps." },
@@ -2497,7 +2508,7 @@ const FORMATIONS = [
 ];
 
 // ── PROFILE ──
-let profilePreviousScreen = 's-progression';
+let profilePreviousScreen = 's-home';
 
 function switchProfileTab(tab) {
   const isReco = tab === 'reco';
@@ -2683,7 +2694,7 @@ function buildSkillsContent(container) {
           </div>
         </div>
         <span class="skills-arrow">→</span>
-      </a>`).join('') || '<p style="font-size:0.82rem;color:var(--ink-soft);">–</p>';
+      </a>`).join('');
 
     const workshopCards = workshops.map(f => `
       <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
@@ -2692,20 +2703,16 @@ function buildSkillsContent(container) {
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
         </div>
-      </a>`).join('') || '<p style="font-size:0.82rem;color:var(--ink-soft);">–</p>';
+      </a>`).join('');
 
     return `<div class="skills-domain-section">
-      <div class="skills-domain-col">
-        <div style="font-weight:800;font-size:0.9rem;line-height:1.3;margin-bottom:6px;">${d.domain}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-weight:800;font-size:0.9rem;">${d.domain}</span>
         <span class="skills-score-badge">${pct}%</span>
       </div>
-      <div class="skills-domain-col">
-        <div class="skills-col-label">Formations</div>
-        <div class="skills-formation-row">${formationCards}</div>
-      </div>
-      <div class="skills-domain-col">
-        <div class="skills-col-label">⚡ Ateliers</div>
-        <div class="skills-workshop-row">${workshopCards}</div>
+      <div class="skills-cards-list">
+        ${formationCards}
+        ${workshopCards}
       </div>
     </div>`;
   }).join('');
