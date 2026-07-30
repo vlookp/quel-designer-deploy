@@ -71,8 +71,11 @@
   }
   .topbar.visible { display: flex; align-items: center; }
   .topbar-inner { max-width: 680px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-  .topbar-standard { display: flex; width: 100%; align-items: center; justify-content: space-between; }
-  body.quiz-active .topbar-standard { display: none !important; }
+  .topbar-standard { display: contents; }
+  body.quiz-active .topbar-standard { display: none; }
+  body.quiz-active #btnHamburger { display: none !important; }
+  body.quiz-active .topbar-brand { display: none !important; }
+  body.quiz-active .topbar-right { display: none !important; }
   .topbar-quiz { display: none; width: 100%; align-items: center; gap: 14px; }
   body.quiz-active .topbar-quiz { display: flex; }
   .quiz-topbar-quit {
