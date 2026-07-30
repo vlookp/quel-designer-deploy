@@ -2653,6 +2653,31 @@ async function saveDomainProgress() {
   const finished = completedDomains.size >= 3;
   await saveSession(finished);
   localStorage.removeItem('qd_draft');
+
+  // Save to local history so the progression screen shows the card + graph
+  const domainScores = getDomainScores().map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) }));
+  const domains = [...domainScores].sort((a, b) => b.pct - a.pct).slice(0, 3).map(d => d.domain);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const history = getHistory();
+  const hasSameDay = history.some(e => (e.dateBase || e.date) === dateStr);
+  const colorIdx = getNextColorIdx();
+  const img = selectedAvatar || '';
+  const name = document.getElementById('topbarUser')?.textContent || '';
+  if (hasSameDay) {
+    history.forEach(e => {
+      if ((e.dateBase || e.date) === dateStr && !e.dateBase) {
+        e.dateBase = e.date;
+        e.date = e.date + ' · ' + (e.time || timeStr);
+      }
+    });
+    history.push({ date: dateStr + ' · ' + timeStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, questionScores: {...scores}, avatarSrc: img, colorIdx });
+  } else {
+    history.push({ date: dateStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, questionScores: {...scores}, avatarSrc: img, colorIdx });
+  }
+  saveHistory(history);
+
   showProgressionFromHome();
 }
 
