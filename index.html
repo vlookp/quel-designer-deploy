@@ -1587,20 +1587,27 @@ function showHome() {
   } else {
     const h1 = document.querySelector('#s-home h1');
     const sub = document.querySelector('#s-home p[style*="color:var(--ink-soft)"]');
-    if (h1) h1.innerHTML = 'Quel designer<br>êtes-vous ?';
-    if (sub) sub.textContent = 'Voici une application pour évaluer ton niveau d\'expertise design. Cela pourra t\'aider à faire un bilan sur ton niveau d\'expertise et les actions à mener pour monter en compétence sur certain domaine. L\'idée n\'est pas d\'être "bon partout" mais de pouvoir se présenter avec au moins 3 expertises à mettre en avant. A toi de jouer !';
     // Show draft card even if no completed history
     const draftCard = buildDraftCard();
     if (draftCard) {
+      const draft = JSON.parse(localStorage.getItem('qd_draft') || 'null');
+      const doneDomains = (draft?.completedDomains || []).length;
+      const userName = document.getElementById('topbarUser')?.textContent || '';
+      if (h1) h1.innerHTML = `Bienvenue dans ton espace&nbsp;👋`;
+      if (sub) sub.textContent = `Tu as déjà démarré — tu es à ${doneDomains} domaine${doneDomains > 1 ? 's' : ''} sur 8. Continue pour obtenir ton profil designer et des recommandations personnalisées.`;
       cards.innerHTML = '';
       cards.appendChild(draftCard);
       tl.style.display = 'block';
       if (homeLogo) homeLogo.style.display = currentUser ? 'none' : 'block';
+      const btnNew = document.getElementById('homeBtnNewBilan');
+      if (btnNew) { btnNew.textContent = 'Continuer mon bilan'; btnNew.style.display = 'block'; }
     } else {
+      if (h1) h1.innerHTML = 'Quel designer<br>êtes-vous ?';
+      if (sub) sub.textContent = 'Voici une application pour évaluer ton niveau d\'expertise design. Cela pourra t\'aider à faire un bilan sur ton niveau d\'expertise et les actions à mener pour monter en compétence sur certain domaine. L\'idée n\'est pas d\'être "bon partout" mais de pouvoir se présenter avec au moins 3 expertises à mettre en avant. A toi de jouer !';
       tl.style.display = 'none';
+      const btnNew = document.getElementById('homeBtnNewBilan');
+      if (btnNew) { btnNew.textContent = 'Faire un nouveau bilan'; btnNew.style.display = 'block'; }
     }
-    const btnNew = document.getElementById('homeBtnNewBilan');
-    if (btnNew) btnNew.style.display = 'block';
   }
   goTo('s-home');
 }
