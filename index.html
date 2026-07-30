@@ -1518,8 +1518,7 @@ function startGuestQuiz() {
   top3Domains = [];
   isRetake = false;
   localStorage.removeItem('qd_draft');
-  goTo('s-domains');
-  updateGlobalProgress('s-domains');
+  showDomains();
   setQuizTopbarMode(true);
 }
 
@@ -2710,6 +2709,23 @@ function continuerVersAvatar() {
 }
 
 function quitQuiz() {
+  if (!currentUser && completedDomains.size >= 1) {
+    // Guest with progress: prompt to register so they can come back
+    const m = document.getElementById('authGateModal');
+    const h = m?.querySelector('h3');
+    const p = m?.querySelector('p');
+    if (h) h.textContent = 'Enregistrez votre progression 💾';
+    if (p) p.textContent = 'Créez un compte gratuit pour sauvegarder votre avancement et reprendre le bilan plus tard.';
+    if (m) m.classList.add('open');
+    return;
+  }
+  if (!currentUser) {
+    // Guest with no progress: just go back to landing
+    setQuizTopbarMode(false);
+    document.body.classList.remove('quiz-active');
+    goTo('s-landing');
+    return;
+  }
   showConfirm({
     title: 'Quitter le quiz ?',
     message: 'Votre progression sera sauvegardée.',
@@ -3177,16 +3193,15 @@ async function loadDashboard() {
 
 // ── INIT ──
 async function init() {
-  if (localStorage.getItem('qd_visited')) switchTab('login');
-  localStorage.setItem('qd_visited', '1');
-  goTo('s-auth');
   const token = localStorage.getItem('qd_token');
   const user  = localStorage.getItem('qd_user');
   if (token && user) {
     SB_TOKEN = token;
     currentUser = JSON.parse(user);
     try { await afterLogin(''); }
-    catch { localStorage.removeItem('qd_token'); localStorage.removeItem('qd_user'); goTo('s-auth'); }
+    catch { localStorage.removeItem('qd_token'); localStorage.removeItem('qd_user'); goTo('s-landing'); }
+  } else {
+    goTo('s-landing');
   }
 }
 
