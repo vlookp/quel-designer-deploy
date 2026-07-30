@@ -1590,12 +1590,10 @@ function updateGlobalProgress(screenId) {
     bar.innerHTML = DOMAINS.map(d =>
       `<span class="qp-chip${completedDomains.has(d) ? ' done' : ''}">${d}</span>`
     ).join('');
-    setQuizTopbarMode(true);
     if (screenId === 's-domains') updateDomainsIntro();
   } else {
     bar.classList.remove('visible');
     document.body.classList.remove('quiz-active');
-    setQuizTopbarMode(false);
   }
 }
 
