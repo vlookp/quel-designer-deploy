@@ -1297,6 +1297,7 @@
           <th>Progression</th>
           <th>Top 3 domaines</th>
           <th>Statut</th>
+          <th title="Newsletter">✉</th>
         </tr>
       </thead>
       <tbody id="dashBody"></tbody>
@@ -3273,7 +3274,7 @@ async function loadDashboard() {
   let profiles, sessions;
   try {
     [profiles, sessions] = await Promise.all([
-      sbRest('/rest/v1/profiles?select=id,name,email&order=created_at.asc'),
+      sbRest('/rest/v1/profiles?select=id,name,email,newsletter_consent&order=created_at.asc'),
       sbRest('/rest/v1/quiz_sessions?select=*')
     ]);
   } catch(e) {
@@ -3311,6 +3312,7 @@ async function loadDashboard() {
       <td>${cd} / ${DOMAINS_COUNT}</td>
       <td style="font-size:0.82rem">${top3}</td>
       <td>${badge}</td>
+      <td style="text-align:center">${p.newsletter_consent ? '✅' : '—'}</td>
     </tr>`;
   }).join('');
 }
