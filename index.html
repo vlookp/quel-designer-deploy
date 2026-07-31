@@ -952,6 +952,19 @@
   .skills-workshop-domain { font-size: 0.68rem; color: var(--ink-soft); font-weight: 600; }
 
   .skills-arrow { font-size: 1rem; opacity: .5; flex-shrink: 0; }
+  .skills-formation-card { position: relative; }
+  .skills-workshop-card { position: relative; }
+  .bookmark-btn {
+    position: absolute; top: 8px; right: 10px;
+    background: none; border: none; font-size: 1.05rem;
+    cursor: pointer; line-height: 1; padding: 3px;
+    opacity: 0.35; transition: opacity .15s, transform .1s;
+    z-index: 2; color: var(--ink);
+  }
+  .bookmark-btn:hover { opacity: 0.8; transform: scale(1.15); }
+  .bookmark-btn.bookmarked { opacity: 1; color: #F59E0B; }
+  .skills-formation-card:hover .bookmark-btn { color: var(--white); }
+  .skills-formation-card:hover .bookmark-btn.bookmarked { color: #FCD34D; }
   .skills-formation-card:hover .skills-arrow { opacity: 1; }
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
@@ -1331,6 +1344,12 @@
       <div class="mon-profil-label">Dernier bilan</div>
       <div class="mon-profil-bilan-mini" id="monProfilBilanMini"></div>
       <button onclick="showEntryResults(monProfilLastEntry)" style="margin-top:14px;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir les résultats →</button>
+    </div>
+
+    <!-- Favoris -->
+    <div id="monProfilFavorisWrap" style="display:none;">
+      <div class="mon-profil-label" style="margin-bottom:6px;">Mes favoris</div>
+      <div id="monProfilFavorisContent"></div>
     </div>
 
     <!-- Progression -->
@@ -2580,6 +2599,74 @@ function saveHistory(h) {
   localStorage.setItem('qd_history', JSON.stringify(h));
 }
 
+function getBookmarks() {
+  try { return JSON.parse(localStorage.getItem('qd_bookmarks') || '[]'); } catch { return []; }
+}
+function saveBookmarks(b) {
+  localStorage.setItem('qd_bookmarks', JSON.stringify(b));
+}
+function toggleBookmark(nom, event) {
+  if (event) { event.preventDefault(); event.stopPropagation(); }
+  const bm = getBookmarks();
+  const idx = bm.indexOf(nom);
+  if (idx === -1) bm.push(nom); else bm.splice(idx, 1);
+  saveBookmarks(bm);
+  // Re-render both screens if mounted
+  const skillsContainer = document.getElementById('skillsContent');
+  if (skillsContainer && document.getElementById('s-competence').classList.contains('active')) {
+    buildSkillsContent(skillsContainer);
+  }
+  refreshMonProfilBookmarks();
+}
+function refreshMonProfilBookmarks() {
+  const wrap = document.getElementById('monProfilFavorisWrap');
+  if (!wrap) return;
+  const bm = getBookmarks();
+  if (bm.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  const items = FORMATIONS.filter(f => bm.includes(f.nom));
+  if (items.length === 0) { wrap.style.display = 'none'; return; }
+
+  const formations = items.filter(f => f.type === 'formation');
+  const workshops  = items.filter(f => f.type === 'workshop');
+
+  const formCards = formations.map(f => `
+    <div style="position:relative;">
+      <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+        <div class="skills-formation-info">
+          <div class="skills-formation-name">${f.nom}</div>
+          <div class="skills-formation-desc">${f.desc || ''}</div>
+          <div class="skills-formation-type">
+            <span class="skills-type-tag formation">Formation · ${f.duree}</span>
+          </div>
+        </div>
+        <span class="skills-arrow">→</span>
+      </a>
+      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="Retirer des favoris">★</button>
+    </div>`).join('');
+
+  const workshopCards = workshops.map(f => `
+    <div style="position:relative;">
+      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+        <span class="skills-workshop-icon">🗓</span>
+        <div class="skills-workshop-info">
+          <div class="skills-workshop-name">${f.nom}</div>
+          <div class="skills-workshop-dur">${f.duree}</div>
+          <div class="skills-workshop-domain">${f.domaines[0]}</div>
+        </div>
+      </a>
+      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="Retirer des favoris">★</button>
+    </div>`).join('');
+
+  const formSection = formations.length > 0 ? `<div class="skills-section-label" style="margin-top:12px;">Formations</div><div class="skills-grid-2">${formCards}</div>` : '';
+  const wsSection  = workshops.length  > 0 ? `<div class="skills-section-label" style="margin-top:12px;">Ateliers</div><div class="skills-grid-2">${workshopCards}</div>` : '';
+
+  document.getElementById('monProfilFavorisContent').innerHTML = formSection + wsSection;
+  wrap.style.display = 'block';
+}
+
 function validateAvatar() {
   goToProgression(true);
 }
@@ -3274,6 +3361,7 @@ function showMonProfil() {
     }
   }
 
+  refreshMonProfilBookmarks();
   document.getElementById('monProfilSaveMsg').style.display = 'none';
   goTo('s-mon-profil');
 }
@@ -3429,27 +3517,41 @@ function buildSkillsContent(container) {
       });
   });
 
-  const formationCards = allFormations.map(f => `
-    <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
-      <div class="skills-formation-info">
-        <div class="skills-formation-name">${f.nom}</div>
-        <div class="skills-formation-desc">${f.desc || ''}</div>
-        <div class="skills-formation-type">
-          <span class="skills-type-tag formation">Formation · ${f.duree}</span>
-        </div>
-      </div>
-      <span class="skills-arrow">→</span>
-    </a>`).join('');
+  const bm = getBookmarks();
 
-  const workshopCards = allWorkshops.map(f => `
-    <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
-      <span class="skills-workshop-icon">🗓</span>
-      <div class="skills-workshop-info">
-        <div class="skills-workshop-name">${f.nom}</div>
-        <div class="skills-workshop-dur">${f.duree}</div>
-        <div class="skills-workshop-domain">${f.domaines[0]}</div>
-      </div>
-    </a>`).join('');
+  const formationCards = allFormations.map(f => {
+    const saved = bm.includes(f.nom);
+    return `
+    <div style="position:relative;">
+      <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+        <div class="skills-formation-info">
+          <div class="skills-formation-name">${f.nom}</div>
+          <div class="skills-formation-desc">${f.desc || ''}</div>
+          <div class="skills-formation-type">
+            <span class="skills-type-tag formation">Formation · ${f.duree}</span>
+          </div>
+        </div>
+        <span class="skills-arrow">→</span>
+      </a>
+      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
+    </div>`;
+  }).join('');
+
+  const workshopCards = allWorkshops.map(f => {
+    const saved = bm.includes(f.nom);
+    return `
+    <div style="position:relative;">
+      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+        <span class="skills-workshop-icon">🗓</span>
+        <div class="skills-workshop-info">
+          <div class="skills-workshop-name">${f.nom}</div>
+          <div class="skills-workshop-dur">${f.duree}</div>
+          <div class="skills-workshop-domain">${f.domaines[0]}</div>
+        </div>
+      </a>
+      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
+    </div>`;
+  }).join('');
 
   const formationSection = allFormations.length > 0 ? `
     <div class="skills-section-label">Formations · 1 journée</div>
