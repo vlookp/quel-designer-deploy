@@ -3123,42 +3123,46 @@ function buildSkillsContent(container) {
   const domainScores = getDomainScores();
   const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
 
-  // result card — use active quiz data or fallback to last saved bilan
-  let top3 = top3Domains.slice(0, 3);
-  let cardColorIdx = pendingColorIdx;
-  let cardAvatar = selectedAvatar;
-  let savedDomainScores = null;
-  if (top3.length === 0) {
-    const h = getHistory().filter(e => !e.isDraft);
-    const last = h.length > 0 ? h[h.length - 1] : null;
-    if (last) {
-      top3 = (last.domains && last.domains.length > 0)
-        ? last.domains.slice(0, 3)
-        : (last.domainScores || []).sort((a,b) => b.pct - a.pct).slice(0, 3).map(d => d.domain);
-      cardColorIdx = last.colorIdx ?? 0;
-      cardAvatar = last.avatarSrc || '';
-      savedDomainScores = last.domainScores || null;
-    }
+  // Result card — always built from last saved bilan (localStorage), with in-memory fallback
+  const allHistory = getHistory();
+  const lastEntry = allHistory.length > 0 ? allHistory[allHistory.length - 1] : null;
+
+  let cardTop3, cardColorIdx, cardAvatar, cardDomainScores;
+
+  if (lastEntry) {
+    // Use saved data from last bilan
+    cardDomainScores = lastEntry.domainScores || [];
+    cardTop3 = (lastEntry.domains && lastEntry.domains.length > 0)
+      ? lastEntry.domains.slice(0, 3)
+      : [...cardDomainScores].sort((a,b) => (b.pct||0) - (a.pct||0)).slice(0,3).map(d => d.domain);
+    cardColorIdx = lastEntry.colorIdx ?? pendingColorIdx;
+    cardAvatar = lastEntry.avatarSrc || selectedAvatar || '';
+  } else {
+    // No history — use current in-memory quiz state
+    cardDomainScores = null;
+    cardTop3 = top3Domains.slice(0, 3);
+    cardColorIdx = pendingColorIdx;
+    cardAvatar = selectedAvatar || '';
   }
-  const top3WithPct = top3.map(domain => {
-    if (savedDomainScores) {
-      const ds = savedDomainScores.find(d => d.domain === domain);
-      return { domain, pct: ds ? ds.pct : 0 };
-    }
-    const ds = domainScores.find(d => d.domain === domain);
-    return { domain, pct: ds ? Math.round(ds.sum / ds.max * 100) : 0 };
+
+  const top3WithPct = cardTop3.map(domain => {
+    const ds = cardDomainScores
+      ? cardDomainScores.find(d => d.domain === domain)
+      : domainScores.find(d => d.domain === domain);
+    const pct = ds ? (ds.pct !== undefined ? ds.pct : Math.round(ds.sum / ds.max * 100)) : 0;
+    return { domain, pct };
   });
   const col = ENTRY_COLORS[cardColorIdx % ENTRY_COLORS.length];
   const avatarHtml = cardAvatar
     ? `<img src="${cardAvatar}" alt="avatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 2px 8px rgba(0,0,0,.12);flex-shrink:0;">`
     : '';
-  const resultCard = top3.length > 0 ? `
+  const resultCard = cardTop3.length > 0 ? `
     <div style="margin-bottom:0;padding:20px;background:${col.bg};border:1.5px solid ${col.stroke}55;border-radius:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
       ${avatarHtml}
       <div style="flex:1;min-width:180px;">
         <div style="font-size:0.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;">Vos 3 expertises</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
-          ${top3WithPct.map((d,i)=>`
+          ${top3WithPct.map((d, i) => `
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:0.8rem;">${['🥇','🥈','🥉'][i]}</span>
               <span style="font-size:0.85rem;font-weight:700;flex:1;">${d.domain}</span>
