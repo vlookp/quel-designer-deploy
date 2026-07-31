@@ -3123,23 +3123,30 @@ function buildSkillsContent(container) {
   const domainScores = getDomainScores();
   const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
 
-  // result card styled like the last bilan card — fallback to last history entry if no active quiz
+  // result card — use active quiz data or fallback to last saved bilan
   let top3 = top3Domains.slice(0, 3);
   let cardColorIdx = pendingColorIdx;
   let cardAvatar = selectedAvatar;
+  let savedDomainScores = null;
   if (top3.length === 0) {
-    const h = getHistory();
+    const h = getHistory().filter(e => !e.isDraft);
     const last = h.length > 0 ? h[h.length - 1] : null;
     if (last) {
-      top3 = (last.domains || []).slice(0, 3);
+      top3 = (last.domains && last.domains.length > 0)
+        ? last.domains.slice(0, 3)
+        : (last.domainScores || []).sort((a,b) => b.pct - a.pct).slice(0, 3).map(d => d.domain);
       cardColorIdx = last.colorIdx ?? 0;
       cardAvatar = last.avatarSrc || '';
+      savedDomainScores = last.domainScores || null;
     }
   }
   const top3WithPct = top3.map(domain => {
+    if (savedDomainScores) {
+      const ds = savedDomainScores.find(d => d.domain === domain);
+      return { domain, pct: ds ? ds.pct : 0 };
+    }
     const ds = domainScores.find(d => d.domain === domain);
-    const pct = ds ? Math.round(ds.sum / ds.max * 100) : 0;
-    return { domain, pct };
+    return { domain, pct: ds ? Math.round(ds.sum / ds.max * 100) : 0 };
   });
   const col = ENTRY_COLORS[cardColorIdx % ENTRY_COLORS.length];
   const avatarHtml = cardAvatar
