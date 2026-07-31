@@ -1333,6 +1333,13 @@
       <button onclick="showEntryResults(monProfilLastEntry)" style="margin-top:14px;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir les résultats →</button>
     </div>
 
+    <!-- Progression -->
+    <div class="mon-profil-card" id="monProfilProgressionCard" style="display:none;">
+      <div class="mon-profil-label">Ma progression</div>
+      <div id="monProfilProgressionBars" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+      <button onclick="renderTimeline(getHistory());goTo('s-progression')" style="background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir ma progression complète →</button>
+    </div>
+
     <!-- Actions -->
     <div class="mon-profil-actions">
       <button class="btn-primary" onclick="showNewBilanPopin()">Faire un nouveau bilan</button>
@@ -3242,6 +3249,29 @@ function showMonProfil() {
   } else {
     monProfilLastEntry = null;
     if (bilanCard) bilanCard.style.display = 'none';
+  }
+
+  // Populate progression bars
+  const progCard = document.getElementById('monProfilProgressionCard');
+  const progBars = document.getElementById('monProfilProgressionBars');
+  if (progCard && progBars) {
+    const lastEntry = history.length > 0 ? history[history.length - 1] : null;
+    const domainScores = lastEntry && lastEntry.domainScores ? lastEntry.domainScores : [];
+    if (domainScores.length > 0) {
+      const top = domainScores.slice().sort((a, b) => b.pct - a.pct).slice(0, 5);
+      const col = lastEntry ? ENTRY_COLORS[(lastEntry.colorIdx ?? 0) % ENTRY_COLORS.length] : ENTRY_COLORS[0];
+      progBars.innerHTML = top.map(d => `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:110px;font-size:0.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;">${d.domain}</div>
+          <div style="flex:1;background:var(--border);border-radius:99px;height:7px;overflow:hidden;">
+            <div style="width:${d.pct}%;background:${col.stroke};height:100%;border-radius:99px;transition:width .4s;"></div>
+          </div>
+          <div style="width:34px;text-align:right;font-size:0.75rem;font-weight:600;color:${col.stroke};flex-shrink:0;">${d.pct}%</div>
+        </div>`).join('');
+      progCard.style.display = 'block';
+    } else {
+      progCard.style.display = 'none';
+    }
   }
 
   document.getElementById('monProfilSaveMsg').style.display = 'none';
