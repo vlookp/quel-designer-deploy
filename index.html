@@ -1103,7 +1103,7 @@
   </button>
   <button class="sidebar-item" id="sidebarReco" onclick="closeSidebar();showSkills()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6 8l1.5 1.5L10.5 6"/></svg>
-    Monter en compétence
+    Compétences
   </button>
   <div class="sidebar-divider"></div>
   <button class="sidebar-item" id="sidebarMesFormations" onclick="closeSidebar();showMesFormations()">
@@ -1380,7 +1380,7 @@
 
 <!-- SKILLS / FORMATIONS -->
 <section class="screen padtop" id="s-skills">
-  <h2>Monter en compétence</h2>
+  <h2>Compétences</h2>
   <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
   <div id="skillsContent" style="width:100%;max-width:800px;"></div>
 </section>
@@ -3314,7 +3314,7 @@ function showMesFormations() {
     container.innerHTML = `
       <div style="text-align:center;padding:60px 20px;color:var(--ink-soft);">
         <div style="font-size:2rem;margin-bottom:12px;">☆</div>
-        <div style="font-size:0.95rem;">Aucune formation mise de côté pour l'instant.<br>Cliquez sur l'étoile dans <strong>Monter en compétence</strong> pour en ajouter.</div>
+        <div style="font-size:0.95rem;">Aucune formation mise de côté pour l'instant.<br>Cliquez sur l'étoile dans <strong>Compétences</strong> pour en ajouter.</div>
       </div>`;
     goTo('s-mes-formations');
     return;
