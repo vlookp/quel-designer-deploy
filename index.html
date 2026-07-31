@@ -958,13 +958,23 @@
     position: absolute; top: 8px; right: 10px;
     background: none; border: none; font-size: 1.05rem;
     cursor: pointer; line-height: 1; padding: 3px;
-    opacity: 0.35; transition: opacity .15s, transform .1s;
+    opacity: 0.28; transition: opacity .15s, transform .1s;
     z-index: 2; color: var(--ink);
   }
-  .bookmark-btn:hover { opacity: 0.8; transform: scale(1.15); }
-  .bookmark-btn.bookmarked { opacity: 1; color: #F59E0B; }
-  .skills-formation-card:hover .bookmark-btn { color: var(--white); }
-  .skills-formation-card:hover .bookmark-btn.bookmarked { color: #FCD34D; }
+  .bookmark-btn:hover { opacity: 0.7; transform: scale(1.15); }
+  .bookmark-btn.bookmarked { opacity: 1; color: var(--ink); }
+  .skills-formation-card:hover .bookmark-btn { color: var(--white); opacity: 0.5; }
+  .skills-formation-card:hover .bookmark-btn.bookmarked { color: var(--white); opacity: 1; }
+  .skills-card-wrap { position: relative; display: flex; flex-direction: column; }
+  .skills-formation-card { cursor: default; }
+  .skills-workshop-card { cursor: default; }
+  .skills-card-footer { display: flex; align-items: center; justify-content: flex-end; padding: 0 16px 12px; }
+  .btn-plus-info {
+    font-size: 0.76rem; font-weight: 700; color: var(--ink); background: none;
+    border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 12px;
+    cursor: pointer; transition: background .15s, border-color .15s, color .15s; white-space: nowrap;
+  }
+  .btn-plus-info:hover { background: var(--ink); color: var(--white); border-color: var(--ink); }
   .skills-formation-card:hover .skills-arrow { opacity: 1; }
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
@@ -2650,8 +2660,8 @@ function refreshMonProfilBookmarks() {
   const workshops  = items.filter(f => f.type === 'workshop');
 
   const formCards = formations.map(f => `
-    <div style="position:relative;">
-      <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+    <div class="skills-card-wrap">
+      <div class="skills-formation-card" style="padding-right:32px;">
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
@@ -2659,21 +2669,26 @@ function refreshMonProfilBookmarks() {
             <span class="skills-type-tag formation">Formation · ${f.duree}</span>
           </div>
         </div>
-        <span class="skills-arrow">→</span>
-      </a>
+      </div>
+      <div class="skills-card-footer">
+        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+      </div>
       <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="Retirer des favoris">★</button>
     </div>`).join('');
 
   const workshopCards = workshops.map(f => `
-    <div style="position:relative;">
-      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+    <div class="skills-card-wrap">
+      <div class="skills-workshop-card" style="padding-right:32px;">
         <span class="skills-workshop-icon">🗓</span>
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
           <div class="skills-workshop-domain">${f.domaines[0]}</div>
         </div>
-      </a>
+      </div>
+      <div class="skills-card-footer">
+        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+      </div>
       <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="Retirer des favoris">★</button>
     </div>`).join('');
 
@@ -3325,8 +3340,8 @@ function showMesFormations() {
   const workshops  = items.filter(f => f.type === 'workshop');
 
   const makeFormCard = f => `
-    <div style="position:relative;">
-      <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+    <div class="skills-card-wrap">
+      <div class="skills-formation-card" style="padding-right:32px;">
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
@@ -3335,21 +3350,26 @@ function showMesFormations() {
             <span class="skills-type-tag domain">${f.domaines[0]}</span>
           </div>
         </div>
-        <span class="skills-arrow">→</span>
-      </a>
+      </div>
+      <div class="skills-card-footer">
+        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+      </div>
       <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)},event);showMesFormations()" title="Retirer des favoris">★</button>
     </div>`;
 
   const makeWsCard = f => `
-    <div style="position:relative;">
-      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+    <div class="skills-card-wrap">
+      <div class="skills-workshop-card" style="padding-right:32px;">
         <span class="skills-workshop-icon">🗓</span>
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
           <div class="skills-workshop-domain">${f.domaines[0]}</div>
         </div>
-      </a>
+      </div>
+      <div class="skills-card-footer">
+        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+      </div>
       <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)},event);showMesFormations()" title="Retirer des favoris">★</button>
     </div>`;
 
@@ -3593,8 +3613,8 @@ function buildSkillsContent(container) {
   const formationCards = allFormations.map(f => {
     const saved = bm.includes(f.nom);
     return `
-    <div style="position:relative;">
-      <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+    <div class="skills-card-wrap">
+      <div class="skills-formation-card" style="padding-right:32px;">
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
@@ -3602,8 +3622,10 @@ function buildSkillsContent(container) {
             <span class="skills-type-tag formation">Formation · ${f.duree}</span>
           </div>
         </div>
-        <span class="skills-arrow">→</span>
-      </a>
+      </div>
+      <div class="skills-card-footer">
+        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+      </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
   }).join('');
@@ -3611,15 +3633,18 @@ function buildSkillsContent(container) {
   const workshopCards = allWorkshops.map(f => {
     const saved = bm.includes(f.nom);
     return `
-    <div style="position:relative;">
-      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+    <div class="skills-card-wrap">
+      <div class="skills-workshop-card" style="padding-right:32px;">
         <span class="skills-workshop-icon">🗓</span>
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
           <div class="skills-workshop-domain">${f.domaines[0]}</div>
         </div>
-      </a>
+      </div>
+      <div class="skills-card-footer">
+        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+      </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
   }).join('');
