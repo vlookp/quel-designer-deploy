@@ -3127,16 +3127,27 @@ function buildSkillsContent(container) {
   const domainScores = getDomainScores();
   const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
 
-  // result card styled like the last bilan card
-  const top3 = top3Domains.slice(0, 3);
+  // result card styled like the last bilan card — fallback to last history entry if no active quiz
+  let top3 = top3Domains.slice(0, 3);
+  let cardColorIdx = pendingColorIdx;
+  let cardAvatar = selectedAvatar;
+  if (top3.length === 0) {
+    const h = getHistory();
+    const last = h.length > 0 ? h[h.length - 1] : null;
+    if (last) {
+      top3 = (last.domains || []).slice(0, 3);
+      cardColorIdx = last.colorIdx ?? 0;
+      cardAvatar = last.avatarSrc || '';
+    }
+  }
   const top3WithPct = top3.map(domain => {
     const ds = domainScores.find(d => d.domain === domain);
     const pct = ds ? Math.round(ds.sum / ds.max * 100) : 0;
     return { domain, pct };
   });
-  const col = ENTRY_COLORS[pendingColorIdx % ENTRY_COLORS.length];
-  const avatarHtml = selectedAvatar
-    ? `<img src="${selectedAvatar}" alt="avatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 2px 8px rgba(0,0,0,.12);flex-shrink:0;">`
+  const col = ENTRY_COLORS[cardColorIdx % ENTRY_COLORS.length];
+  const avatarHtml = cardAvatar
+    ? `<img src="${cardAvatar}" alt="avatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 2px 8px rgba(0,0,0,.12);flex-shrink:0;">`
     : '';
   const resultCard = top3.length > 0 ? `
     <div style="margin-bottom:0;padding:20px;background:${col.bg};border:1.5px solid ${col.stroke}55;border-radius:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
