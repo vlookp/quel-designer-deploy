@@ -1141,6 +1141,26 @@
   </div>
 </section>
 
+<!-- RESET PASSWORD -->
+<section class="screen" id="s-reset">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;">
+    <div style="width:100%;max-width:400px;background:var(--card);border-radius:20px;padding:32px 28px;box-shadow:0 2px 16px #0000000a;">
+      <h2 style="font-family:Georgia,serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;">Choisissez un nouveau mot de passe</h2>
+      <p style="font-size:0.88rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.5;">Votre lien est valide. Entrez votre nouveau mot de passe.</p>
+      <div class="auth-msg" id="resetMsg"></div>
+      <div class="auth-field">
+        <label>Nouveau mot de passe</label>
+        <input type="password" id="resetPassword1" placeholder="••••••••" oninput="document.getElementById('resetMsg').className='auth-msg'">
+      </div>
+      <div class="auth-field">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="resetPassword2" placeholder="••••••••">
+      </div>
+      <button class="btn-auth" onclick="submitResetPassword()">Mettre à jour</button>
+    </div>
+  </div>
+</section>
+
 <!-- FORGOT PASSWORD -->
 <section class="screen" id="s-forgot">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;">
@@ -1659,10 +1679,10 @@ function goTo(id) {
   if (currentUser) updateProfileCircle();
   const quizScreens_ = ['s-domains', 's-quiz', 's-continue'];
   setQuizTopbarMode(quizScreens_.includes(id));
-  const noFooter = ['s-landing', 's-auth', 's-forgot', 's-quiz', 's-domains', 's-droits', 's-politique'];
+  const noFooter = ['s-landing', 's-auth', 's-forgot', 's-reset', 's-quiz', 's-domains', 's-droits', 's-politique'];
   const footer = document.getElementById('appFooter');
   if (footer) footer.classList.toggle('visible', !noFooter.includes(id));
-  const noSidebar = ['s-landing', 's-auth', 's-forgot', 's-quiz', 's-domains', 's-continue', 's-droits', 's-politique'];
+  const noSidebar = ['s-landing', 's-auth', 's-forgot', 's-reset', 's-quiz', 's-domains', 's-continue', 's-droits', 's-politique'];
   const showSidebar = !!currentUser && !noSidebar.includes(id);
   document.body.classList.toggle('sidebar-active', showSidebar);
   const sidebar = document.getElementById('sidebar');
@@ -3217,7 +3237,6 @@ function buildSkillsContent(container) {
         <div class="skills-formation-desc">${f.desc || ''}</div>
         <div class="skills-formation-type">
           <span class="skills-type-tag formation">Formation · ${f.duree}</span>
-          <span class="skills-type-tag domain">${f.domaines[0]}</span>
         </div>
       </div>
       <span class="skills-arrow">→</span>
@@ -3241,7 +3260,7 @@ function buildSkillsContent(container) {
     <div class="skills-section-label">Ateliers · 3h</div>
     <div class="skills-grid-2">${workshopCards}</div>` : '';
 
-  container.innerHTML = `${resultCard}<h3 class="skills-reco-title">Nous vous recommandons</h3>${formationSection}${workshopSection}`;
+  container.innerHTML = `${resultCard}<h3 class="skills-reco-title">Le Popup Design Lab vous recommande</h3>${formationSection}${workshopSection}`;
 }
 
 function showSkills() {
@@ -3347,8 +3366,40 @@ async function loadDashboard() {
   }).join('');
 }
 
+async function submitResetPassword() {
+  const p1 = document.getElementById('resetPassword1').value;
+  const p2 = document.getElementById('resetPassword2').value;
+  const msg = document.getElementById('resetMsg');
+  const show = (txt, type) => { msg.textContent = txt; msg.className = 'auth-msg ' + (type||'') + ' visible'; };
+  if (!p1) return show('Entrez un nouveau mot de passe.', 'error');
+  if (p1.length < 6) return show('Le mot de passe doit contenir au moins 6 caractères.', 'error');
+  if (p1 !== p2) return show('Les mots de passe ne correspondent pas.', 'error');
+  show('Mise à jour en cours…', '');
+  try {
+    await sbRest('/auth/v1/user', { method: 'PUT', body: JSON.stringify({ password: p1 }) });
+    show('Mot de passe mis à jour ! Redirection…', 'success');
+    setTimeout(() => { goTo('s-auth'); switchTab('login'); }, 2000);
+  } catch(e) {
+    show('Une erreur est survenue. Le lien a peut-être expiré.', 'error');
+  }
+}
+
 // ── INIT ──
 async function init() {
+  // Detect Supabase recovery link (#access_token=...&type=recovery)
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    const params = Object.fromEntries(hash.split('&').map(p => p.split('=')));
+    if (params.type === 'recovery' && params.access_token) {
+      SB_TOKEN = decodeURIComponent(params.access_token);
+      localStorage.setItem('qd_token', SB_TOKEN);
+      if (params.refresh_token) localStorage.setItem('qd_refresh_token', decodeURIComponent(params.refresh_token));
+      history.replaceState(null, '', window.location.pathname);
+      goTo('s-reset');
+      return;
+    }
+  }
+
   const token = localStorage.getItem('qd_token');
   const user  = localStorage.getItem('qd_user');
   if (token && user) {
