@@ -114,6 +114,12 @@
   }
   .btn-small:hover { border-color: var(--ink); }
   .btn-small.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn-topbar-long { display: inline; }
+  .btn-topbar-short { display: none; }
+  @media (max-width: 480px) {
+    .btn-topbar-long { display: none; }
+    .btn-topbar-short { display: inline; }
+  }
   /* profile dropdown */
   .profile-dropdown-wrap { position: relative; }
   .profile-dropdown {
@@ -1055,7 +1061,7 @@
   </div>
   <div class="topbar-right">
     <span id="topbarUser" style="display:none;"></span>
-    <button class="btn-small" id="btnFaireBilan" style="display:none" onclick="retakeQuiz()">Faire un nouveau bilan</button>
+    <button class="btn-small" id="btnFaireBilan" style="display:none;white-space:nowrap;" onclick="retakeQuiz()"><span class="btn-topbar-long">Faire un nouveau bilan</span><span class="btn-topbar-short">Nouveau bilan</span></button>
     <div class="profile-dropdown-wrap" id="profileDropdownWrap" style="display:none;">
       <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()" title="Mon profil">
         <span class="profile-initial" id="profileInitial"></span>
