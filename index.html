@@ -430,7 +430,7 @@
   .domain-bar-row.done .domain-bar-check { opacity: 1; }
 
   /* ── QUIZ ── */
-  #s-quiz { min-height: 100vh; align-items: center; justify-content: center; padding: 70px 20px 40px; }
+  #s-quiz { min-height: 100vh; align-items: center; justify-content: center; padding: 70px 20px calc(80px + env(safe-area-inset-bottom, 0px)); }
   .quiz-wrap { width: 100%; max-width: 540px; }
   .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .quiz-quit-btn {
