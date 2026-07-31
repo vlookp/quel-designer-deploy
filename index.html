@@ -3127,9 +3127,6 @@ function buildSkillsContent(container) {
   const allHistory = getHistory();
   const lastEntry = allHistory.length > 0 ? allHistory[allHistory.length - 1] : null;
 
-  // DEBUG — à retirer
-  console.log('[Reco] history length:', allHistory.length, 'lastEntry:', lastEntry ? JSON.stringify({domains: lastEntry.domains, domainScores: lastEntry.domainScores?.length}) : null, 'top3Domains:', top3Domains);
-
   let cardTop3, cardColorIdx, cardAvatar, cardDomainScores;
 
   if (lastEntry) {
@@ -3225,7 +3222,8 @@ function buildSkillsContent(container) {
     <div class="skills-section-label">Ateliers · 3h</div>
     <div class="skills-grid-2">${workshopCards}</div>` : '';
 
-  container.innerHTML = `${resultCard}<h3 class="skills-reco-title">Nous vous recommandons</h3>${formationSection}${workshopSection}`;
+  const _debug = `<div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:8px;padding:12px;font-size:0.8rem;margin-bottom:16px;">DEBUG — history:${allHistory.length} · lastEntry:[${lastEntry?(lastEntry.domains||[]).join(',')||'domains vides':'null'}] · cardTop3:[${cardTop3.join(',')||'vide'}] · resultCard:${resultCard?'OK':'VIDE'}</div>`;
+  container.innerHTML = `${_debug}${resultCard}<h3 class="skills-reco-title">Nous vous recommandons</h3>${formationSection}${workshopSection}`;
 }
 
 function showSkills() {
