@@ -3222,8 +3222,7 @@ function buildSkillsContent(container) {
     <div class="skills-section-label">Ateliers · 3h</div>
     <div class="skills-grid-2">${workshopCards}</div>` : '';
 
-  const _debug = `<div style="background:#fef9c3;border:1px solid #f59e0b;border-radius:8px;padding:12px;font-size:0.8rem;margin-bottom:16px;">DEBUG — history:${allHistory.length} · lastEntry:[${lastEntry?(lastEntry.domains||[]).join(',')||'domains vides':'null'}] · cardTop3:[${cardTop3.join(',')||'vide'}] · resultCard:${resultCard?'OK':'VIDE'}</div>`;
-  container.innerHTML = `${_debug}${resultCard}<h3 class="skills-reco-title">Nous vous recommandons</h3>${formationSection}${workshopSection}`;
+  container.innerHTML = `${resultCard}<h3 class="skills-reco-title">Nous vous recommandons</h3>${formationSection}${workshopSection}`;
 }
 
 function showSkills() {
