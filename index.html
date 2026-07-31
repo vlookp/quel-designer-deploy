@@ -2669,10 +2669,7 @@ function refreshMonProfilBookmarks() {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div class="skills-workshop-domain">${f.domaines[0]}</div>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
+          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:4px;">Plus d'info →</a>
         </div>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
@@ -3347,10 +3344,7 @@ function showMesFormations() {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div class="skills-workshop-domain">${f.domaines[0]}</div>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
+          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:4px;">Plus d'info →</a>
         </div>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
@@ -3620,10 +3614,7 @@ function buildSkillsContent(container) {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div class="skills-workshop-domain">${f.domaines[0]}</div>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
+          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:4px;">Plus d'info →</a>
         </div>
       </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
