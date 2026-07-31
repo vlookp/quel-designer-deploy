@@ -1450,8 +1450,24 @@ DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
 
 // ── SUPABASE REST ──
 let SB_TOKEN = null;
+let _refreshing = null;
 
-async function sbRest(path, opts = {}) {
+async function sbRefreshToken() {
+  const rt = localStorage.getItem('qd_refresh_token');
+  if (!rt) throw new Error('No refresh token');
+  const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: rt })
+  });
+  const body = await res.json();
+  if (!res.ok || !body.access_token) throw new Error('Refresh failed');
+  SB_TOKEN = body.access_token;
+  localStorage.setItem('qd_token', SB_TOKEN);
+  if (body.refresh_token) localStorage.setItem('qd_refresh_token', body.refresh_token);
+}
+
+async function sbRest(path, opts = {}, _retry = false) {
   const headers = {
     'apikey': SUPABASE_KEY,
     'Content-Type': 'application/json',
@@ -1463,6 +1479,11 @@ async function sbRest(path, opts = {}) {
   let body; try { body = JSON.parse(txt); } catch { body = txt; }
   if (!res.ok) {
     const msg = body?.error_description || body?.message || body?.msg || body?.error || res.status + ' ' + res.statusText;
+    // Auto-refresh on JWT expiry (once)
+    if (!_retry && (res.status === 401 || (typeof msg === 'string' && msg.toLowerCase().includes('jwt')))) {
+      if (!_refreshing) _refreshing = sbRefreshToken().finally(() => { _refreshing = null; });
+      try { await _refreshing; return sbRest(path, opts, true); } catch { /* refresh failed, fall through */ }
+    }
     throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
   }
   return body;
@@ -1828,6 +1849,7 @@ async function submitAuth() {
       SB_TOKEN = res.access_token;
       currentUser = res.user;
       localStorage.setItem('qd_token', SB_TOKEN);
+      if (res.refresh_token) localStorage.setItem('qd_refresh_token', res.refresh_token);
       localStorage.setItem('qd_user', JSON.stringify(res.user));
       const newsletterConsent = document.getElementById('newsletterCheck')?.checked || false;
       localStorage.setItem('qd_newsletter_consent', newsletterConsent ? '1' : '0');
@@ -1842,6 +1864,7 @@ async function submitAuth() {
       SB_TOKEN = res.access_token;
       currentUser = res.user;
       localStorage.setItem('qd_token', SB_TOKEN);
+      if (res.refresh_token) localStorage.setItem('qd_refresh_token', res.refresh_token);
       localStorage.setItem('qd_user', JSON.stringify(res.user));
       await afterLogin('');
     }
@@ -1899,6 +1922,7 @@ async function afterLogin(fallbackName) {
 
 function signOut() {
   localStorage.removeItem('qd_token');
+  localStorage.removeItem('qd_refresh_token');
   localStorage.removeItem('qd_user');
   SB_TOKEN = null; currentUser = null; scores = {};
   completedDomains.clear(); top3Domains = [];
