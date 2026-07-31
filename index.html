@@ -807,6 +807,26 @@
 
   /* ── PROFILE SCREEN ── */
   #s-profile { padding: 70px 20px 80px; align-items: center; }
+  #s-mon-profil { padding: 70px 20px 80px; align-items: center; }
+  .mon-profil-wrap { max-width: 480px; width: 100%; margin: 0 auto; }
+  .mon-profil-avatar-zone { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 32px; }
+  .mon-profil-avatar-img { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); background: var(--fill-dim); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: opacity .15s; }
+  .mon-profil-avatar-img:hover { opacity: .8; }
+  .mon-profil-avatar-initial { font-size: 2rem; font-weight: 800; color: var(--ink-soft); }
+  .mon-profil-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+  .mon-profil-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 10px; }
+  .mon-profil-name-row { display: flex; gap: 10px; align-items: center; }
+  .mon-profil-name-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; background: var(--bg); color: var(--ink); font-family: inherit; }
+  .mon-profil-name-input:focus { outline: none; border-color: var(--ink); }
+  .mon-profil-save-btn { background: var(--ink); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-size: 0.84rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .mon-profil-bilan-mini { display: flex; align-items: center; gap: 12px; }
+  .mon-profil-bilan-mini img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .mon-profil-bilan-ph { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; flex-shrink: 0; }
+  .mon-profil-bilan-info { flex: 1; }
+  .mon-profil-bilan-date { font-size: 0.65rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  .mon-profil-bilan-domains { font-size: 0.82rem; font-weight: 700; margin-top: 2px; }
+  .mon-profil-bilan-pcts { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
+  .mon-profil-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
   .profile-wrap { max-width: 560px; width: 100%; margin: 0 auto; }
   #s-profile h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; }
   .profile-section { margin-bottom: 36px; }
@@ -1032,7 +1052,7 @@
         <img id="profileAvatar" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
       </div>
       <div class="profile-dropdown" id="profileDropdown">
-        <button onclick="closeProfileDropdown();showProfile('reco')">Mon profil</button>
+        <button onclick="closeProfileDropdown();showMonProfil()">Mon profil</button>
         <hr>
         <button id="dropdownDashboard" style="display:none" onclick="closeProfileDropdown();showDashboard()">Dashboard</button>
         <hr id="dropdownDashboardSep" style="display:none">
@@ -1282,6 +1302,43 @@
 </section>
 
 <!-- PROFILE -->
+<section class="screen padtop" id="s-mon-profil">
+  <div class="mon-profil-wrap">
+    <h2 style="font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,1.8rem);font-weight:800;letter-spacing:-.02em;margin-bottom:24px;">Mon profil</h2>
+
+    <!-- Avatar -->
+    <div class="mon-profil-avatar-zone">
+      <div id="monProfilAvatar" class="mon-profil-avatar-img" onclick="openAvatarModal()">
+        <span class="mon-profil-avatar-initial" id="monProfilInitial">?</span>
+      </div>
+      <button onclick="openAvatarModal()" style="background:none;border:1.5px solid var(--border);border-radius:20px;padding:6px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;color:var(--ink);">Changer l'avatar</button>
+    </div>
+
+    <!-- Prénom -->
+    <div class="mon-profil-card">
+      <div class="mon-profil-label">Prénom</div>
+      <div class="mon-profil-name-row">
+        <input class="mon-profil-name-input" type="text" id="monProfilName" placeholder="Votre prénom">
+        <button class="mon-profil-save-btn" onclick="saveMonProfil()">Enregistrer</button>
+      </div>
+      <div id="monProfilSaveMsg" style="font-size:0.78rem;color:var(--ink-soft);margin-top:8px;display:none;">✓ Prénom mis à jour</div>
+    </div>
+
+    <!-- Dernier bilan -->
+    <div class="mon-profil-card" id="monProfilBilanCard" style="display:none;">
+      <div class="mon-profil-label">Dernier bilan</div>
+      <div class="mon-profil-bilan-mini" id="monProfilBilanMini"></div>
+      <button onclick="showEntryResults(monProfilLastEntry)" style="margin-top:14px;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir les résultats →</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="mon-profil-actions">
+      <button class="btn-primary" onclick="showNewBilanPopin()">Faire un nouveau bilan</button>
+      <button class="btn-secondary" onclick="showProfile('history')">Voir tous mes bilans</button>
+    </div>
+  </div>
+</section>
+
 <section class="screen padtop" id="s-profile">
   <div class="profile-wrap">
     <h2 style="font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,1.8rem);font-weight:800;letter-spacing:-.02em;margin-bottom:20px;">Mes bilans</h2>
@@ -2764,6 +2821,8 @@ function openAvatarModal() {
   _avatarModalPrev = selectedAvatar;
   const overlay = document.getElementById('avatarModalOverlay');
   overlay.classList.add('open');
+  const applyBtn = document.getElementById('avatarModalApplyBtn');
+  if (applyBtn) applyBtn.textContent = _avatarModalFromQuiz ? 'Valider' : 'Modifier votre avatar';
   if (typeof AVATAR_URIS !== 'undefined') {
     buildAvatarGallery('avatarModalGallery');
   } else {
@@ -2792,8 +2851,15 @@ function applyAvatarFromModal() {
     updateProfileCircle();
     const circle = document.getElementById('profileAvatarCircle');
     if (circle) renderProfileAvatarPreview();
+    // Update Mon profil avatar if visible
+    const monProfilAv = document.getElementById('monProfilAvatar');
+    if (monProfilAv) monProfilAv.innerHTML = `<img src="${selectedAvatar}" alt="avatar" style="width:88px;height:88px;border-radius:50%;object-fit:cover;">`;
   }
+  const fromQuiz = _avatarModalFromQuiz;
+  _avatarModalFromQuiz = false;
+  document.getElementById('avatarModalApplyBtn').textContent = 'Modifier votre avatar';
   closeAvatarModal();
+  if (fromQuiz) goToProgression(true);
 }
 
 function cancelAvatarModal() {
@@ -2807,7 +2873,8 @@ function continuerVersAvatar() {
   if (selectedAvatar) {
     goToProgression();
   } else {
-    goToAvatarScreen();
+    _avatarModalFromQuiz = true;
+    openAvatarModal();
   }
 }
 
@@ -3095,6 +3162,78 @@ function renderProfileHistory() {
   });
   container.innerHTML = '';
   container.appendChild(list);
+}
+
+let monProfilLastEntry = null;
+let _avatarModalFromQuiz = false;
+
+function showMonProfil() {
+  // Populate name
+  const name = document.getElementById('nameInput')?.value.trim() || '';
+  const nameEl = document.getElementById('monProfilName');
+  if (nameEl) nameEl.value = name;
+
+  // Populate avatar
+  const avatarEl = document.getElementById('monProfilAvatar');
+  const initialEl = document.getElementById('monProfilInitial');
+  if (avatarEl) {
+    if (selectedAvatar) {
+      avatarEl.innerHTML = `<img src="${selectedAvatar}" alt="avatar" style="width:88px;height:88px;border-radius:50%;object-fit:cover;">`;
+    } else {
+      avatarEl.innerHTML = `<span class="mon-profil-avatar-initial">${name ? name[0].toUpperCase() : '?'}</span>`;
+    }
+  }
+
+  // Populate last bilan
+  const history = getHistory();
+  const bilanCard = document.getElementById('monProfilBilanCard');
+  const bilanMini = document.getElementById('monProfilBilanMini');
+  if (history.length > 0) {
+    monProfilLastEntry = history[history.length - 1];
+    const e = monProfilLastEntry;
+    const col = ENTRY_COLORS[(e.colorIdx ?? 0) % ENTRY_COLORS.length];
+    const domainsStr = (e.domains || []).slice(0, 3).map(d => {
+      const ds = (e.domainScores || []).find(s => s.domain === d);
+      return ds ? `${d} ${ds.pct}%` : d;
+    }).join(' · ');
+    const avatarHtml = e.avatarSrc
+      ? `<img src="${e.avatarSrc}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+      : `<div class="mon-profil-bilan-ph" style="background:${col.stroke}22;border:1.5px solid ${col.stroke}55;color:${col.stroke};">${(e.name||'?')[0].toUpperCase()}</div>`;
+    bilanMini.innerHTML = `
+      ${avatarHtml}
+      <div class="mon-profil-bilan-info">
+        <div class="mon-profil-bilan-date">${e.date}</div>
+        <div class="mon-profil-bilan-domains">${e.name || ''}</div>
+        <div class="mon-profil-bilan-pcts">${domainsStr}</div>
+      </div>`;
+    bilanCard.style.display = 'block';
+    bilanCard.style.borderColor = col.stroke + '55';
+    bilanCard.style.background = col.bg;
+  } else {
+    monProfilLastEntry = null;
+    if (bilanCard) bilanCard.style.display = 'none';
+  }
+
+  document.getElementById('monProfilSaveMsg').style.display = 'none';
+  goTo('s-mon-profil');
+}
+
+function saveMonProfil() {
+  const name = document.getElementById('monProfilName').value.trim();
+  if (!name) return;
+  const nameInput = document.getElementById('nameInput');
+  if (nameInput) nameInput.value = name;
+  updateAvatarCardText();
+  updateResultsPreview();
+  updateProfileCircle();
+  // Update avatar display
+  const avatarEl = document.getElementById('monProfilAvatar');
+  if (avatarEl && !selectedAvatar) {
+    avatarEl.innerHTML = `<span class="mon-profil-avatar-initial">${name[0].toUpperCase()}</span>`;
+  }
+  const msg = document.getElementById('monProfilSaveMsg');
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 2000);
 }
 
 function showProfileHistory() {
@@ -3425,7 +3564,7 @@ init();
       <div class="avatar-gallery" id="avatarModalGallery"></div>
     </div>
     <div style="position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;">
-      <button class="btn-primary" style="flex:1;" onclick="applyAvatarFromModal()">Modifier votre avatar</button>
+      <button class="btn-primary" style="flex:1;" id="avatarModalApplyBtn" onclick="applyAvatarFromModal()">Modifier votre avatar</button>
       <button class="btn-secondary" style="flex:1;" onclick="cancelAvatarModal()">Annuler</button>
     </div>
   </div>
