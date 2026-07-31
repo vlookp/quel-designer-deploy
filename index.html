@@ -2605,6 +2605,7 @@ function goToProgression(fromQuiz = false) {
     history.push({ date: dateStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, questionScores: {...scores}, avatarSrc: img, colorIdx });
   }
   saveHistory(history);
+  pendingColorIdx = getNextColorIdx();
   renderTimeline(history);
   if (fromQuiz) {
     updateResultsPreview();
@@ -2936,6 +2937,7 @@ async function saveDomainProgress() {
     history.push({ date: dateStr, dateBase: dateStr, time: timeStr, name, domains, domainScores, questionScores: {...scores}, avatarSrc: img, colorIdx });
   }
   saveHistory(history);
+  pendingColorIdx = getNextColorIdx();
 
   // Reset quiz state to prevent duplicate saves if user navigates back
   completedDomains.clear();
