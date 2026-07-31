@@ -2609,13 +2609,22 @@ function toggleBookmark(nom, event) {
   if (event) { event.preventDefault(); event.stopPropagation(); }
   const bm = getBookmarks();
   const idx = bm.indexOf(nom);
-  if (idx === -1) bm.push(nom); else bm.splice(idx, 1);
+  const adding = idx === -1;
+  if (adding) bm.push(nom); else bm.splice(idx, 1);
   saveBookmarks(bm);
-  // Re-render both screens if mounted
-  const skillsContainer = document.getElementById('skillsContent');
-  if (skillsContainer && document.getElementById('s-competence').classList.contains('active')) {
-    buildSkillsContent(skillsContainer);
+
+  // Instant visual feedback on the clicked button
+  if (event && event.currentTarget) {
+    const btn = event.currentTarget;
+    btn.textContent = adding ? '★' : '☆';
+    btn.classList.toggle('bookmarked', adding);
+    btn.title = adding ? 'Retirer des favoris' : 'Ajouter aux favoris';
+    if (adding) {
+      btn.style.transform = 'scale(1.4)';
+      setTimeout(() => { btn.style.transform = ''; }, 200);
+    }
   }
+
   refreshMonProfilBookmarks();
 }
 function refreshMonProfilBookmarks() {
