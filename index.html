@@ -2921,7 +2921,7 @@ async function forgotPassword() {
   if (!email) return _showForgotMsg('Entrez votre email.', 'error');
   _showForgotMsg('Envoi en cours…', '');
   try {
-    await sbRest('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email }) });
+    await sbRest('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email, redirectTo: window.location.origin }) });
     _showForgotMsg('Un lien de réinitialisation vous a été envoyé par email.', 'success');
   } catch(e) {
     _showForgotMsg('Une erreur est survenue. Vérifiez votre email et réessayez.', 'error');
