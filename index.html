@@ -3127,6 +3127,9 @@ function buildSkillsContent(container) {
   const allHistory = getHistory();
   const lastEntry = allHistory.length > 0 ? allHistory[allHistory.length - 1] : null;
 
+  // DEBUG — à retirer
+  console.log('[Reco] history length:', allHistory.length, 'lastEntry:', lastEntry ? JSON.stringify({domains: lastEntry.domains, domainScores: lastEntry.domainScores?.length}) : null, 'top3Domains:', top3Domains);
+
   let cardTop3, cardColorIdx, cardAvatar, cardDomainScores;
 
   if (lastEntry) {
