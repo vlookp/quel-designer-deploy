@@ -3389,11 +3389,11 @@ async function init() {
   // Detect Supabase recovery link (#access_token=...&type=recovery)
   const hash = window.location.hash.slice(1);
   if (hash) {
-    const params = Object.fromEntries(hash.split('&').map(p => p.split('=')));
-    if (params.type === 'recovery' && params.access_token) {
-      SB_TOKEN = decodeURIComponent(params.access_token);
+    const params = new URLSearchParams(hash);
+    if (params.get('type') === 'recovery' && params.get('access_token')) {
+      SB_TOKEN = params.get('access_token');
       localStorage.setItem('qd_token', SB_TOKEN);
-      if (params.refresh_token) localStorage.setItem('qd_refresh_token', decodeURIComponent(params.refresh_token));
+      if (params.get('refresh_token')) localStorage.setItem('qd_refresh_token', params.get('refresh_token'));
       history.replaceState(null, '', window.location.pathname);
       goTo('s-reset');
       return;
