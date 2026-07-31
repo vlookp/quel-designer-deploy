@@ -1055,8 +1055,7 @@
   </div>
   <div class="topbar-right">
     <span id="topbarUser" style="display:none;"></span>
-    <button class="btn-small dark" id="btnDashboard" style="display:none" onclick="showDashboard()">Dashboard</button>
-    <button class="btn-small" id="btnFaireBilan" style="display:none" onclick="retakeQuiz()">Faire un bilan</button>
+    <button class="btn-small" id="btnFaireBilan" style="display:none" onclick="retakeQuiz()">Faire un nouveau bilan</button>
     <div class="profile-dropdown-wrap" id="profileDropdownWrap" style="display:none;">
       <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()" title="Mon profil">
         <span class="profile-initial" id="profileInitial"></span>
@@ -1065,8 +1064,6 @@
       <div class="profile-dropdown" id="profileDropdown">
         <button onclick="closeProfileDropdown();showMonProfil()">Mon profil</button>
         <hr>
-        <button id="dropdownDashboard" style="display:none" onclick="closeProfileDropdown();showDashboard()">Dashboard</button>
-        <hr id="dropdownDashboardSep" style="display:none">
         <button onclick="closeProfileDropdown();openContactModal()">Nous contacter</button>
         <hr>
         <button class="danger" onclick="closeProfileDropdown();signOut()">Se déconnecter</button>
@@ -1355,9 +1352,13 @@
       <button onclick="renderTimeline(getHistory());goTo('s-progression')" style="background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir ma progression complète →</button>
     </div>
 
+    <!-- Dashboard admin -->
+    <div id="monProfilDashboardWrap" style="display:none;margin-bottom:16px;">
+      <button class="btn-small dark" onclick="showDashboard()" style="width:100%;padding:10px;">Dashboard</button>
+    </div>
+
     <!-- Actions -->
     <div class="mon-profil-actions">
-      <button class="btn-primary" onclick="showNewBilanPopin()">Faire un nouveau bilan</button>
       <button class="btn-secondary" onclick="showProfile('history')">Voir tous mes bilans</button>
     </div>
   </div>
@@ -1374,9 +1375,6 @@
 <section class="screen padtop" id="s-profile">
   <div class="profile-wrap">
     <h2 class="screen-h2" style="margin-bottom:20px;">Mes bilans</h2>
-    <div style="margin-bottom:20px;">
-      <button class="btn-primary" onclick="_retakeQuiz()" style="width:100%;">Faire un nouveau bilan</button>
-    </div>
     <div id="profileHistoryContent"></div>
   </div>
 </section>
@@ -1837,7 +1835,6 @@ let _quizTopbarSaved = [];
 function setQuizTopbarMode(active) {
   // topbar-brand and btnHamburger are handled by CSS via body.quiz-active — no JS needed
   const toSaveRestore = [
-    document.getElementById('btnDashboard'),
     document.getElementById('btnFaireBilan'),
     document.getElementById('topbarUser')
   ];
@@ -1890,11 +1887,8 @@ function showTopbar(name, email) {
   document.getElementById('topbar').classList.add('visible');
   document.getElementById('topbarUser').textContent = name || email;
   if (email === TEACHER_EMAIL) {
-    document.getElementById('btnDashboard').style.display = 'inline-block';
-    const dd = document.getElementById('dropdownDashboard');
-    const sep = document.getElementById('dropdownDashboardSep');
-    if (dd) dd.style.display = 'block';
-    if (sep) sep.style.display = 'block';
+    const dw = document.getElementById('monProfilDashboardWrap');
+    if (dw) dw.style.display = 'block';
   }
   document.getElementById('btnFaireBilan').style.display = 'inline-block';
   document.getElementById('btnHamburger').classList.add('visible');
@@ -2062,7 +2056,6 @@ function signOut() {
   selectedAvatar = null; selectedBg = 0;
   DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
   document.getElementById('topbar').classList.remove('visible');
-  document.getElementById('btnDashboard').style.display = 'none';
   document.getElementById('btnFaireBilan').style.display = 'none';
   document.getElementById('btnHamburger').classList.remove('visible');
   const wrap = document.getElementById('profileDropdownWrap');
