@@ -1134,9 +1134,26 @@
         </div>
       </div>
       <div id="field-forgot" style="display:none;text-align:right;margin-top:-4px;margin-bottom:4px;">
-        <button onclick="forgotPassword()" style="background:none;border:none;padding:0;font-size:0.8rem;color:var(--ink-soft);cursor:pointer;text-decoration:underline;">J'ai oublié mon mot de passe</button>
+        <button onclick="goTo('s-forgot')" style="background:none;border:none;padding:0;font-size:0.8rem;color:var(--ink-soft);cursor:pointer;text-decoration:underline;">J'ai oublié mon mot de passe</button>
       </div>
       <button class="btn-auth" id="authBtn" onclick="submitAuth()">Créer mon compte</button>
+    </div>
+  </div>
+</section>
+
+<!-- FORGOT PASSWORD -->
+<section class="screen" id="s-forgot">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;">
+    <div style="width:100%;max-width:400px;background:var(--card);border-radius:20px;padding:32px 28px;box-shadow:0 2px 16px #0000000a;">
+      <button onclick="goTo('s-auth')" style="background:none;border:none;padding:0;font-size:0.85rem;color:var(--ink-soft);cursor:pointer;margin-bottom:20px;display:flex;align-items:center;gap:6px;">← Retour</button>
+      <h2 style="font-family:Georgia,serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;">Mot de passe oublié</h2>
+      <p style="font-size:0.88rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.5;">Entrez votre email pour recevoir un lien de réinitialisation.</p>
+      <div class="auth-msg" id="forgotMsg"></div>
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="forgotEmail" placeholder="votre@email.com">
+      </div>
+      <button class="btn-auth" onclick="forgotPassword()">Envoyer le lien</button>
     </div>
   </div>
 </section>
@@ -1642,10 +1659,10 @@ function goTo(id) {
   if (currentUser) updateProfileCircle();
   const quizScreens_ = ['s-domains', 's-quiz', 's-continue'];
   setQuizTopbarMode(quizScreens_.includes(id));
-  const noFooter = ['s-landing', 's-auth', 's-quiz', 's-domains', 's-droits', 's-politique'];
+  const noFooter = ['s-landing', 's-auth', 's-forgot', 's-quiz', 's-domains', 's-droits', 's-politique'];
   const footer = document.getElementById('appFooter');
   if (footer) footer.classList.toggle('visible', !noFooter.includes(id));
-  const noSidebar = ['s-landing', 's-auth', 's-quiz', 's-domains', 's-continue', 's-droits', 's-politique'];
+  const noSidebar = ['s-landing', 's-auth', 's-forgot', 's-quiz', 's-domains', 's-continue', 's-droits', 's-politique'];
   const showSidebar = !!currentUser && !noSidebar.includes(id);
   document.body.classList.toggle('sidebar-active', showSidebar);
   const sidebar = document.getElementById('sidebar');
@@ -2273,10 +2290,11 @@ function computeAndShowResults() {
 
   const barsEl = document.getElementById('resultBars');
   barsEl.innerHTML = '';
+  const allZero = sorted.every(d => d.sum === 0);
   sorted.forEach((d, i) => {
     const pct = Math.round(d.sum / d.max * 100);
     const fillPct = Math.round(d.sum / maxMax * 100);
-    const tier = i < 3 ? (i === 0 ? 'top' : 'mid') : 'low';
+    const tier = (!allZero && i < 3) ? (i === 0 ? 'top' : 'mid') : 'low';
     const row = document.createElement('div');
     row.className = 'result-bar-row ' + tier;
     row.innerHTML = `
@@ -2891,15 +2909,22 @@ function retakeFromScratch() {
 
 function _retakeQuiz() { retakeQuiz(); }
 
+function _showForgotMsg(msg, type) {
+  const el = document.getElementById('forgotMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'auth-msg ' + (type ? type + ' ' : '') + 'visible';
+}
+
 async function forgotPassword() {
-  const email = document.getElementById('authEmail').value.trim();
-  if (!email) return showAuthMsg('Entrez votre email pour recevoir le lien de réinitialisation.', 'error');
-  showAuthMsg('Envoi en cours…', '');
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) return _showForgotMsg('Entrez votre email.', 'error');
+  _showForgotMsg('Envoi en cours…', '');
   try {
     await sbRest('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email }) });
-    showAuthMsg('Un lien de réinitialisation vous a été envoyé par email.', 'success');
+    _showForgotMsg('Un lien de réinitialisation vous a été envoyé par email.', 'success');
   } catch(e) {
-    showAuthMsg('Une erreur est survenue. Vérifiez votre email et réessayez.', 'error');
+    _showForgotMsg('Une erreur est survenue. Vérifiez votre email et réessayez.', 'error');
   }
 }
 
