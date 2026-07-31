@@ -373,9 +373,6 @@
   /* ── DOMAIN BARS ── */
   #s-domains { padding: 70px 20px 48px; max-width: 600px; margin: 0 auto; width: 100%; }
   #s-domains h2 {
-    font-family: Georgia, serif;
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
-    margin-bottom: 8px;
     margin-top: 24px;
     letter-spacing: -.02em;
   }
@@ -475,12 +472,7 @@
   /* ── CONTINUE ── */
   #s-continue { min-height: 100vh; align-items: center; justify-content: center; padding: 70px 20px 48px; }
   .continue-wrap { max-width: 600px; width: 100%; }
-  #s-continue h2 {
-    font-family: Georgia, serif;
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
-    margin-bottom: 8px;
-    letter-spacing: -.02em;
-  }
+  #s-continue h2 { margin-bottom: 8px; }
   #s-continue .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
   .continue-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; align-items: center; }
   .btn-results {
@@ -493,12 +485,7 @@
   /* ── RESULTS ── */
   #s-results { padding: 70px 20px 80px; align-items: center; }
   .results-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
-  #s-results h2 {
-    font-family: Georgia, serif;
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
-    margin-bottom: 6px;
-    letter-spacing: -.02em;
-  }
+  #s-results h2 { margin-bottom: 6px; }
   #s-results .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
 
   /* Sorted result bars */
@@ -538,12 +525,7 @@
   /* ── AVATAR ── */
   #s-avatar { padding: 70px 20px 80px; align-items: center; }
   .avatar-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
-  #s-avatar h2 {
-    font-family: Georgia, serif;
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
-    margin-bottom: 6px;
-    letter-spacing: -.02em;
-  }
+  #s-avatar h2 { margin-bottom: 6px; }
   #s-avatar .sub { color: var(--ink-soft); margin-bottom: 24px; font-size: 0.92rem; }
   .name-input {
     display: block; margin: 0 auto 20px; max-width: 300px; width: 100%;
@@ -603,12 +585,7 @@
   /* ── PROGRESSION ── */
   #s-progression { padding: 70px 20px 80px; align-items: center; }
   .prog-wrap { max-width: 640px; width: 100%; margin: 0 auto; }
-  #s-progression h2 {
-    font-family: Georgia, serif;
-    font-size: clamp(1.6rem, 5vw, 2.2rem);
-    margin-bottom: 6px;
-    letter-spacing: -.02em;
-  }
+  #s-progression h2 { margin-bottom: 6px; }
   #s-progression .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; }
   .timeline {
     display: flex; gap: 12px; overflow-x: auto;
@@ -744,7 +721,7 @@
 
   /* ── DASHBOARD ── */
   #s-dashboard { padding: 70px 20px 60px; align-items: center; }
-  #s-dashboard h2 { font-family: Georgia, serif; font-size: 2rem; text-align: center; margin-bottom: 8px; }
+  #s-dashboard h2 { margin-bottom: 8px; }
   .dash-sub { text-align: center; color: var(--ink-soft); margin-bottom: 24px; font-size: 0.9rem; }
   .dash-stats { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px; }
   .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 110px; }
@@ -830,7 +807,7 @@
   .mon-profil-bilan-pcts { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
   .mon-profil-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
   .profile-wrap { max-width: 560px; width: 100%; margin: 0 auto; }
-  #s-profile h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; }
+  #s-profile h2 { margin-bottom: 4px; }
   .profile-section { margin-bottom: 36px; }
   .profile-section-title {
     font-size: 0.72rem; font-weight: 700; letter-spacing: .08em;
@@ -888,7 +865,7 @@
 
   /* ── SKILLS / MONTÉE EN COMPÉTENCE ── */
   #s-skills { padding: 70px 20px 80px; align-items: center; }
-  #s-skills h2 { font-family: Georgia, serif; font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 800; margin-bottom: 6px; letter-spacing: -.02em; text-align: center; }
+  #s-skills h2 { margin-bottom: 6px; }
   #s-skills .sub { color: var(--ink-soft); margin-bottom: 28px; font-size: 0.92rem; text-align: center; }
   .skills-score-badge {
     font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
@@ -979,6 +956,16 @@
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
   .btn-skills { background: var(--ink); color: var(--white); border: none; border-radius: 10px; padding: 14px 28px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: block; margin: 0 auto; transition: opacity .15s; }
   .btn-skills:hover { opacity: .8; }
+
+  /* ── Unified screen titles ── */
+  .screen h2, .screen-h2 {
+    font-family: Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    text-align: left;
+    line-height: 1.25;
+  }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 480px) {
@@ -1189,7 +1176,7 @@
 <section class="screen" id="s-reset">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;">
     <div style="width:100%;max-width:400px;background:var(--card);border-radius:20px;padding:32px 28px;box-shadow:0 2px 16px #0000000a;">
-      <h2 style="font-family:Georgia,serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;">Choisissez un nouveau mot de passe</h2>
+      <h2 class="screen-h2">Choisissez un nouveau mot de passe</h2>
       <p style="font-size:0.88rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.5;">Votre lien est valide. Entrez votre nouveau mot de passe.</p>
       <div class="auth-msg" id="resetMsg"></div>
       <div class="auth-field">
@@ -1210,7 +1197,7 @@
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;">
     <div style="width:100%;max-width:400px;background:var(--card);border-radius:20px;padding:32px 28px;box-shadow:0 2px 16px #0000000a;">
       <button onclick="goTo('s-auth')" style="background:none;border:none;padding:0;font-size:0.85rem;color:var(--ink-soft);cursor:pointer;margin-bottom:20px;display:flex;align-items:center;gap:6px;">← Retour</button>
-      <h2 style="font-family:Georgia,serif;font-size:1.4rem;font-weight:800;margin-bottom:8px;">Mot de passe oublié</h2>
+      <h2 class="screen-h2">Mot de passe oublié</h2>
       <p style="font-size:0.88rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.5;">Entrez votre email pour recevoir un lien de réinitialisation.</p>
       <div class="auth-msg" id="forgotMsg"></div>
       <div class="auth-field">
@@ -1328,7 +1315,7 @@
 <!-- PROFILE -->
 <section class="screen padtop" id="s-mon-profil">
   <div class="mon-profil-wrap">
-    <h2 style="font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,1.8rem);font-weight:800;letter-spacing:-.02em;margin-bottom:24px;">Mon profil</h2>
+    <h2 class="screen-h2" style="margin-bottom:24px;">Mon profil</h2>
 
     <!-- Avatar -->
     <div class="mon-profil-avatar-zone">
@@ -1378,7 +1365,7 @@
 
 <section class="screen padtop" id="s-mes-formations">
   <div style="width:100%;max-width:680px;margin:0 auto;padding:0 20px 80px;">
-    <h2 style="font-size:1.35rem;font-weight:800;margin-bottom:4px;">Mes formations</h2>
+    <h2 class="screen-h2" style="margin-bottom:4px;">Mes formations</h2>
     <p class="sub" style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:28px;">Les formations et ateliers que vous avez mis de côté.</p>
     <div id="mesFormationsContent"></div>
   </div>
@@ -1386,7 +1373,7 @@
 
 <section class="screen padtop" id="s-profile">
   <div class="profile-wrap">
-    <h2 style="font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,1.8rem);font-weight:800;letter-spacing:-.02em;margin-bottom:20px;">Mes bilans</h2>
+    <h2 class="screen-h2" style="margin-bottom:20px;">Mes bilans</h2>
     <div id="profileHistoryContent"></div>
   </div>
 </section>
