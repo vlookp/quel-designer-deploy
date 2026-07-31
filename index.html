@@ -1072,7 +1072,7 @@
   </button>
   <button class="sidebar-item" id="sidebarReco" onclick="closeSidebar();showSkills()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M6 8l1.5 1.5L10.5 6"/></svg>
-    Recommandations
+    Monter en compétence
   </button>
   <div class="sidebar-divider"></div>
   <button class="sidebar-item disabled" disabled>
@@ -1271,7 +1271,7 @@
 
 <!-- SKILLS / FORMATIONS -->
 <section class="screen padtop" id="s-skills">
-  <h2>Recommandations</h2>
+  <h2>Monter en compétence</h2>
   <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
   <div id="skillsContent" style="width:100%;max-width:800px;"></div>
 </section>
@@ -3156,21 +3156,32 @@ function buildSkillsContent(container) {
   const avatarHtml = cardAvatar
     ? `<img src="${cardAvatar}" alt="avatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 2px 8px rgba(0,0,0,.12);flex-shrink:0;">`
     : '';
+  const cardName = (lastEntry && lastEntry.name) ? lastEntry.name : (document.getElementById('nameInput') ? document.getElementById('nameInput').value.trim() : '');
+  const cardSentence = cardName && cardTop3.length >= 3
+    ? `Je suis ${cardName}, ${cardTop3[0]} avec une bonne maîtrise en ${cardTop3[1]} et une bonne connaissance en ${cardTop3[2]}.`
+    : '';
+  const cardDate = (lastEntry && lastEntry.date) ? lastEntry.date : new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const bilanCard = cardTop3.length > 0 ? `
+    <div class="avatar-card" style="position:relative;width:100%;max-width:220px;margin:0 auto;background:${col.bg};">
+      <button class="card-download-btn" onclick="event.stopPropagation();triggerDownload()" title="Télécharger ma carte"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v8M4 6l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div style="font-size:0.6rem;color:#888;text-align:center;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;">${cardDate}</div>
+      ${cardAvatar ? `<img src="${cardAvatar}" alt="avatar" style="display:inline-block;">` : ''}
+      ${cardSentence ? `<p style="font-size:0.82rem;font-weight:500;color:#111;margin-top:8px;line-height:1.4;">${cardSentence}</p>` : ''}
+      <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;">
+    </div>` : '';
+
+  const calendlyBlock = `
+    <div style="flex:1;min-width:200px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;">
+      <div style="font-size:1.1rem;font-weight:800;font-family:Georgia,serif;line-height:1.3;">Besoin de conseil ?</div>
+      <div style="font-size:0.88rem;color:var(--ink-soft);line-height:1.5;">Réservez un call gratuit de 30 min avec notre équipe pour faire le point sur votre progression.</div>
+      <a href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener" style="background:#111;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:0.84rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;margin-top:4px;">Réserver un call gratuit →</a>
+    </div>`;
+
   const resultCard = cardTop3.length > 0 ? `
-    <div style="margin-bottom:0;padding:20px;background:${col.bg};border:1.5px solid ${col.stroke}55;border-radius:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-      ${avatarHtml}
-      <div style="flex:1;min-width:180px;">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;">Vos 3 expertises</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          ${top3WithPct.map((d, i) => `
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:0.8rem;">${['🥇','🥈','🥉'][i]}</span>
-              <span style="font-size:0.85rem;font-weight:700;flex:1;">${d.domain}</span>
-              <span style="font-size:0.82rem;font-weight:700;color:var(--ink-soft);">${d.pct}%</span>
-            </div>`).join('')}
-        </div>
-      </div>
-      <button onclick="computeAndShowResults()" style="background:${col.stroke};color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">Voir mes résultats</button>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:0;">
+      ${bilanCard}
+      ${calendlyBlock}
     </div>` : '';
 
   if (weakDomains.length === 0) {
