@@ -657,6 +657,23 @@
     content: ''; display: inline-block; width: 24px; height: 1px;
     background: repeating-linear-gradient(90deg,var(--ink-soft) 0,var(--ink-soft) 4px,transparent 4px,transparent 8px);
   }
+  /* ── HORIZONTAL CHART (mobile) ── */
+  .prog-hchart { display: none; flex-direction: column; gap: 16px; }
+  .prog-hchart-row { display: flex; flex-direction: column; gap: 4px; }
+  .prog-hchart-label { font-size: 0.72rem; font-weight: 700; color: var(--ink); margin-bottom: 1px; }
+  .prog-hchart-bars { display: flex; flex-direction: column; gap: 4px; }
+  .prog-hbar-line { display: flex; align-items: center; gap: 8px; }
+  .prog-hbar-track { flex: 1; height: 14px; background: var(--fill-dim); border-radius: 20px; position: relative; }
+  .prog-hbar-track::after { content: ''; position: absolute; top: -3px; bottom: -3px; left: 60%; width: 1.5px; background: repeating-linear-gradient(180deg,var(--ink-soft) 0,var(--ink-soft) 3px,transparent 3px,transparent 6px); pointer-events: none; }
+  .prog-hbar-fill { height: 100%; border-radius: 20px; border: 1.5px solid transparent; transition: width .6s cubic-bezier(.34,1.1,.64,1); }
+  .prog-hbar-pct { font-size: 0.68rem; font-weight: 700; color: var(--ink-soft); width: 30px; text-align: right; flex-shrink: 0; }
+  .prog-hchart-note { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; color: var(--ink-soft); margin-top: 12px; }
+  .prog-hchart-note::before { content: ''; display: inline-block; width: 18px; height: 1.5px; background: repeating-linear-gradient(90deg,var(--ink-soft) 0,var(--ink-soft) 3px,transparent 3px,transparent 6px); flex-shrink: 0; }
+  @media (max-width: 480px) {
+    .prog-chart-wrap, .prog-threshold-label { display: none; }
+    .prog-hchart { display: flex; }
+  }
+
   .timeline-card.future {
     border: 2px dashed var(--border); background: transparent;
     cursor: pointer; transition: border-color .15s, background .15s;
@@ -2614,6 +2631,53 @@ function drawProgressionBars(history) {
 
   chartWrap.appendChild(chart);
   el.appendChild(chartWrap);
+
+  // Horizontal chart for mobile
+  const hChart = document.createElement('div');
+  hChart.className = 'prog-hchart';
+  const hBarEls = [];
+  DOMAINS.forEach((domain, di) => {
+    const abbr = DOMAIN_LABELS[di] || domain;
+    const row = document.createElement('div');
+    row.className = 'prog-hchart-row';
+    const labelEl = document.createElement('div');
+    labelEl.className = 'prog-hchart-label';
+    labelEl.textContent = abbr;
+    const barsGroup = document.createElement('div');
+    barsGroup.className = 'prog-hchart-bars';
+    entries.forEach((entry, ei) => {
+      const col = ENTRY_COLORS[entryColors[ei]];
+      const ds = entry.domainScores.find(d => d.domain === domain);
+      const pct = ds ? ds.pct : 0;
+      const line = document.createElement('div');
+      line.className = 'prog-hbar-line';
+      const track = document.createElement('div');
+      track.className = 'prog-hbar-track';
+      const fill = document.createElement('div');
+      fill.className = 'prog-hbar-fill';
+      fill.style.cssText = `width:0%;background:${col.bg};border-color:${col.stroke};`;
+      fill.dataset.pct = pct;
+      track.appendChild(fill);
+      const pctEl = document.createElement('span');
+      pctEl.className = 'prog-hbar-pct';
+      pctEl.textContent = pct > 0 ? pct + '%' : '—';
+      line.appendChild(track);
+      line.appendChild(pctEl);
+      barsGroup.appendChild(line);
+      hBarEls.push({ fill, pct });
+    });
+    row.appendChild(labelEl);
+    row.appendChild(barsGroup);
+    hChart.appendChild(row);
+  });
+  const hNote = document.createElement('div');
+  hNote.className = 'prog-hchart-note';
+  hNote.textContent = 'Seuil de maîtrise à 60%';
+  hChart.appendChild(hNote);
+  el.appendChild(hChart);
+  requestAnimationFrame(() => {
+    hBarEls.forEach(({ fill, pct }) => { fill.style.width = pct + '%'; });
+  });
 }
 
 // ── PROGRESSION HISTORY ──
