@@ -1110,9 +1110,9 @@
     Monter en compétence
   </button>
   <div class="sidebar-divider"></div>
-  <button class="sidebar-item disabled" disabled>
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h10a1 1 0 0 1 1 1v9.5L8 10.5 2 12.5V3a1 1 0 0 1 1-1z"/></svg>
-    Futures formations
+  <button class="sidebar-item" id="sidebarMesFormations" onclick="closeSidebar();showMesFormations()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h10a1 1 0 0 1 1 1v9.5L8 10.5 2 12.5V3a1 1 0 0 1 1-1z"/><path d="M6 7l1.2 1.2L10 5.5" stroke-width="1.6"/></svg>
+    Mes formations
   </button>
 </nav>
 
@@ -1364,6 +1364,14 @@
       <button class="btn-primary" onclick="showNewBilanPopin()">Faire un nouveau bilan</button>
       <button class="btn-secondary" onclick="showProfile('history')">Voir tous mes bilans</button>
     </div>
+  </div>
+</section>
+
+<section class="screen padtop" id="s-mes-formations">
+  <div style="width:100%;max-width:680px;margin:0 auto;padding:0 20px 80px;">
+    <h2 style="font-size:1.35rem;font-weight:800;margin-bottom:4px;">Mes formations</h2>
+    <p class="sub" style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:28px;">Les formations et ateliers que vous avez mis de côté.</p>
+    <div id="mesFormationsContent"></div>
   </div>
 </section>
 
@@ -1781,7 +1789,7 @@ function goTo(id) {
 }
 
 function updateSidebarActive(id) {
-  const map = { 's-home': 'sidebarHome', 's-profile': 'sidebarBilans', 's-progression': 'sidebarProgression', 's-skills': 'sidebarReco' };
+  const map = { 's-home': 'sidebarHome', 's-profile': 'sidebarBilans', 's-progression': 'sidebarProgression', 's-skills': 'sidebarReco', 's-mes-formations': 'sidebarMesFormations' };
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
   const activeId = map[id];
   if (activeId) document.getElementById(activeId)?.classList.add('active');
@@ -3299,6 +3307,60 @@ function renderProfileHistory() {
 
 let monProfilLastEntry = null;
 let _avatarModalFromQuiz = false;
+
+function showMesFormations() {
+  const container = document.getElementById('mesFormationsContent');
+  const bm = getBookmarks();
+  if (bm.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--ink-soft);">
+        <div style="font-size:2rem;margin-bottom:12px;">☆</div>
+        <div style="font-size:0.95rem;">Aucune formation mise de côté pour l'instant.<br>Cliquez sur l'étoile dans <strong>Monter en compétence</strong> pour en ajouter.</div>
+      </div>`;
+    goTo('s-mes-formations');
+    return;
+  }
+  const items = FORMATIONS.filter(f => bm.includes(f.nom));
+  const formations = items.filter(f => f.type === 'formation');
+  const workshops  = items.filter(f => f.type === 'workshop');
+
+  const makeFormCard = f => `
+    <div style="position:relative;">
+      <a class="skills-formation-card" href="${f.lien}" target="_blank" rel="noopener">
+        <div class="skills-formation-info">
+          <div class="skills-formation-name">${f.nom}</div>
+          <div class="skills-formation-desc">${f.desc || ''}</div>
+          <div class="skills-formation-type">
+            <span class="skills-type-tag formation">Formation · ${f.duree}</span>
+            <span class="skills-type-tag domain">${f.domaines[0]}</span>
+          </div>
+        </div>
+        <span class="skills-arrow">→</span>
+      </a>
+      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)},event);showMesFormations()" title="Retirer des favoris">★</button>
+    </div>`;
+
+  const makeWsCard = f => `
+    <div style="position:relative;">
+      <a class="skills-workshop-card" href="${f.lien}" target="_blank" rel="noopener">
+        <span class="skills-workshop-icon">🗓</span>
+        <div class="skills-workshop-info">
+          <div class="skills-workshop-name">${f.nom}</div>
+          <div class="skills-workshop-dur">${f.duree}</div>
+          <div class="skills-workshop-domain">${f.domaines[0]}</div>
+        </div>
+      </a>
+      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)},event);showMesFormations()" title="Retirer des favoris">★</button>
+    </div>`;
+
+  const formSection = formations.length > 0
+    ? `<div class="skills-section-label">Formations · 1 journée</div><div class="skills-grid-2">${formations.map(makeFormCard).join('')}</div>` : '';
+  const wsSection = workshops.length > 0
+    ? `<div class="skills-section-label" style="margin-top:20px;">Ateliers · 3h</div><div class="skills-grid-2">${workshops.map(makeWsCard).join('')}</div>` : '';
+
+  container.innerHTML = formSection + wsSection;
+  goTo('s-mes-formations');
+}
 
 function showMonProfil() {
   // Populate name
