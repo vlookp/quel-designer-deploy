@@ -968,7 +968,6 @@
   .skills-card-wrap { position: relative; display: flex; flex-direction: column; }
   .skills-formation-card { cursor: default; }
   .skills-workshop-card { cursor: default; }
-  .skills-card-footer { display: flex; align-items: center; justify-content: flex-end; padding: 0 16px 12px; }
   .btn-plus-info {
     font-size: 0.76rem; font-weight: 700; color: var(--ink); background: none;
     border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 12px;
@@ -2665,13 +2664,11 @@ function refreshMonProfilBookmarks() {
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
-          <div class="skills-formation-type">
+          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <span class="skills-type-tag formation">Formation · ${f.duree}</span>
+            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
           </div>
         </div>
-      </div>
-      <div class="skills-card-footer">
-        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
     </div>`).join('');
@@ -2683,11 +2680,11 @@ function refreshMonProfilBookmarks() {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <div class="skills-workshop-domain">${f.domaines[0]}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div class="skills-workshop-domain">${f.domaines[0]}</div>
+            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+          </div>
         </div>
-      </div>
-      <div class="skills-card-footer">
-        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
     </div>`).join('');
@@ -3345,14 +3342,11 @@ function showMesFormations() {
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
-          <div class="skills-formation-type">
+          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <span class="skills-type-tag formation">Formation · ${f.duree}</span>
-            <span class="skills-type-tag domain">${f.domaines[0]}</span>
+            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
           </div>
         </div>
-      </div>
-      <div class="skills-card-footer">
-        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
     </div>`;
@@ -3364,11 +3358,11 @@ function showMesFormations() {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <div class="skills-workshop-domain">${f.domaines[0]}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div class="skills-workshop-domain">${f.domaines[0]}</div>
+            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+          </div>
         </div>
-      </div>
-      <div class="skills-card-footer">
-        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
     </div>`;
@@ -3618,13 +3612,11 @@ function buildSkillsContent(container) {
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
-          <div class="skills-formation-type">
+          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <span class="skills-type-tag formation">Formation · ${f.duree}</span>
+            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
           </div>
         </div>
-      </div>
-      <div class="skills-card-footer">
-        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
@@ -3639,11 +3631,11 @@ function buildSkillsContent(container) {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <div class="skills-workshop-domain">${f.domaines[0]}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div class="skills-workshop-domain">${f.domaines[0]}</div>
+            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
+          </div>
         </div>
-      </div>
-      <div class="skills-card-footer">
-        <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
