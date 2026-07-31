@@ -2872,7 +2872,7 @@ async function forgotPassword() {
   if (!email) return showAuthMsg('Entrez votre email pour recevoir le lien de réinitialisation.', 'error');
   showAuthMsg('Envoi en cours…', '');
   try {
-    await sbFetch('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email }) });
+    await sbRest('/auth/v1/recover', { method: 'POST', body: JSON.stringify({ email }) });
     showAuthMsg('Un lien de réinitialisation vous a été envoyé par email.', 'success');
   } catch(e) {
     showAuthMsg('Une erreur est survenue. Vérifiez votre email et réessayez.', 'error');
