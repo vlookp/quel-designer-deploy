@@ -2631,9 +2631,9 @@ function toggleBookmark(nom, event) {
   if (adding) bm.push(nom); else bm.splice(idx, 1);
   saveBookmarks(bm);
 
-  // Instant visual feedback on the clicked button
-  if (event && event.currentTarget) {
-    const btn = event.currentTarget;
+  // Instant visual feedback — target the button reliably
+  const btn = event && (event.target.closest('.bookmark-btn') || event.target);
+  if (btn) {
     btn.textContent = adding ? '★' : '☆';
     btn.classList.toggle('bookmarked', adding);
     btn.title = adding ? 'Retirer des favoris' : 'Ajouter aux favoris';
@@ -2673,7 +2673,7 @@ function refreshMonProfilBookmarks() {
       <div class="skills-card-footer">
         <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
-      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="Retirer des favoris">★</button>
+      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
     </div>`).join('');
 
   const workshopCards = workshops.map(f => `
@@ -2689,7 +2689,7 @@ function refreshMonProfilBookmarks() {
       <div class="skills-card-footer">
         <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
-      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="Retirer des favoris">★</button>
+      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
     </div>`).join('');
 
   const formSection = formations.length > 0 ? `<div class="skills-section-label" style="margin-top:12px;">Formations</div><div class="skills-grid-2">${formCards}</div>` : '';
@@ -3354,7 +3354,7 @@ function showMesFormations() {
       <div class="skills-card-footer">
         <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
-      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)},event);showMesFormations()" title="Retirer des favoris">★</button>
+      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
     </div>`;
 
   const makeWsCard = f => `
@@ -3370,7 +3370,7 @@ function showMesFormations() {
       <div class="skills-card-footer">
         <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
-      <button class="bookmark-btn bookmarked" onclick="toggleBookmark(${JSON.stringify(f.nom)},event);showMesFormations()" title="Retirer des favoris">★</button>
+      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
     </div>`;
 
   const formSection = formations.length > 0
@@ -3626,7 +3626,7 @@ function buildSkillsContent(container) {
       <div class="skills-card-footer">
         <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
-      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
+      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
   }).join('');
 
@@ -3645,7 +3645,7 @@ function buildSkillsContent(container) {
       <div class="skills-card-footer">
         <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
       </div>
-      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" onclick="toggleBookmark(${JSON.stringify(f.nom)}, event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
+      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
   }).join('');
 
