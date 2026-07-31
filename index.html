@@ -114,11 +114,12 @@
   }
   .btn-small:hover { border-color: var(--ink); }
   .btn-small.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .btn-topbar-long { display: inline; }
-  .btn-topbar-short { display: none; }
   @media (max-width: 480px) {
-    .btn-topbar-long { display: none; }
-    .btn-topbar-short { display: inline; }
+    #btnFaireBilan { display: none !important; }
+  }
+  .sidebar-bilan-btn { display: none; }
+  @media (max-width: 480px) {
+    .sidebar-bilan-btn { display: flex; }
   }
   /* profile dropdown */
   .profile-dropdown-wrap { position: relative; }
@@ -1061,7 +1062,7 @@
   </div>
   <div class="topbar-right">
     <span id="topbarUser" style="display:none;"></span>
-    <button class="btn-small" id="btnFaireBilan" style="display:none;white-space:nowrap;" onclick="retakeQuiz()"><span class="btn-topbar-long">Faire un nouveau bilan</span><span class="btn-topbar-short">Nouveau bilan</span></button>
+    <button class="btn-small" id="btnFaireBilan" style="display:none;white-space:nowrap;" onclick="retakeQuiz()">Faire un nouveau bilan</button>
     <div class="profile-dropdown-wrap" id="profileDropdownWrap" style="display:none;">
       <div class="profile-circle" id="profileCircle" onclick="toggleProfileDropdown()" title="Mon profil">
         <span class="profile-initial" id="profileInitial"></span>
@@ -1112,6 +1113,11 @@
   <button class="sidebar-item" id="sidebarMesFormations" onclick="closeSidebar();showMesFormations()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h10a1 1 0 0 1 1 1v9.5L8 10.5 2 12.5V3a1 1 0 0 1 1-1z"/><path d="M6 7l1.2 1.2L10 5.5" stroke-width="1.6"/></svg>
     Mes formations
+  </button>
+  <div class="sidebar-divider sidebar-bilan-btn" id="sidebarBilanDivider" style="display:none;"></div>
+  <button class="sidebar-item sidebar-bilan-btn" id="sidebarFaireBilan" style="display:none;" onclick="closeSidebar();retakeQuiz()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/></svg>
+    Faire un nouveau bilan
   </button>
 </nav>
 
@@ -1897,6 +1903,8 @@ function showTopbar(name, email) {
     if (dw) dw.style.display = 'block';
   }
   document.getElementById('btnFaireBilan').style.display = 'inline-block';
+  document.getElementById('sidebarFaireBilan').style.display = 'flex';
+  document.getElementById('sidebarBilanDivider').style.display = 'block';
   document.getElementById('btnHamburger').classList.add('visible');
   updateProfileCircle();
 }
@@ -2063,6 +2071,8 @@ function signOut() {
   DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
   document.getElementById('topbar').classList.remove('visible');
   document.getElementById('btnFaireBilan').style.display = 'none';
+  document.getElementById('sidebarFaireBilan').style.display = 'none';
+  document.getElementById('sidebarBilanDivider').style.display = 'none';
   document.getElementById('btnHamburger').classList.remove('visible');
   const wrap = document.getElementById('profileDropdownWrap');
   if (wrap) wrap.style.display = 'none';
