@@ -1667,9 +1667,10 @@ function showHome() {
     // #37 — show only last 3 bilans on home (chronological, oldest first)
     const displayHistory = history.slice(-3);
     const homeOffset = history.length - displayHistory.length;
+    const homeColors = resolveUniqueColors(displayHistory);
     displayHistory.forEach((entry, displayIdx) => {
       const realIdx = homeOffset + displayIdx;
-      const col = ENTRY_COLORS[(entry.colorIdx ?? displayIdx) % ENTRY_COLORS.length];
+      const col = ENTRY_COLORS[homeColors[displayIdx]];
       const domainsStr = (entry.domains || []).map(d => {
         const ds = (entry.domainScores || []).find(s => s.domain === d);
         return ds ? `${d} ${ds.pct}%` : d;
@@ -1687,7 +1688,7 @@ function showHome() {
           <div class="tac-name">${entry.name}</div>
           <div class="tac-domains">${domainsStr}</div>
         </div>`;
-      card.onclick = () => showEntryResults(entry, entry.colorIdx ?? displayIdx);
+      card.onclick = () => showEntryResults(entry, homeColors[displayIdx]);
       cards.appendChild(card);
     });
     // #106 — draft card at end (most recent, chronological order)
@@ -2445,11 +2446,33 @@ function resolveDisplayColors(entries) {
   });
 }
 
+// Assigns unique display colors to a list of entries (no two same color)
+// Returns array of color indices, one per entry
+function resolveUniqueColors(entries) {
+  const used = [];
+  return entries.map((entry, i) => {
+    let idx = entry.colorIdx ?? (i % ENTRY_COLORS.length);
+    // If this color already appears in the display set, pick the next unused one
+    let attempts = 0;
+    while (used.includes(idx) && attempts < ENTRY_COLORS.length) {
+      idx = (idx + 1) % ENTRY_COLORS.length;
+      attempts++;
+    }
+    used.push(idx);
+    return idx;
+  });
+}
+
 function getNextColorIdx() {
   const history = getHistory();
-  const lastColorIdx = history.length > 0 ? (history[history.length - 1].colorIdx ?? -1) : -1;
+  // Check last 2 entries to avoid collision with both neighbors
+  const usedRecent = history.slice(-2).map(e => e.colorIdx ?? -1);
   let idx = history.length % ENTRY_COLORS.length;
-  if (idx === lastColorIdx) idx = (idx + 1) % ENTRY_COLORS.length;
+  let attempts = 0;
+  while (usedRecent.includes(idx) && attempts < ENTRY_COLORS.length) {
+    idx = (idx + 1) % ENTRY_COLORS.length;
+    attempts++;
+  }
   return idx;
 }
 
@@ -2471,6 +2494,7 @@ function drawProgressionBars(history) {
   if (!allEntries.length) { el.style.display = 'none'; return; }
   // Show up to 3 most recent bilans
   const entries = allEntries.slice(-3);
+  const entryColors = resolveUniqueColors(entries);
   el.style.display = 'block';
   el.innerHTML = '';
 
@@ -2478,7 +2502,7 @@ function drawProgressionBars(history) {
   const legend = document.createElement('div');
   legend.className = 'prog-chart-legend';
   entries.forEach((entry, ei) => {
-    const col = ENTRY_COLORS[(entry.colorIdx ?? ei) % ENTRY_COLORS.length];
+    const col = ENTRY_COLORS[entryColors[ei]];
     const item = document.createElement('div');
     item.className = 'prog-legend-item';
     item.innerHTML = `<span class="prog-legend-dot" style="background:${col.bg};border:2px solid ${col.stroke};"></span>${entry.dateBase || entry.date}`;
@@ -2504,7 +2528,7 @@ function drawProgressionBars(history) {
 
     const barEls = [];
     entries.forEach((entry, ei) => {
-      const col = ENTRY_COLORS[(entry.colorIdx ?? ei) % ENTRY_COLORS.length];
+      const col = ENTRY_COLORS[entryColors[ei]];
       const ds = entry.domainScores.find(d => d.domain === domain);
       const pct = ds ? ds.pct : 0;
       const barH = Math.max(pct * CHART_H / 100, pct > 0 ? 3 : 0);
@@ -2628,11 +2652,12 @@ function renderTimeline(history) {
   // #38 — show only last 3 bilans
   const displayEntries = history.slice(-3);
   const offset = history.length - displayEntries.length;
+  const displayColors = resolveUniqueColors(displayEntries);
   displayEntries.forEach((entry, displayIdx) => {
     const realIdx = offset + displayIdx;
     const card = document.createElement('div');
     card.className = 'timeline-card';
-    const col = ENTRY_COLORS[(entry.colorIdx ?? displayIdx) % ENTRY_COLORS.length];
+    const col = ENTRY_COLORS[displayColors[displayIdx]];
     const domainsStr = (entry.domains || []).map(d => {
       const ds = (entry.domainScores || []).find(s => s.domain === d);
       return ds ? `${d} ${ds.pct}%` : d;
@@ -2647,7 +2672,7 @@ function renderTimeline(history) {
         <div class="tac-name">${entry.name}</div>
         <div class="tac-domains">${domainsStr}</div>
       </div>`;
-    card.onclick = () => showEntryResults(entry, entry.colorIdx ?? displayIdx);
+    card.onclick = () => showEntryResults(entry, displayColors[displayIdx]);
     tl.appendChild(card);
   });
 
