@@ -2165,13 +2165,14 @@ async function afterLogin(fallbackName) {
       return;
     }
   }
-  // If user just finished quiz and was redirected to auth, show results
+  // If user just finished quiz and was redirected to auth, show progression then avatar
   if (_pendingResults) {
     _pendingResults = false;
     pendingColorIdx = getNextColorIdx();
     showTopbar(profileName || currentUser.email, currentUser.email);
-    updateResultsPreview();
-    goTo('s-results');
+    renderTimeline(getHistory());
+    goTo('s-progression');
+    setTimeout(() => goToAvatarScreen(), 400);
     return;
   }
   // #79 — always land on home after login; draft card lets user choose to resume
