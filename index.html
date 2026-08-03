@@ -1911,10 +1911,13 @@ async function submitFeedback() {
     nom: currentUser?.user_metadata?.full_name || currentUser?.email || null,
     email: currentUser?.email || null,
     note: _feedbackNote,
-    commentaire: document.getElementById('feedbackText').value.trim() || null
+    commentaire: document.getElementById('feedbackText').value.trim() || null,
+    sb_key: SUPABASE_KEY,
+    sb_token: SB_TOKEN || SUPABASE_KEY
   };
   try {
-    await sbRest('/rest/v1/feedback', { method: 'POST', body: JSON.stringify(payload) });
+    const r = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!r.ok) throw new Error(await r.text());
     closeFeedbackModal();
     alert('Merci pour votre avis !');
   } catch(e) {
