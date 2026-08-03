@@ -3275,14 +3275,16 @@ async function saveDomainProgress() {
   top3Domains = [];
 
   if (!currentUser) {
-    // Guest: show auth gate instead of progression
-    _authGateQuit = false;
-    const m = document.getElementById('authGateModal');
-    const h = m?.querySelector('h3');
-    const p = m?.querySelector('p');
-    if (h) h.textContent = 'Vos résultats sont prêts ! 🎉';
-    if (p) p.textContent = 'Créez un compte gratuit pour accéder à vos résultats et les retrouver plus tard.';
-    if (m) m.classList.add('open');
+    // End-of-quiz wall — no escape, inscription required
+    _pendingResults = true;
+    showChoiceModal({
+      title: 'Vos résultats sont prêts ! 🎉',
+      message: 'Créez un compte gratuit pour accéder à votre profil complet et retrouver votre bilan plus tard.',
+      primaryLabel: 'Créer mon compte',
+      primaryAction: () => { goTo('s-auth'); switchTab('signup'); },
+      secondaryLabel: 'J\'ai déjà un compte',
+      secondaryAction: () => { goTo('s-auth'); switchTab('login'); }
+    });
     return;
   }
   showProgressionFromHome();
