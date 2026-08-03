@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://pwosfdnirfnlgrhfwaqc.supabase.co';
-const NOTION_DB_ID = '4751ebd0f1a04af8ad50a986bc09f2ae';
+const NOTION_DB_ID = '0b4f1f62-dddd-4c4f-94bc-445327c7807e';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
