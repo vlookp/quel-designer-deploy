@@ -1635,6 +1635,7 @@ let selectedValue = null;
 let top3Domains = [];
 let isRetake = false;
 let isModify = false;
+let _pendingResults = false;
 let isEditingFromResults = false;
 let authMode = 'signup';
 let selectedAvatar = null, selectedBg = 0;
@@ -2163,6 +2164,15 @@ async function afterLogin(fallbackName) {
       showHome();
       return;
     }
+  }
+  // If user just finished quiz and was redirected to auth, show results
+  if (_pendingResults) {
+    _pendingResults = false;
+    pendingColorIdx = getNextColorIdx();
+    showTopbar(profileName || currentUser.email, currentUser.email);
+    updateResultsPreview();
+    goTo('s-results');
+    return;
   }
   // #79 — always land on home after login; draft card lets user choose to resume
   pendingColorIdx = getNextColorIdx();
@@ -2916,7 +2926,19 @@ function goToProgression(fromQuiz = false) {
   renderTimeline(history);
   if (fromQuiz) {
     updateResultsPreview();
-    goTo('s-results');
+    if (!currentUser) {
+      _pendingResults = true;
+      showChoiceModal({
+        title: 'Vos résultats sont prêts !',
+        message: 'Créez un compte gratuit pour accéder à votre profil complet et sauvegarder votre bilan.',
+        primaryLabel: 'Créer mon compte',
+        primaryAction: () => { goTo('s-auth'); switchTab('signup'); },
+        secondaryLabel: 'J\'ai déjà un compte',
+        secondaryAction: () => { goTo('s-auth'); switchTab('login'); }
+      });
+    } else {
+      goTo('s-results');
+    }
   } else {
     goTo('s-progression');
   }
