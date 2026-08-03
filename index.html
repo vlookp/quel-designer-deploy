@@ -831,6 +831,12 @@
   .mon-profil-bilan-domains { font-size: 0.82rem; font-weight: 700; margin-top: 2px; }
   .mon-profil-bilan-pcts { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
   .mon-profil-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+  .feedback-stars { display: flex; gap: 8px; justify-content: center; margin: 12px 0 16px; }
+  .feedback-star { font-size: 2rem; cursor: pointer; color: var(--fill-dim); transition: color .15s, transform .1s; user-select: none; }
+  .feedback-star.active, .feedback-star.hover { color: #f59e0b; }
+  .feedback-star:hover { transform: scale(1.15); }
+  .feedback-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; color: var(--ink); background: var(--bg); resize: none; outline: none; transition: border-color .2s; }
+  .feedback-textarea:focus { border-color: var(--ink); }
   .profile-wrap { max-width: 560px; width: 100%; margin: 0 auto; }
   #s-profile h2 { margin-bottom: 4px; }
   .profile-section { margin-bottom: 36px; }
@@ -1057,6 +1063,25 @@
 </div>
 
 <!-- CHOICE MODAL (#65) -->
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-box">
+    <h3>Donner mon avis</h3>
+    <p>Comment évaluez-vous votre expérience ?</p>
+    <div class="feedback-stars" id="feedbackStars">
+      <span class="feedback-star" data-val="1">★</span>
+      <span class="feedback-star" data-val="2">★</span>
+      <span class="feedback-star" data-val="3">★</span>
+      <span class="feedback-star" data-val="4">★</span>
+      <span class="feedback-star" data-val="5">★</span>
+    </div>
+    <textarea id="feedbackText" class="feedback-textarea" placeholder="Un commentaire ? (facultatif)" rows="3"></textarea>
+    <div class="modal-actions" style="flex-direction:column;gap:8px;margin-top:8px;">
+      <button class="modal-confirm" id="feedbackSubmitBtn" onclick="submitFeedback()" style="width:100%;">Envoyer</button>
+      <button class="modal-cancel" onclick="closeFeedbackModal()" style="width:100%;justify-content:center;">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="choiceModal">
   <div class="modal-box">
     <h3 id="choiceTitle"></h3>
@@ -1397,6 +1422,7 @@
     <!-- Actions -->
     <div class="mon-profil-actions">
       <button class="btn-secondary" onclick="showProfile('history')">Voir tous mes bilans</button>
+      <button class="btn-secondary" onclick="openFeedbackModal()">Donner mon avis</button>
     </div>
   </div>
 </section>
@@ -1849,6 +1875,54 @@ function closeSidebar() {
 
 function openContactModal() {
   window.location.href = 'mailto:contact@popupdesignlab.com?subject=Besoin%20de%20formation&body=Bonjour%2C%0A%0AJe%20souhaite%20vous%20contacter%20au%20sujet%20d\'une%20formation.%0A%0A';
+}
+
+let _feedbackNote = 0;
+
+function openFeedbackModal() {
+  _feedbackNote = 0;
+  document.getElementById('feedbackText').value = '';
+  document.querySelectorAll('.feedback-star').forEach(s => s.classList.remove('active'));
+  document.getElementById('feedbackModal').classList.add('open');
+  const stars = document.querySelectorAll('.feedback-star');
+  stars.forEach(star => {
+    star.onmouseenter = () => {
+      const val = +star.dataset.val;
+      stars.forEach(s => s.classList.toggle('hover', +s.dataset.val <= val));
+    };
+    star.onmouseleave = () => stars.forEach(s => s.classList.remove('hover'));
+    star.onclick = () => {
+      _feedbackNote = +star.dataset.val;
+      stars.forEach(s => s.classList.toggle('active', +s.dataset.val <= _feedbackNote));
+    };
+  });
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').classList.remove('open');
+}
+
+async function submitFeedback() {
+  if (!_feedbackNote) { alert('Veuillez sélectionner une note.'); return; }
+  const btn = document.getElementById('feedbackSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi…';
+  const payload = {
+    nom: currentUser?.user_metadata?.full_name || currentUser?.email || null,
+    email: currentUser?.email || null,
+    note: _feedbackNote,
+    commentaire: document.getElementById('feedbackText').value.trim() || null
+  };
+  try {
+    await sbRest('/rest/v1/feedback', { method: 'POST', body: JSON.stringify(payload) });
+    closeFeedbackModal();
+    alert('Merci pour votre avis !');
+  } catch(e) {
+    alert('Une erreur est survenue, veuillez réessayer.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Envoyer';
+  }
 }
 
 function updateGlobalProgress(screenId) {
