@@ -1727,8 +1727,8 @@ function closeAuthGate() {
 
 function authGateSignup() {
   closeAuthGate();
-  // Clear old history from device — new account starts fresh
-  localStorage.removeItem('qd_history');
+  // Clear guest history — new account starts fresh
+  localStorage.removeItem('qd_history_guest');
   // Save current guest progress so afterLogin can restore it as a draft
   if (completedDomains.size > 0) saveDraft();
   goTo('s-auth');
@@ -2165,9 +2165,17 @@ async function afterLogin(fallbackName) {
       return;
     }
   }
-  // If user just finished quiz and was redirected to auth, show progression then avatar
+  // If user just finished quiz and was redirected to auth, migrate guest history then show progression
   if (_pendingResults) {
     _pendingResults = false;
+    // Migrate guest history to user-keyed history
+    const guestHistory = JSON.parse(localStorage.getItem('qd_history_guest') || '[]');
+    if (guestHistory.length > 0) {
+      const userKey = 'qd_history_' + currentUser.id;
+      const existing = JSON.parse(localStorage.getItem(userKey) || '[]');
+      if (existing.length === 0) localStorage.setItem(userKey, JSON.stringify(guestHistory));
+      localStorage.removeItem('qd_history_guest');
+    }
     pendingColorIdx = getNextColorIdx();
     showTopbar(profileName || currentUser.email, currentUser.email);
     renderTimeline(getHistory());
@@ -2777,11 +2785,14 @@ function drawProgressionBars(history) {
 }
 
 // ── PROGRESSION HISTORY ──
+function historyKey() {
+  return currentUser ? 'qd_history_' + currentUser.id : 'qd_history_guest';
+}
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem('qd_history') || '[]'); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem(historyKey()) || '[]'); } catch { return []; }
 }
 function saveHistory(h) {
-  localStorage.setItem('qd_history', JSON.stringify(h));
+  localStorage.setItem(historyKey(), JSON.stringify(h));
 }
 
 function getBookmarks() {
