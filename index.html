@@ -3255,6 +3255,22 @@ function quitQuiz() {
 }
 
 async function saveDomainProgress() {
+  // When retaking, ask: new bilan or update existing?
+  if (isRetake && getHistory().length > 0) {
+    showChoiceModal({
+      title: 'Enregistrer mon bilan',
+      message: 'Souhaitez-vous créer un nouveau bilan ou mettre à jour votre bilan actuel ?',
+      primaryLabel: 'Créer un nouveau bilan',
+      primaryAction: () => { isModify = false; _doSaveDomainProgress(); },
+      secondaryLabel: 'Modifier mon bilan actuel',
+      secondaryAction: () => { isModify = true; _doSaveDomainProgress(); }
+    });
+    return;
+  }
+  await _doSaveDomainProgress();
+}
+
+async function _doSaveDomainProgress() {
   const finished = completedDomains.size >= 3;
   await saveSession(finished);
   localStorage.removeItem('qd_draft');
@@ -3270,7 +3286,12 @@ async function saveDomainProgress() {
   const colorIdx = getNextColorIdx();
   const img = selectedAvatar || '';
   const name = document.getElementById('topbarUser')?.textContent || '';
-  if (hasSameDay) {
+
+  if (isModify && history.length > 0) {
+    // Update the last entry in place — no new card
+    history[history.length - 1] = { ...history[history.length - 1], domains, domainScores, questionScores: {...scores}, avatarSrc: img };
+    isModify = false;
+  } else if (hasSameDay) {
     history.forEach(e => {
       if ((e.dateBase || e.date) === dateStr && !e.dateBase) {
         e.dateBase = e.date;
