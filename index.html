@@ -828,6 +828,8 @@
   .mon-profil-bilan-ph { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; flex-shrink: 0; }
   .mon-profil-bilan-info { flex: 1; }
   .mon-profil-bilan-date { font-size: 0.65rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  .bilan-label-short { display: none; }
+  @media (max-width: 600px) { .bilan-label-full { display: none; } .bilan-label-short { display: inline; } }
   .mon-profil-bilan-domains { font-size: 0.82rem; font-weight: 700; margin-top: 2px; }
   .mon-profil-bilan-pcts { font-size: 0.72rem; color: var(--ink-soft); margin-top: 2px; }
   .mon-profil-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
@@ -1397,7 +1399,7 @@
 
     <!-- Dernier bilan -->
     <div class="mon-profil-card" id="monProfilBilanCard" style="display:none;">
-      <div class="mon-profil-label">Dernier bilan</div>
+      <div class="mon-profil-label" id="monProfilBilanLabel">Dernier bilan</div>
       <div class="mon-profil-bilan-mini" id="monProfilBilanMini"></div>
       <button onclick="showEntryResults(monProfilLastEntry)" style="margin-top:14px;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir les résultats →</button>
     </div>
@@ -2860,7 +2862,7 @@ function refreshMonProfilBookmarks() {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:4px;">Plus d'info →</a>
+          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:12px;">Plus d'info →</a>
         </div>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
@@ -3580,7 +3582,7 @@ function showMesFormations() {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:4px;">Plus d'info →</a>
+          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:12px;">Plus d'info →</a>
         </div>
       </div>
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
@@ -3627,12 +3629,14 @@ function showMonProfil() {
     const avatarHtml = e.avatarSrc
       ? `<img src="${e.avatarSrc}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
       : `<div class="mon-profil-bilan-ph" style="background:${col.stroke}22;border:1.5px solid ${col.stroke}55;color:${col.stroke};">${(e.name||'?')[0].toUpperCase()}</div>`;
+    const labelEl = document.getElementById('monProfilBilanLabel');
+    if (labelEl) {
+      labelEl.innerHTML = `<span class="bilan-label-full">DERNIER BILAN · ${e.date}</span><span class="bilan-label-short">DERNIER BILAN</span>`;
+    }
     bilanMini.innerHTML = `
       ${avatarHtml}
       <div class="mon-profil-bilan-info">
-        <div class="mon-profil-bilan-date">${e.date}</div>
-        <div class="mon-profil-bilan-domains">${e.name || ''}</div>
-        <div class="mon-profil-bilan-pcts">${domainsStr}</div>
+        <div class="mon-profil-bilan-pcts" style="font-size:1rem;font-style:italic;line-height:1.5;color:var(--ink);">« ${domainsStr} »</div>
       </div>`;
     bilanCard.style.display = 'block';
     bilanCard.style.borderColor = col.stroke + '55';
@@ -3856,7 +3860,7 @@ function buildSkillsContent(container) {
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-workshop-dur">${f.duree}</div>
-          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:4px;">Plus d'info →</a>
+          <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener" style="align-self:flex-start;margin-top:12px;">Plus d'info →</a>
         </div>
       </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
