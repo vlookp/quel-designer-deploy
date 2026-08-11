@@ -2858,8 +2858,8 @@ function refreshMonProfilBookmarks() {
       <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
     </div>`).join('');
 
-  const formSection = formations.length > 0 ? `<div class="skills-section-label" style="margin-top:12px;">Formations</div><div class="skills-grid-2">${formCards}</div>` : '';
-  const wsSection  = workshops.length  > 0 ? `<div class="skills-section-label" style="margin-top:12px;">Ateliers</div><div class="skills-grid-2">${workshopCards}</div>` : '';
+  const formSection = formations.length > 0 ? `<div class="skills-grid-2">${formCards}</div>` : '';
+  const wsSection  = workshops.length  > 0 ? `<div class="skills-grid-2" style="margin-top:${formations.length > 0 ? '12px' : '0'}">${workshopCards}</div>` : '';
 
   document.getElementById('monProfilFavorisContent').innerHTML = formSection + wsSection;
   wrap.style.display = 'block';
