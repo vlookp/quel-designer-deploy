@@ -3271,6 +3271,7 @@ async function _doSaveDomainProgress() {
   const dateStr = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   const history = getHistory();
+  const isFirstBilan = history.length === 0;
   const hasSameDay = history.some(e => (e.dateBase || e.date) === dateStr);
   const colorIdx = getNextColorIdx();
   const img = selectedAvatar || '';
@@ -3310,6 +3311,11 @@ async function _doSaveDomainProgress() {
       secondaryLabel: 'J\'ai déjà un compte',
       secondaryAction: () => { goTo('s-auth'); switchTab('login'); }
     });
+    return;
+  }
+  if (isFirstBilan && !selectedAvatar) {
+    showProgressionFromHome();
+    setTimeout(() => goToAvatarScreen(), 400);
     return;
   }
   showProgressionFromHome();
