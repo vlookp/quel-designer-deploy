@@ -1376,31 +1376,32 @@
 
 <!-- PROFILE -->
 <section class="screen padtop" id="s-mon-profil">
-  <div class="mon-profil-wrap" style="position:relative;">
-    <button onclick="goHome()" style="position:absolute;top:-8px;right:0;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink-soft);line-height:1;padding:4px 8px;" title="Fermer">✕</button>
+  <div class="mon-profil-wrap">
     <h2 class="screen-h2" style="margin-bottom:24px;">Mon profil</h2>
 
     <!-- Avatar -->
-    <div class="mon-profil-avatar-zone" onclick="openAvatarModal()" style="cursor:pointer;" title="Changer l'avatar">
-      <div id="monProfilAvatar" class="mon-profil-avatar-img">
+    <div class="mon-profil-avatar-zone">
+      <div id="monProfilAvatar" class="mon-profil-avatar-img" onclick="openAvatarModal()">
         <span class="mon-profil-avatar-initial" id="monProfilInitial">?</span>
       </div>
+      <button onclick="openAvatarModal()" style="background:none;border:1.5px solid var(--border);border-radius:20px;padding:6px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;color:var(--ink);">Changer l'avatar</button>
     </div>
 
     <!-- Prénom -->
     <div class="mon-profil-card">
       <div class="mon-profil-label">Prénom</div>
       <div class="mon-profil-name-row">
-        <input class="mon-profil-name-input" type="text" id="monProfilName" placeholder="Votre prénom"
-          onblur="saveMonProfil()" onkeydown="if(event.key==='Enter'){this.blur();}">
+        <input class="mon-profil-name-input" type="text" id="monProfilName" placeholder="Votre prénom">
+        <button class="mon-profil-save-btn" onclick="saveMonProfil()">Enregistrer</button>
       </div>
       <div id="monProfilSaveMsg" style="font-size:0.78rem;color:var(--ink-soft);margin-top:8px;display:none;">✓ Prénom mis à jour</div>
     </div>
 
     <!-- Dernier bilan -->
-    <div class="mon-profil-card" id="monProfilBilanCard" style="display:none;cursor:pointer;" onclick="if(monProfilLastEntry) showEntryResults(monProfilLastEntry)">
+    <div class="mon-profil-card" id="monProfilBilanCard" style="display:none;">
       <div class="mon-profil-label" id="monProfilBilanLabel">Dernier bilan</div>
       <div class="mon-profil-bilan-mini" id="monProfilBilanMini"></div>
+      <button onclick="showEntryResults(monProfilLastEntry)" style="margin-top:14px;background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir les résultats →</button>
     </div>
 
     <!-- Favoris -->
@@ -1410,14 +1411,10 @@
     </div>
 
     <!-- Progression -->
-    <div class="mon-profil-card" id="monProfilProgressionCard" style="display:none;cursor:pointer;" onclick="renderTimeline(getHistory());goTo('s-progression')">
+    <div class="mon-profil-card" id="monProfilProgressionCard" style="display:none;">
       <div class="mon-profil-label">Ma progression</div>
-      <div id="monProfilProgressionBars" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
-
-    <!-- Dashboard admin -->
-    <div id="monProfilDashboardWrap" style="display:none;margin-bottom:16px;">
-      <button class="btn-small dark" onclick="showDashboard()" style="width:100%;padding:10px;">Dashboard</button>
+      <div id="monProfilProgressionBars" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+      <button onclick="renderTimeline(getHistory());goTo('s-progression')" style="background:none;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:0.82rem;font-weight:600;cursor:pointer;color:var(--ink);">Voir ma progression complète →</button>
     </div>
   </div>
 </section>
