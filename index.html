@@ -23,6 +23,35 @@
     --avatar-bg: #ece8e0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  /* ── SMOOTH INTERACTIONS (global) ── */
+  a, button, input, textarea, select,
+  .skills-formation-card, .skills-workshop-card, .skills-card-wrap,
+  .pos-card, .pos-domain-chip, .pos-formation-item,
+  .mon-profil-card, .mon-profil-avatar-img,
+  .sidebar-item, .bookmark-btn, .timeline-card,
+  .result-bar-row, .btn-plus-info, .formation-request-btn {
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease,
+                opacity .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .skills-formation-card, .skills-workshop-card, .pos-card, .mon-profil-card, .timeline-card {
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease,
+                opacity .18s ease, transform .18s ease, box-shadow .2s ease;
+  }
+  .skills-card-wrap:hover .skills-formation-card,
+  .skills-card-wrap:hover .skills-workshop-card {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  }
+  .pos-card:hover, .mon-profil-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,.06);
+  }
+  button, .pos-domain-chip, .sidebar-item { -webkit-tap-highlight-color: transparent; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .001ms !important; animation-duration: .001ms !important; scroll-behavior: auto !important; }
+  }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     background: var(--bg);
