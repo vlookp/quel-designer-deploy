@@ -1466,6 +1466,7 @@
     <h2>Compétences</h2>
     <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
   </div>
+  <div id="skillsBilanWrap" style="width:100%;max-width:800px;margin-bottom:24px;"></div>
   <div id="positionnementWrap" style="display:none;"></div>
   <div id="skillsContent" style="width:100%;max-width:800px;"></div>
 </section>
@@ -2627,6 +2628,8 @@ async function showResults() {
 }
 
 // ── POSITIONNEMENT (atout + levier) ──
+let _posState = { sorted: [], atoutDomain: '', levierDomain: '' };
+
 function pickLevier(sortedScores, excludeDomain) {
   const candidates = sortedScores.filter(d => d.domain !== excludeDomain);
   // Sweet spot: score between 35 and 65, closest to 50 — where effort pays off fastest
@@ -2642,13 +2645,21 @@ function renderPositionnement(domainScores) {
   const wrap = document.getElementById('positionnementWrap');
   if (!wrap) return;
   if (!domainScores || domainScores.length < 2 || domainScores.every(d => d.pct === 0)) {
-    wrap.style.display = 'none'; wrap.innerHTML = ''; return;
+    wrap.style.display = 'none'; wrap.innerHTML = '';
+    _posState = { sorted: [], atoutDomain: '', levierDomain: '' };
+    renderSkillsRecommendations();
+    return;
   }
   const sorted = [...domainScores].sort((a, b) => b.pct - a.pct);
   const atout = sorted[0];
   const levier = pickLevier(sorted, atout.domain);
-  if (!levier) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
-  wrap.dataset.scores = JSON.stringify(sorted);
+  if (!levier) {
+    wrap.style.display = 'none'; wrap.innerHTML = '';
+    _posState = { sorted: [], atoutDomain: '', levierDomain: '' };
+    renderSkillsRecommendations();
+    return;
+  }
+  _posState = { sorted, atoutDomain: atout.domain, levierDomain: levier.domain };
   wrap.innerHTML = `
     <div class="pos-title">Votre positionnement</div>
     <div class="pos-card">
@@ -2659,33 +2670,20 @@ function renderPositionnement(domainScores) {
     <div class="pos-card" id="posLevierCard"></div>`;
   renderLevierCard(levier, sorted, atout.domain);
   wrap.style.display = 'grid';
+  renderSkillsRecommendations();
 }
 
 function renderLevierCard(levier, sorted, atoutDomain) {
   const card = document.getElementById('posLevierCard');
   if (!card) return;
-  const formations = FORMATIONS.filter(f => f.domaines.includes(levier.domain)).slice(0, 2);
-  const formHtml = formations.length > 0
-    ? `<div class="pos-formations">${formations.map(f =>
-        `<div class="pos-formation-item"><span>${f.nom} · ${f.duree}</span><a href="${f.lien}" target="_blank" rel="noopener">Voir →</a></div>`).join('')}</div>`
-    : '';
   card.innerHTML = `
     <div class="pos-card-label">📈 Votre levier</div>
     <div class="pos-card-domain">${levier.domain} · ${levier.pct}%</div>
     <div class="pos-card-text">Progresser en ${levier.domain} vous rendrait plus polyvalent·e et renforcerait votre profil.</div>
-    ${formHtml}
     <button class="pos-switch-btn" onclick="togglePosDomainList()">Choisir un autre axe</button>
     <div class="pos-domain-list" id="posDomainList" style="display:none;">
       ${sorted.filter(d => d.domain !== atoutDomain && d.domain !== levier.domain).map(d =>
         `<button class="pos-domain-chip" onclick='switchLevier(${JSON.stringify(d.domain)})'>${d.domain} · ${d.pct}%</button>`).join('')}
-    </div>
-    <div class="pos-request">
-      <div class="pos-request-label">Vous ne trouvez pas la formation qu'il vous faut ? Dites-nous ce que vous cherchez — nous vous préviendrons dès qu'elle sera disponible.</div>
-      <div class="pos-request-row">
-        <input class="pos-request-input" id="posRequestInput" type="text" placeholder="Ex : formation Design System avancé">
-        <button class="pos-request-btn" id="posRequestBtn" onclick="submitFormationRequest()">Envoyer</button>
-      </div>
-      <div id="posRequestMsg" style="font-size:0.78rem;color:var(--ink-soft);margin-top:8px;display:none;">✓ Merci ! Nous revenons vers vous dès que possible.</div>
     </div>`;
 }
 
@@ -2695,10 +2693,12 @@ function togglePosDomainList() {
 }
 
 function switchLevier(domain) {
-  const wrap = document.getElementById('positionnementWrap');
-  const sorted = JSON.parse(wrap.dataset.scores || '[]');
+  const { sorted, atoutDomain } = _posState;
   const levier = sorted.find(d => d.domain === domain);
-  if (levier) renderLevierCard(levier, sorted, sorted[0]?.domain);
+  if (!levier) return;
+  _posState.levierDomain = domain;
+  renderLevierCard(levier, sorted, atoutDomain);
+  renderSkillsRecommendations();
 }
 
 async function submitFormationRequest() {
@@ -2708,14 +2708,14 @@ async function submitFormationRequest() {
   const demande = input.value.trim();
   if (!demande) { input.focus(); return; }
   btn.disabled = true; btn.textContent = 'Envoi…';
-  const levierDomain = document.querySelector('#posLevierCard .pos-card-domain')?.textContent || '';
+  const levierDomain = _posState.levierDomain || '';
   try {
     await sbRest('/rest/v1/formation_requests', {
       method: 'POST',
       body: JSON.stringify({
         nom: currentUser?.user_metadata?.full_name || null,
         email: currentUser?.email || null,
-        domaine: levierDomain.split('·')[0].trim() || null,
+        domaine: levierDomain || null,
         demande
       })
     });
@@ -3893,11 +3893,9 @@ function showPolitique() {
   goTo('s-politique');
 }
 
-function buildSkillsContent(container) {
-  const domainScores = getDomainScores();
-  const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
-
+function buildBilanCard(container) {
   // Result card — always built from last saved bilan (localStorage), with in-memory fallback
+  const domainScores = getDomainScores();
   const allHistory = getHistory();
   const lastEntry = allHistory.length > 0 ? allHistory[allHistory.length - 1] : null;
 
@@ -3958,29 +3956,13 @@ function buildSkillsContent(container) {
       ${calendlyBlock}
     </div>` : '';
 
-  if (weakDomains.length === 0) {
-    container.innerHTML = `${resultCard}<div class="skills-all-good"><span>🎉</span>Tous vos domaines sont au-dessus de 60% — continuez comme ça !</div>`;
-    return;
-  }
+  container.innerHTML = resultCard;
+}
 
-  // collect all formations and workshops across weak domains (deduped)
-  const seen = new Set();
-  const allFormations = [];
-  const allWorkshops = [];
-  weakDomains.forEach(d => {
-    FORMATIONS.filter(f => f.domaines.includes(d.domain) && f.moduleIA && !seen.has(f.nom))
-      .forEach(f => {
-        seen.add(f.nom);
-        if (f.type === 'formation') allFormations.push(f);
-        else allWorkshops.push(f);
-      });
-  });
-
+function makeFormationCardHtml(f) {
   const bm = getBookmarks();
-
-  const formationCards = allFormations.map(f => {
-    const saved = bm.includes(f.nom);
-    return `
+  const saved = bm.includes(f.nom);
+  return `
     <div class="skills-card-wrap">
       <div class="skills-formation-card" style="padding-right:32px;">
         <div class="skills-formation-info">
@@ -3994,11 +3976,12 @@ function buildSkillsContent(container) {
       </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
-  }).join('');
+}
 
-  const workshopCards = allWorkshops.map(f => {
-    const saved = bm.includes(f.nom);
-    return `
+function makeWorkshopCardHtml(f) {
+  const bm = getBookmarks();
+  const saved = bm.includes(f.nom);
+  return `
     <div class="skills-card-wrap">
       <div class="skills-workshop-card" style="padding-right:32px;">
         <span class="skills-workshop-icon">🗓</span>
@@ -4010,17 +3993,68 @@ function buildSkillsContent(container) {
       </div>
       <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
-  }).join('');
+}
 
+function renderSkillsRecommendations() {
+  const container = document.getElementById('skillsContent');
+  if (!container) return;
+  const levierDomain = _posState.levierDomain;
+
+  if (levierDomain) {
+    // Recommendations targeted at the chosen levier
+    const allFormations = FORMATIONS.filter(f => f.domaines.includes(levierDomain) && f.type === 'formation');
+    const allWorkshops = FORMATIONS.filter(f => f.domaines.includes(levierDomain) && f.type === 'workshop');
+
+    const formationSection = allFormations.length > 0 ? `
+      <div class="skills-section-label">Formations · 1 journée</div>
+      <div class="skills-grid-2">${allFormations.map(makeFormationCardHtml).join('')}</div>` : '';
+
+    const workshopSection = allWorkshops.length > 0 ? `
+      <div class="skills-section-label">Ateliers · 3h</div>
+      <div class="skills-grid-2">${allWorkshops.map(makeWorkshopCardHtml).join('')}</div>` : '';
+
+    const requestBlock = `
+      <div class="pos-request" style="border-top:none;padding-top:0;margin-top:20px;">
+        <div class="pos-request-label">Vous ne trouvez pas la formation qu'il vous faut ? Dites-nous ce que vous cherchez — nous vous préviendrons dès qu'elle sera disponible.</div>
+        <div class="pos-request-row">
+          <input class="pos-request-input" id="posRequestInput" type="text" placeholder="Ex : formation Design System avancé">
+          <button class="pos-request-btn" id="posRequestBtn" onclick="submitFormationRequest()">Envoyer</button>
+        </div>
+        <div id="posRequestMsg" style="font-size:0.78rem;color:var(--ink-soft);margin-top:8px;display:none;">✓ Merci ! Nous revenons vers vous dès que possible.</div>
+      </div>`;
+
+    const emptyMsg = (allFormations.length === 0 && allWorkshops.length === 0)
+      ? `<div class="skills-all-good"><span>🔍</span>Pas encore de formation dédiée à ce domaine — dites-nous ce qui vous intéresse ci-dessous.</div>` : '';
+
+    container.innerHTML = `<h3 class="skills-reco-title">Formations pour progresser en ${levierDomain}</h3>${formationSection}${workshopSection}${emptyMsg}${requestBlock}`;
+    return;
+  }
+
+  // Fallback: no levier identified (e.g. no bilan yet) — generic recommendations across weak domains
+  const domainScores = getDomainScores();
+  const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
+  if (weakDomains.length === 0) {
+    container.innerHTML = `<div class="skills-all-good"><span>🎉</span>Tous vos domaines sont au-dessus de 60% — continuez comme ça !</div>`;
+    return;
+  }
+  const seen = new Set();
+  const allFormations = [];
+  const allWorkshops = [];
+  weakDomains.forEach(d => {
+    FORMATIONS.filter(f => f.domaines.includes(d.domain) && f.moduleIA && !seen.has(f.nom))
+      .forEach(f => {
+        seen.add(f.nom);
+        if (f.type === 'formation') allFormations.push(f);
+        else allWorkshops.push(f);
+      });
+  });
   const formationSection = allFormations.length > 0 ? `
     <div class="skills-section-label">Formations · 1 journée</div>
-    <div class="skills-grid-2">${formationCards}</div>` : '';
-
+    <div class="skills-grid-2">${allFormations.map(makeFormationCardHtml).join('')}</div>` : '';
   const workshopSection = allWorkshops.length > 0 ? `
     <div class="skills-section-label">Ateliers · 3h</div>
-    <div class="skills-grid-2">${workshopCards}</div>` : '';
-
-  container.innerHTML = `${resultCard}<h3 class="skills-reco-title">Le Popup Design Lab vous recommande</h3>${formationSection}${workshopSection}`;
+    <div class="skills-grid-2">${allWorkshops.map(makeWorkshopCardHtml).join('')}</div>` : '';
+  container.innerHTML = `<h3 class="skills-reco-title">Le Popup Design Lab vous recommande</h3>${formationSection}${workshopSection}`;
 }
 
 function showSkills() {
@@ -4033,8 +4067,8 @@ function showSkills() {
   } else {
     posScores = getDomainScores().map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) }));
   }
+  buildBilanCard(document.getElementById('skillsBilanWrap'));
   renderPositionnement(posScores);
-  buildSkillsContent(document.getElementById('skillsContent'));
   goTo('s-skills');
 }
 
