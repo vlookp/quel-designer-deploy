@@ -1005,7 +1005,8 @@
   .pos-domain-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .pos-domain-chip { background: none; border: 1.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink); transition: border-color .15s; }
   .pos-domain-chip:hover { border-color: var(--ink); }
-  .pos-request { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .pos-request { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); max-width: calc(50% - 6px); }
+  @media (max-width: 540px) { .pos-request { max-width: 100%; } }
   .pos-request-label { font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 8px; }
   .pos-request-row { display: flex; gap: 8px; }
   .pos-request-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; font-size: 0.84rem; background: var(--bg); color: var(--ink); font-family: inherit; min-width: 0; }
