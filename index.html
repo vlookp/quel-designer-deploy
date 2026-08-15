@@ -989,8 +989,9 @@
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
   /* positionnement */
-  #positionnementWrap { width: 100%; max-width: 400px; margin: 4px auto 24px; display: flex; flex-direction: column; gap: 16px; }
-  .pos-title { font-size: 1.05rem; font-weight: 800; text-align: center; margin-bottom: 2px; }
+  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pos-title { font-size: 1.05rem; font-weight: 800; text-align: left; margin-bottom: 2px; grid-column: 1 / -1; }
+  @media (max-width: 640px) { #positionnementWrap { grid-template-columns: 1fr; } }
   .pos-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 20px; text-align: left; }
   .pos-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
   .pos-card-domain { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
@@ -1362,7 +1363,6 @@
     <h2>Vos résultats</h2>
     <p class="sub">Vos compétences par domaine</p>
     <div class="result-bars" id="resultBars"></div>
-    <div id="positionnementWrap" style="display:none;"></div>
     <div id="avatarPreview" onclick="continuerVersAvatar()" style="cursor:pointer;margin-bottom:12px;display:none;"></div>
     <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Voir ma progression</button>
   </div>
@@ -1466,6 +1466,7 @@
     <h2>Compétences</h2>
     <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
   </div>
+  <div id="positionnementWrap" style="display:none;"></div>
   <div id="skillsContent" style="width:100%;max-width:800px;"></div>
 </section>
 
@@ -2587,7 +2588,6 @@ function computeAndShowResults() {
     });
   });
 
-  renderPositionnement(sorted.map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) })));
   updateAvatarCardText();
   updateResultsPreview();
   goTo('s-results');
@@ -2658,7 +2658,7 @@ function renderPositionnement(domainScores) {
     </div>
     <div class="pos-card" id="posLevierCard"></div>`;
   renderLevierCard(levier, sorted, atout.domain);
-  wrap.style.display = 'flex';
+  wrap.style.display = 'grid';
 }
 
 function renderLevierCard(levier, sorted, atoutDomain) {
@@ -3188,7 +3188,6 @@ function showEntryResults(entry, colorIdxOverride) {
     btn.textContent = 'Voir ma progression';
   }
 
-  renderPositionnement(domainScores.length > 0 ? domainScores.map(d => ({ domain: d.domain, pct: d.pct })) : []);
   document.getElementById('s-results').querySelector('.sub').textContent = `Résultats du ${entry.date}`;
   goTo('s-results');
 }
@@ -4025,6 +4024,16 @@ function buildSkillsContent(container) {
 }
 
 function showSkills() {
+  // Positionnement built from the last saved bilan, with in-memory quiz fallback
+  const h = getHistory();
+  const lastEntry = h.length > 0 ? h[h.length - 1] : null;
+  let posScores = [];
+  if (lastEntry && lastEntry.domainScores && lastEntry.domainScores.length > 0) {
+    posScores = lastEntry.domainScores.map(d => ({ domain: d.domain, pct: d.pct }));
+  } else {
+    posScores = getDomainScores().map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) }));
+  }
+  renderPositionnement(posScores);
   buildSkillsContent(document.getElementById('skillsContent'));
   goTo('s-skills');
 }
