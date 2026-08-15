@@ -1005,7 +1005,7 @@
   .pos-domain-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .pos-domain-chip { background: none; border: 1.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink); transition: border-color .15s; }
   .pos-domain-chip:hover { border-color: var(--ink); }
-  .pos-request { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); max-width: calc(50% - 6px); }
+  .pos-request { margin-top: 14px; max-width: calc(50% - 6px); background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px 18px; }
   @media (max-width: 540px) { .pos-request { max-width: 100%; } }
   .pos-request-label { font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 8px; }
   .pos-request-row { display: flex; gap: 8px; }
@@ -4015,7 +4015,7 @@ function renderSkillsRecommendations() {
       <div class="skills-grid-2">${allWorkshops.map(makeWorkshopCardHtml).join('')}</div>` : '';
 
     const requestBlock = `
-      <div class="pos-request" style="border-top:none;padding-top:0;margin-top:20px;">
+      <div class="pos-request" style="margin-top:20px;">
         <div class="pos-request-label">Vous ne trouvez pas la formation qu'il vous faut ? Dites-nous ce que vous cherchez — nous vous préviendrons dès qu'elle sera disponible.</div>
         <div class="pos-request-row">
           <input class="pos-request-input" id="posRequestInput" type="text" placeholder="Ex : formation Design System avancé">
