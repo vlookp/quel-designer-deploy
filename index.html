@@ -988,6 +988,30 @@
   .skills-formation-card:hover .skills-arrow { opacity: 1; }
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
+  /* positionnement */
+  #positionnementWrap { width: 100%; max-width: 400px; margin: 4px auto 24px; display: flex; flex-direction: column; gap: 16px; }
+  .pos-title { font-size: 1.05rem; font-weight: 800; text-align: center; margin-bottom: 2px; }
+  .pos-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 20px; text-align: left; }
+  .pos-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+  .pos-card-domain { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+  .pos-card-text { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.5; }
+  .pos-formations { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .pos-formation-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--fill-dim); border-radius: 10px; padding: 10px 12px; font-size: 0.82rem; font-weight: 600; }
+  .pos-formation-item a { flex-shrink: 0; font-size: 0.78rem; font-weight: 700; color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .pos-formation-item a:hover { text-decoration: underline; }
+  .pos-switch-btn { background: none; border: none; font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); cursor: pointer; text-decoration: underline; padding: 4px 0; margin-top: 10px; }
+  .pos-switch-btn:hover { color: var(--ink); }
+  .pos-domain-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pos-domain-chip { background: none; border: 1.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink); transition: border-color .15s; }
+  .pos-domain-chip:hover { border-color: var(--ink); }
+  .pos-request { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .pos-request-label { font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 8px; }
+  .pos-request-row { display: flex; gap: 8px; }
+  .pos-request-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px; font-size: 0.84rem; background: var(--bg); color: var(--ink); font-family: inherit; min-width: 0; }
+  .pos-request-input:focus { outline: none; border-color: var(--ink); }
+  .pos-request-btn { background: var(--ink); color: #fff; border: none; border-radius: 10px; padding: 9px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .pos-request-btn:disabled { opacity: .5; cursor: default; }
+
   .btn-skills { background: var(--ink); color: var(--white); border: none; border-radius: 10px; padding: 14px 28px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: block; margin: 0 auto; transition: opacity .15s; }
   .btn-skills:hover { opacity: .8; }
 
@@ -1338,6 +1362,7 @@
     <h2>Vos résultats</h2>
     <p class="sub">Vos compétences par domaine</p>
     <div class="result-bars" id="resultBars"></div>
+    <div id="positionnementWrap" style="display:none;"></div>
     <div id="avatarPreview" onclick="continuerVersAvatar()" style="cursor:pointer;margin-bottom:12px;display:none;"></div>
     <button class="btn-primary" id="btnGoAvatar" style="width:100%;max-width:300px;display:block;margin-left:auto;margin-right:auto;" onclick="continuerVersAvatar()">Voir ma progression</button>
   </div>
@@ -2562,6 +2587,7 @@ function computeAndShowResults() {
     });
   });
 
+  renderPositionnement(sorted.map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) })));
   updateAvatarCardText();
   updateResultsPreview();
   goTo('s-results');
@@ -2598,6 +2624,108 @@ async function showResults() {
   isRetake = false;
   clearDraft();
   await saveSession(true);
+}
+
+// ── POSITIONNEMENT (atout + levier) ──
+function pickLevier(sortedScores, excludeDomain) {
+  const candidates = sortedScores.filter(d => d.domain !== excludeDomain);
+  // Sweet spot: score between 35 and 65, closest to 50 — where effort pays off fastest
+  const sweet = candidates.filter(d => d.pct >= 35 && d.pct <= 65)
+    .sort((a, b) => Math.abs(a.pct - 50) - Math.abs(b.pct - 50));
+  if (sweet.length > 0) return sweet[0];
+  // Fallback: 2nd lowest (the lowest is often simply out of scope)
+  const asc = [...candidates].sort((a, b) => a.pct - b.pct);
+  return asc[1] || asc[0] || null;
+}
+
+function renderPositionnement(domainScores) {
+  const wrap = document.getElementById('positionnementWrap');
+  if (!wrap) return;
+  if (!domainScores || domainScores.length < 2 || domainScores.every(d => d.pct === 0)) {
+    wrap.style.display = 'none'; wrap.innerHTML = ''; return;
+  }
+  const sorted = [...domainScores].sort((a, b) => b.pct - a.pct);
+  const atout = sorted[0];
+  const levier = pickLevier(sorted, atout.domain);
+  if (!levier) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+  wrap.dataset.scores = JSON.stringify(sorted);
+  wrap.innerHTML = `
+    <div class="pos-title">Votre positionnement</div>
+    <div class="pos-card">
+      <div class="pos-card-label">🏆 Votre atout</div>
+      <div class="pos-card-domain">${atout.domain} · ${atout.pct}%</div>
+      <div class="pos-card-text">C'est votre point fort — l'expertise à valoriser dans votre pratique et vos projets.</div>
+    </div>
+    <div class="pos-card" id="posLevierCard"></div>`;
+  renderLevierCard(levier, sorted, atout.domain);
+  wrap.style.display = 'flex';
+}
+
+function renderLevierCard(levier, sorted, atoutDomain) {
+  const card = document.getElementById('posLevierCard');
+  if (!card) return;
+  const formations = FORMATIONS.filter(f => f.domaines.includes(levier.domain)).slice(0, 2);
+  const formHtml = formations.length > 0
+    ? `<div class="pos-formations">${formations.map(f =>
+        `<div class="pos-formation-item"><span>${f.nom} · ${f.duree}</span><a href="${f.lien}" target="_blank" rel="noopener">Voir →</a></div>`).join('')}</div>`
+    : '';
+  card.innerHTML = `
+    <div class="pos-card-label">📈 Votre levier</div>
+    <div class="pos-card-domain">${levier.domain} · ${levier.pct}%</div>
+    <div class="pos-card-text">Progresser en ${levier.domain} vous rendrait plus polyvalent·e et renforcerait votre profil.</div>
+    ${formHtml}
+    <button class="pos-switch-btn" onclick="togglePosDomainList()">Choisir un autre axe</button>
+    <div class="pos-domain-list" id="posDomainList" style="display:none;">
+      ${sorted.filter(d => d.domain !== atoutDomain && d.domain !== levier.domain).map(d =>
+        `<button class="pos-domain-chip" onclick='switchLevier(${JSON.stringify(d.domain)})'>${d.domain} · ${d.pct}%</button>`).join('')}
+    </div>
+    <div class="pos-request">
+      <div class="pos-request-label">Vous ne trouvez pas la formation qu'il vous faut ? Dites-nous ce que vous cherchez — nous vous préviendrons dès qu'elle sera disponible.</div>
+      <div class="pos-request-row">
+        <input class="pos-request-input" id="posRequestInput" type="text" placeholder="Ex : formation Design System avancé">
+        <button class="pos-request-btn" id="posRequestBtn" onclick="submitFormationRequest()">Envoyer</button>
+      </div>
+      <div id="posRequestMsg" style="font-size:0.78rem;color:var(--ink-soft);margin-top:8px;display:none;">✓ Merci ! Nous revenons vers vous dès que possible.</div>
+    </div>`;
+}
+
+function togglePosDomainList() {
+  const list = document.getElementById('posDomainList');
+  if (list) list.style.display = list.style.display === 'none' ? 'flex' : 'none';
+}
+
+function switchLevier(domain) {
+  const wrap = document.getElementById('positionnementWrap');
+  const sorted = JSON.parse(wrap.dataset.scores || '[]');
+  const levier = sorted.find(d => d.domain === domain);
+  if (levier) renderLevierCard(levier, sorted, sorted[0]?.domain);
+}
+
+async function submitFormationRequest() {
+  const input = document.getElementById('posRequestInput');
+  const btn = document.getElementById('posRequestBtn');
+  const msg = document.getElementById('posRequestMsg');
+  const demande = input.value.trim();
+  if (!demande) { input.focus(); return; }
+  btn.disabled = true; btn.textContent = 'Envoi…';
+  const levierDomain = document.querySelector('#posLevierCard .pos-card-domain')?.textContent || '';
+  try {
+    await sbRest('/rest/v1/formation_requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        nom: currentUser?.user_metadata?.full_name || null,
+        email: currentUser?.email || null,
+        domaine: levierDomain.split('·')[0].trim() || null,
+        demande
+      })
+    });
+    input.value = '';
+    msg.style.display = 'block';
+  } catch(e) {
+    alert('Une erreur est survenue, veuillez réessayer.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Envoyer';
+  }
 }
 
 // ── UNIFIED COLOR PALETTE ──
@@ -3060,6 +3188,7 @@ function showEntryResults(entry, colorIdxOverride) {
     btn.textContent = 'Voir ma progression';
   }
 
+  renderPositionnement(domainScores.length > 0 ? domainScores.map(d => ({ domain: d.domain, pct: d.pct })) : []);
   document.getElementById('s-results').querySelector('.sub').textContent = `Résultats du ${entry.date}`;
   goTo('s-results');
 }
