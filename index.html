@@ -285,10 +285,8 @@
   .landing-wrap { width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0; }
   .landing-wrap h1 { font-size: 60px; line-height: 1.15; margin-bottom: 16px; }
   @media (max-width: 540px) { .landing-wrap h1 { font-size: 40px; } }
-  .landing-sub { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.7; margin-bottom: 28px; }
-  .landing-points { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; width: 100%; }
-  .landing-point { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; color: var(--ink); padding: 4px 0; text-align: left; }
-  .landing-meta { font-size: 0.82rem; color: var(--ink-soft); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 28px; }
+  .landing-sub { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.7; margin-bottom: 20px; }
+  .landing-meta { font-size: 0.82rem; color: var(--ink-soft); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 32px; }
   .landing-login { font-size: 0.88rem; color: var(--ink-soft); margin-top: 16px; }
   .landing-login button { background: none; border: none; color: var(--ink); font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; font-size: inherit; }
   #s-auth {
@@ -1243,11 +1241,6 @@
     <img id="landingLogo" alt="Popup Design Lab" style="width:72px;height:auto;display:block;margin:0 auto 28px;opacity:0.85;">
     <h1>Quel designer<br>êtes-vous ?</h1>
     <p class="landing-sub">Faites le point sur ce que vous savez vraiment faire —<br>pour savoir où vous concentrer ensuite.</p>
-    <div class="landing-points">
-      <div class="landing-point">🎯 <span>Identifiez vos domaines de force</span></div>
-      <div class="landing-point">📍 <span>Repérez ce qu'il vous reste à apprendre</span></div>
-      <div class="landing-point">💬 <span>Sachez quoi mettre en avant en entretien</span></div>
-    </div>
     <p class="landing-meta">~10 minutes · 8 domaines du design</p>
     <button class="btn-primary" style="width:100%;max-width:320px;" onclick="startGuestQuiz()">Commencer mon bilan</button>
     <p class="landing-login">Déjà un compte ? <button onclick="goTo('s-auth');switchTab('login')">Se connecter</button></p>
