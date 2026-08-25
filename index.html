@@ -283,10 +283,11 @@
     padding: 60px 24px;
   }
   .landing-wrap { width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0; }
-  .landing-wrap h1 { margin-bottom: 16px; }
+  .landing-wrap h1 { font-size: 60px; line-height: 1.15; margin-bottom: 16px; }
+  @media (max-width: 540px) { .landing-wrap h1 { font-size: 40px; } }
   .landing-sub { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.7; margin-bottom: 28px; }
   .landing-points { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; width: 100%; }
-  .landing-point { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; background: var(--fill-dim); border-radius: 10px; padding: 12px 16px; text-align: left; }
+  .landing-point { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; color: var(--ink); padding: 4px 0; text-align: left; }
   .landing-meta { font-size: 0.82rem; color: var(--ink-soft); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 28px; }
   .landing-login { font-size: 0.88rem; color: var(--ink-soft); margin-top: 16px; }
   .landing-login button { background: none; border: none; color: var(--ink); font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; font-size: inherit; }
@@ -1113,7 +1114,7 @@
 <div class="modal-overlay" id="authGateModal" onclick="if(event.target===this)closeAuthGate()">
   <div class="modal-box" style="text-align:center;">
     <h3>Enregistrez votre progression 🎯</h3>
-    <p>Vous avez complété votre premier domaine ! Créez un compte gratuit pour sauvegarder vos résultats et continuer le bilan.</p>
+    <p>Vous avez complété votre premier domaine !<br>Créez un compte gratuit pour sauvegarder vos résultats et continuer le bilan.</p>
     <div class="modal-actions" style="flex-direction:column;gap:8px;">
       <button class="modal-confirm" style="width:100%;" onclick="authGateSignup()">Créer un compte gratuit</button>
       <button class="modal-cancel" style="width:100%;justify-content:center;" onclick="closeAuthGate()">Continuer sans compte</button>
@@ -1217,6 +1218,10 @@
   <button class="sidebar-item" id="sidebarMesFormations" onclick="closeSidebar();showMesFormations()">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h10a1 1 0 0 1 1 1v9.5L8 10.5 2 12.5V3a1 1 0 0 1 1-1z"/><path d="M6 7l1.2 1.2L10 5.5" stroke-width="1.6"/></svg>
     Mes formations
+  </button>
+  <button class="sidebar-item" id="sidebarFeedback" onclick="closeSidebar();openFeedbackModal()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h12a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6l-3 3v-3H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/></svg>
+    Laisser un avis
   </button>
   <div class="sidebar-divider"></div>
   <a class="sidebar-item" href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener" style="text-decoration:none;" onclick="closeSidebar()">
@@ -2571,13 +2576,6 @@ function showContinue() {
   if (continueSaveBtn) continueSaveBtn.style.display = canEnregistrer ? 'inline-block' : 'none';
   if (continueQuitBtn) continueQuitBtn.style.display = (canSave && !canEnregistrer) ? 'inline-block' : 'none';
   goTo('s-continue');
-  // Auth gate: after 1st domain, non-logged-in guest
-  if (!currentUser && completedDomains.size === 1 && !allDone) {
-    setTimeout(() => {
-      const m = document.getElementById('authGateModal');
-      if (m) m.classList.add('open');
-    }, 400);
-  }
   if (allDone) {
     document.getElementById('quizProgress')?.classList.remove('visible');
     document.body.classList.remove('quiz-active');
