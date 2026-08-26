@@ -1027,22 +1027,35 @@
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
   /* positionnement */
-  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .pos-title { font-size: 1.05rem; font-weight: 800; text-align: left; margin-bottom: 2px; grid-column: 1 / -1; }
+  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start; }
   @media (max-width: 640px) { #positionnementWrap { grid-template-columns: 1fr; } }
   .pos-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 20px; text-align: left; }
   .pos-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
   .pos-card-domain { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
   .pos-card-text { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.5; }
-  .pos-formations { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-  .pos-formation-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--fill-dim); border-radius: 10px; padding: 10px 12px; font-size: 0.82rem; font-weight: 600; }
-  .pos-formation-item a { flex-shrink: 0; font-size: 0.78rem; font-weight: 700; color: var(--ink); text-decoration: none; white-space: nowrap; }
-  .pos-formation-item a:hover { text-decoration: underline; }
-  .pos-switch-btn { background: none; border: none; font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); cursor: pointer; text-decoration: underline; padding: 4px 0; margin-top: 10px; }
-  .pos-switch-btn:hover { color: var(--ink); }
-  .pos-domain-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .pos-domain-chip { background: none; border: 1.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink); transition: border-color .15s; }
-  .pos-domain-chip:hover { border-color: var(--ink); }
+  .pos-bilan-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px; }
+  .pos-bilan-atout { margin-bottom: 12px; }
+  .pos-bilan-atout-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; }
+  .pos-bilan-atout-value { font-size: 0.95rem; font-weight: 800; }
+  .pos-levier-box { background: var(--fill-dim); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+  .pos-levier-box .pos-bilan-atout-label { color: var(--ink-soft); }
+  .pos-others-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .pos-other-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .pos-other-row span:first-child { color: var(--ink-soft); }
+  .pos-other-row span:last-child { font-weight: 700; }
+  @media (max-width: 480px) { .pos-others-list { grid-template-columns: 1fr; } }
+
+  /* filter chips */
+  .reco-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 20px; }
+  .reco-filter-chip {
+    background: none; border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 7px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    color: var(--ink-soft); transition: border-color .15s, background .15s, color .15s;
+  }
+  .reco-filter-chip:hover { border-color: var(--ink); color: var(--ink); }
+  .reco-filter-chip.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .reco-filter-chip.recommended:not(.active) { border-color: var(--ink); color: var(--ink); }
+
   .pos-request { margin-top: 14px; max-width: calc(50% - 6px); background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px 18px; }
   @media (max-width: 540px) { .pos-request { max-width: 100%; } }
   .pos-request-label { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.6; margin-bottom: 12px; }
@@ -1051,6 +1064,22 @@
   .pos-request-input:focus { outline: none; border-color: var(--ink); }
   .pos-request-btn { background: var(--ink); color: #fff; border: none; border-radius: 10px; padding: 9px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
   .pos-request-btn:disabled { opacity: .5; cursor: default; }
+
+  /* floating conseil widget */
+  .conseil-widget {
+    position: fixed; bottom: 20px; right: 20px; z-index: 200;
+    width: 280px; background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 18px 20px; box-shadow: 0 8px 28px rgba(0,0,0,.12);
+    transform: translateY(20px) scale(.96); opacity: 0; pointer-events: none;
+    transition: transform .25s ease, opacity .25s ease;
+  }
+  .conseil-widget.visible { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+  .conseil-widget-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 0.9rem; cursor: pointer; color: var(--ink-soft); line-height: 1; padding: 4px; }
+  .conseil-widget-close:hover { color: var(--ink); }
+  .conseil-widget-title { font-size: 0.95rem; font-weight: 800; font-family: Georgia, serif; margin-bottom: 8px; padding-right: 16px; }
+  .conseil-widget-text { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.5; margin-bottom: 12px; }
+  .conseil-widget-btn { display: inline-block; background: var(--ink); color: #fff; border-radius: 10px; padding: 9px 16px; font-size: 0.8rem; font-weight: 700; text-decoration: none; }
+  @media (max-width: 480px) { .conseil-widget { width: calc(100vw - 32px); right: 16px; bottom: 16px; } }
 
   .btn-skills { background: var(--ink); color: var(--white); border: none; border-radius: 10px; padding: 14px 28px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: block; margin: 0 auto; transition: opacity .15s; }
   .btn-skills:hover { opacity: .8; }
@@ -1503,12 +1532,19 @@
 <section class="screen padtop" id="s-skills">
   <div style="width:100%;max-width:800px;">
     <h2>Compétences</h2>
-    <p class="sub">Voici des formations et des workshops que nous vous recommandons pour monter en compétences.</p>
+    <p class="sub">En fonction du dernier bilan que vous avez effectué, voici des recommandations pour monter en compétence.</p>
   </div>
-  <div id="skillsBilanWrap" style="width:100%;max-width:800px;margin-bottom:24px;"></div>
   <div id="positionnementWrap" style="display:none;"></div>
   <div id="skillsContent" style="width:100%;max-width:800px;"></div>
 </section>
+
+<!-- Floating "Besoin de conseil" widget -->
+<div id="conseilWidget" class="conseil-widget">
+  <button class="conseil-widget-close" onclick="dismissConseilWidget()" title="Fermer">✕</button>
+  <div class="conseil-widget-title">Besoin de conseil ?</div>
+  <div class="conseil-widget-text">Réservez un call gratuit de 30 min avec notre équipe pour faire le point sur votre progression.</div>
+  <a class="conseil-widget-btn" href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener">Réserver un call gratuit →</a>
+</div>
 
 <!-- DASHBOARD -->
 <section class="screen padtop" id="s-dashboard">
@@ -1892,6 +1928,7 @@ function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
+  if (id !== 's-skills') document.getElementById('conseilWidget')?.classList.remove('visible');
   updateGlobalProgress(id);
   if (currentUser) updateProfileCircle();
   const quizScreens_ = ['s-domains', 's-quiz', 's-continue'];
@@ -2676,7 +2713,7 @@ async function showResults() {
 }
 
 // ── POSITIONNEMENT (atout + levier) ──
-let _posState = { sorted: [], atoutDomain: '', levierDomain: '' };
+let _posState = { sorted: [], atoutDomain: '', levierDomain: '', activeFilters: new Set() };
 
 function pickLevier(sortedScores, excludeDomain) {
   const candidates = sortedScores.filter(d => d.domain !== excludeDomain);
@@ -2694,7 +2731,7 @@ function renderPositionnement(domainScores) {
   if (!wrap) return;
   if (!domainScores || domainScores.length < 2 || domainScores.every(d => d.pct === 0)) {
     wrap.style.display = 'none'; wrap.innerHTML = '';
-    _posState = { sorted: [], atoutDomain: '', levierDomain: '' };
+    _posState = { sorted: [], atoutDomain: '', levierDomain: '', activeFilters: new Set() };
     renderSkillsRecommendations();
     return;
   }
@@ -2703,49 +2740,41 @@ function renderPositionnement(domainScores) {
   const levier = pickLevier(sorted, atout.domain);
   if (!levier) {
     wrap.style.display = 'none'; wrap.innerHTML = '';
-    _posState = { sorted: [], atoutDomain: '', levierDomain: '' };
+    _posState = { sorted: [], atoutDomain: '', levierDomain: '', activeFilters: new Set() };
     renderSkillsRecommendations();
     return;
   }
-  _posState = { sorted, atoutDomain: atout.domain, levierDomain: levier.domain };
+  _posState = { sorted, atoutDomain: atout.domain, levierDomain: levier.domain, activeFilters: new Set([levier.domain]) };
+
+  const others = sorted.filter(d => d.domain !== atout.domain && d.domain !== levier.domain);
+  const othersHtml = others.map(d =>
+    `<div class="pos-other-row"><span>${d.domain}</span><span>${d.pct}%</span></div>`).join('');
+
   wrap.innerHTML = `
-    <div class="pos-title">Votre positionnement</div>
+    <div class="pos-card">${buildBilanCardHtml()}</div>
     <div class="pos-card">
-      <div class="pos-card-label">🏆 Votre atout</div>
-      <div class="pos-card-domain">${atout.domain} · ${atout.pct}%</div>
-      <div class="pos-card-text">C'est votre point fort — l'expertise à valoriser dans votre pratique et vos projets.</div>
-    </div>
-    <div class="pos-card" id="posLevierCard"></div>`;
-  renderLevierCard(levier, sorted, atout.domain);
+      <div class="pos-bilan-label">Dernier bilan</div>
+      <div class="pos-bilan-atout">
+        <div class="pos-bilan-atout-label">🏆 Votre atout</div>
+        <div class="pos-bilan-atout-value">${atout.domain} · ${atout.pct}%</div>
+      </div>
+      <div class="pos-levier-box">
+        <div class="pos-bilan-atout-label">📈 Votre levier</div>
+        <div class="pos-bilan-atout-value">${levier.domain} · ${levier.pct}%</div>
+      </div>
+      <div class="pos-others-list">${othersHtml}</div>
+    </div>`;
   wrap.style.display = 'grid';
   renderSkillsRecommendations();
 }
 
-function renderLevierCard(levier, sorted, atoutDomain) {
-  const card = document.getElementById('posLevierCard');
-  if (!card) return;
-  card.innerHTML = `
-    <div class="pos-card-label">📈 Votre levier</div>
-    <div class="pos-card-domain">${levier.domain} · ${levier.pct}%</div>
-    <div class="pos-card-text">Progresser en ${levier.domain} vous rendrait plus polyvalent·e et renforcerait votre profil.</div>
-    <button class="pos-switch-btn" onclick="togglePosDomainList()">Choisir un autre axe</button>
-    <div class="pos-domain-list" id="posDomainList" style="display:none;">
-      ${sorted.filter(d => d.domain !== atoutDomain && d.domain !== levier.domain).map(d =>
-        `<button class="pos-domain-chip" onclick='switchLevier(${JSON.stringify(d.domain)})'>${d.domain} · ${d.pct}%</button>`).join('')}
-    </div>`;
-}
-
-function togglePosDomainList() {
-  const list = document.getElementById('posDomainList');
-  if (list) list.style.display = list.style.display === 'none' ? 'flex' : 'none';
-}
-
-function switchLevier(domain) {
-  const { sorted, atoutDomain } = _posState;
-  const levier = sorted.find(d => d.domain === domain);
-  if (!levier) return;
-  _posState.levierDomain = domain;
-  renderLevierCard(levier, sorted, atoutDomain);
+function toggleRecoFilter(domain) {
+  const filters = _posState.activeFilters;
+  if (filters.has(domain)) {
+    if (filters.size > 1) filters.delete(domain); // keep at least one active
+  } else {
+    filters.add(domain);
+  }
   renderSkillsRecommendations();
 }
 
@@ -3937,7 +3966,7 @@ function showPolitique() {
   goTo('s-politique');
 }
 
-function buildBilanCard(container) {
+function buildBilanCardHtml() {
   // Result card — always built from last saved bilan (localStorage), with in-memory fallback
   const domainScores = getDomainScores();
   const allHistory = getHistory();
@@ -3987,20 +4016,7 @@ function buildBilanCard(container) {
       <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;">
     </div>` : '';
 
-  const calendlyBlock = `
-    <div style="flex:1;min-width:200px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;">
-      <div style="font-size:1.1rem;font-weight:800;font-family:Georgia,serif;line-height:1.3;">Besoin de conseil ?</div>
-      <div style="font-size:0.88rem;color:var(--ink-soft);line-height:1.5;">Réservez un call gratuit de 30 min avec notre équipe pour faire le point sur votre progression.</div>
-      <a href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener" style="background:#111;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:0.84rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;margin-top:4px;">Réserver un call gratuit →</a>
-    </div>`;
-
-  const resultCard = cardTop3.length > 0 ? `
-    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:0;">
-      ${bilanCard}
-      ${calendlyBlock}
-    </div>` : '';
-
-  container.innerHTML = resultCard;
+  return bilanCard;
 }
 
 function makeFormationCardHtml(f) {
@@ -4045,9 +4061,15 @@ function renderSkillsRecommendations() {
   const levierDomain = _posState.levierDomain;
 
   if (levierDomain) {
-    // Recommendations targeted at the chosen levier
-    const allFormations = FORMATIONS.filter(f => f.domaines.includes(levierDomain) && f.type === 'formation');
-    const allWorkshops = FORMATIONS.filter(f => f.domaines.includes(levierDomain) && f.type === 'workshop');
+    const activeFilters = _posState.activeFilters;
+    const filtersHtml = DOMAINS.map(d => {
+      const isActive = activeFilters.has(d);
+      const isRecommended = d === levierDomain;
+      return `<button class="reco-filter-chip${isActive ? ' active' : ''}${isRecommended ? ' recommended' : ''}" onclick='toggleRecoFilter(${JSON.stringify(d)})'>${d}${isRecommended ? ' ★' : ''}</button>`;
+    }).join('');
+
+    const allFormations = FORMATIONS.filter(f => f.type === 'formation' && f.domaines.some(dom => activeFilters.has(dom)));
+    const allWorkshops = FORMATIONS.filter(f => f.type === 'workshop' && f.domaines.some(dom => activeFilters.has(dom)));
 
     const formationSection = allFormations.length > 0 ? `
       <div class="skills-section-label">Formations · 1 journée</div>
@@ -4068,9 +4090,9 @@ function renderSkillsRecommendations() {
       </div>`;
 
     const emptyMsg = (allFormations.length === 0 && allWorkshops.length === 0)
-      ? `<div class="skills-all-good"><span>🔍</span>Pas encore de formation dédiée à ce domaine — dites-nous ce qui vous intéresse ci-dessous.</div>` : '';
+      ? `<div class="skills-all-good"><span>🔍</span>Pas encore de formation pour ce filtre — dites-nous ce qui vous intéresse ci-dessous.</div>` : '';
 
-    container.innerHTML = `<h3 class="skills-reco-title">Formations pour progresser en ${levierDomain}</h3>${formationSection}${workshopSection}${emptyMsg}${requestBlock}`;
+    container.innerHTML = `<h3 class="skills-reco-title">Les recommandations du Popup</h3><div class="reco-filters">${filtersHtml}</div>${formationSection}${workshopSection}${emptyMsg}${requestBlock}`;
     return;
   }
 
@@ -4111,9 +4133,34 @@ function showSkills() {
   } else {
     posScores = getDomainScores().map(d => ({ domain: d.domain, pct: Math.round(d.sum / d.max * 100) }));
   }
-  buildBilanCard(document.getElementById('skillsBilanWrap'));
   renderPositionnement(posScores);
   goTo('s-skills');
+  setupConseilWidget();
+}
+
+let _conseilWidgetBound = false;
+function setupConseilWidget() {
+  const widget = document.getElementById('conseilWidget');
+  if (!widget) return;
+  if (sessionStorage.getItem('qd_conseil_dismissed')) return;
+  if (_conseilWidgetBound) return;
+  _conseilWidgetBound = true;
+  const onScroll = () => {
+    if (!document.getElementById('s-skills').classList.contains('active')) return;
+    const trigger = document.getElementById('positionnementWrap');
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    if (rect.bottom < window.innerHeight * 0.8) {
+      widget.classList.add('visible');
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+function dismissConseilWidget() {
+  const widget = document.getElementById('conseilWidget');
+  if (widget) widget.classList.remove('visible');
+  sessionStorage.setItem('qd_conseil_dismissed', '1');
 }
 
 function buildSentence() {
