@@ -1126,6 +1126,15 @@
     padding: 4px 10px; cursor: pointer;
   }
   #toast-cancel:hover { background: rgba(255,255,255,.28); }
+  #bookmarkToast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--white); border-radius: 12px;
+    padding: 12px 16px; display: flex; align-items: center; gap: 14px;
+    font-size: 0.88rem; font-weight: 500; white-space: nowrap;
+    opacity: 0; pointer-events: none; z-index: 500;
+    transition: opacity .2s, transform .2s;
+  }
+  #bookmarkToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -3028,8 +3037,21 @@ function toggleBookmark(nom, event) {
     }
   }
 
+  showBookmarkToast(adding ? 'Cet événement a bien été sauvegardé dans Mes formations' : 'Cet événement a été retiré de Mes formations');
   refreshMonProfilBookmarks();
 }
+
+let _bookmarkToastTimer = null;
+function showBookmarkToast(message) {
+  const toast = document.getElementById('bookmarkToast');
+  const msg = document.getElementById('bookmarkToast-msg');
+  if (!toast || !msg) return;
+  msg.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(_bookmarkToastTimer);
+  _bookmarkToastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
 function refreshMonProfilBookmarks() {
   const wrap = document.getElementById('monProfilFavorisWrap');
   if (!wrap) return;
@@ -4345,6 +4367,7 @@ init();
   </div>
 </div>
 <div id="toast"><span id="toast-msg"></span><button id="toast-cancel" onclick="_cancelDelete()">Annuler</button></div>
+<div id="bookmarkToast"><span id="bookmarkToast-msg"></span></div>
 <footer class="app-footer" id="appFooter">
   <div class="footer-inner">
     <!-- Col 1 : LeFlowDesign -->
