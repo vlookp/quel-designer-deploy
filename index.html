@@ -1543,7 +1543,7 @@
   <button class="conseil-widget-close" onclick="dismissConseilWidget()" title="Fermer">✕</button>
   <div class="conseil-widget-title">Besoin de conseil ?</div>
   <div class="conseil-widget-text">Réservez un call gratuit de 30 min avec notre équipe pour faire le point sur votre progression.</div>
-  <a class="conseil-widget-btn" href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener">Réserver un call gratuit →</a>
+  <a class="conseil-widget-btn" href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener" onclick="dismissConseilWidget()">Réserver un call gratuit →</a>
 </div>
 
 <!-- DASHBOARD -->
@@ -4146,6 +4146,7 @@ function setupConseilWidget() {
   if (_conseilWidgetBound) return;
   _conseilWidgetBound = true;
   const onScroll = () => {
+    if (sessionStorage.getItem('qd_conseil_dismissed')) return;
     if (!document.getElementById('s-skills').classList.contains('active')) return;
     const trigger = document.getElementById('positionnementWrap');
     if (!trigger) return;
