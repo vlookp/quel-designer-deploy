@@ -945,8 +945,9 @@
   }
   .skills-reco-title {
     font-family: Georgia, serif; font-size: 1.1rem; font-weight: 800;
-    margin: 32px 0 16px; letter-spacing: -.01em;
+    margin: 32px 0 4px; letter-spacing: -.01em;
   }
+  .reco-sub { font-size: 0.86rem; color: var(--ink-soft); margin-bottom: 12px; }
   .skills-section-label {
     font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
     color: var(--ink-soft); margin-bottom: 12px; margin-top: 24px;
@@ -1039,6 +1040,9 @@
   .pos-bilan-atout-value { font-size: 0.95rem; font-weight: 800; }
   .pos-levier-box { background: var(--fill-dim); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
   .pos-levier-box .pos-bilan-atout-label { color: var(--ink-soft); }
+  .pos-levier-box .pos-card-text { margin-top: 6px; }
+  .pos-avatar-col { display: flex; align-items: flex-start; justify-content: center; }
+  @media (max-width: 640px) { .pos-avatar-col .avatar-card { max-width: 100% !important; } }
   .pos-others-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
   .pos-other-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .pos-other-row span:first-child { color: var(--ink-soft); }
@@ -2751,7 +2755,7 @@ function renderPositionnement(domainScores) {
     `<div class="pos-other-row"><span>${d.domain}</span><span>${d.pct}%</span></div>`).join('');
 
   wrap.innerHTML = `
-    <div class="pos-card">${buildBilanCardHtml()}</div>
+    <div class="pos-avatar-col">${buildBilanCardHtml()}</div>
     <div class="pos-card">
       <div class="pos-bilan-label">Dernier bilan</div>
       <div class="pos-bilan-atout">
@@ -2761,6 +2765,7 @@ function renderPositionnement(domainScores) {
       <div class="pos-levier-box">
         <div class="pos-bilan-atout-label">📈 Votre levier</div>
         <div class="pos-bilan-atout-value">${levier.domain} · ${levier.pct}%</div>
+        <div class="pos-card-text">Progresser en ${levier.domain} vous rendrait plus polyvalent·e et renforcerait votre profil.</div>
       </div>
       <div class="pos-others-list">${othersHtml}</div>
     </div>`;
@@ -4092,7 +4097,7 @@ function renderSkillsRecommendations() {
     const emptyMsg = (allFormations.length === 0 && allWorkshops.length === 0)
       ? `<div class="skills-all-good"><span>🔍</span>Pas encore de formation pour ce filtre — dites-nous ce qui vous intéresse ci-dessous.</div>` : '';
 
-    container.innerHTML = `<h3 class="skills-reco-title">Les recommandations du Popup</h3><div class="reco-filters">${filtersHtml}</div>${formationSection}${workshopSection}${emptyMsg}${requestBlock}`;
+    container.innerHTML = `<h3 class="skills-reco-title">Recommandations</h3><p class="reco-sub">Sélectionnez les événements qui vous intéressent</p><div class="reco-filters">${filtersHtml}</div>${formationSection}${workshopSection}${emptyMsg}${requestBlock}`;
     return;
   }
 
