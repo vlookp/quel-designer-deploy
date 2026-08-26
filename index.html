@@ -398,6 +398,7 @@
     transition: opacity .15s;
   }
   .btn-primary:hover { opacity: 0.8; }
+  .btn-primary:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
   .btn-secondary {
     background: var(--bg); color: var(--ink-soft);
     border: 1.5px solid var(--border);
@@ -1690,7 +1691,7 @@ let authMode = 'signup';
 let selectedAvatar = null, selectedBg = 0;
 let pendingColorIdx = 0;
 
-DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+scores = {};
 
 // ── SUPABASE REST ──
 let SB_TOKEN = null;
@@ -2244,7 +2245,7 @@ function signOut() {
   SB_TOKEN = null; currentUser = null; scores = {};
   completedDomains.clear(); top3Domains = [];
   selectedAvatar = null; selectedBg = 0;
-  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  scores = {};
   document.getElementById('topbar').classList.remove('visible');
   document.getElementById('btnFaireBilan').style.display = 'none';
   document.getElementById('sidebarFaireBilan').style.display = 'none';
@@ -2338,7 +2339,7 @@ function getDraftCardData() {
 }
 
 function _restoreDraftState(draft) {
-  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  scores = {};
   Object.assign(scores, draft.scores);
   completedDomains.clear();
   draft.completedDomains.forEach(d => completedDomains.add(d));
@@ -2432,7 +2433,7 @@ function _commitCancelDraft() {
 function startQuiz(domain, resumeQIndex = 0) {
   currentDomain = domain;
   currentQIndex = resumeQIndex;
-  selectedValue = scores[domain + '|' + resumeQIndex] ?? 0;
+  selectedValue = scores[domain + '|' + resumeQIndex] ?? null;
   saveDraft();
   renderQuestion();
   goTo('s-quiz');
@@ -2446,7 +2447,7 @@ function renderQuestion() {
   document.getElementById('quizBar').style.width = (currentQIndex / total * 100) + '%';
   document.getElementById('quizQuestion').textContent = items[currentQIndex];
 
-  selectedValue = scores[currentDomain + '|' + currentQIndex] ?? 0;
+  selectedValue = scores[currentDomain + '|' + currentQIndex] ?? null;
 
   const optionsEl = document.getElementById('quizOptions');
   optionsEl.innerHTML = '';
@@ -2463,6 +2464,7 @@ function renderQuestion() {
 
   const nextBtn = document.getElementById('quizNext');
   nextBtn.textContent = currentQIndex === total - 1 ? 'Terminer' : 'Suivant';
+  nextBtn.disabled = selectedValue === null;
   const backBtn = document.getElementById('quizBack');
   if (currentQIndex === 0) {
     backBtn.textContent = '← Domaines';
@@ -2482,14 +2484,16 @@ function selectOption(value) {
   document.querySelectorAll('#quizOptions .option').forEach(el => el.classList.remove('selected'));
   const idx = OPTIONS.findIndex(o => o.value === value);
   document.querySelectorAll('#quizOptions .option')[idx]?.classList.add('selected');
+  document.getElementById('quizNext').disabled = false;
 }
 
 async function quizNext() {
-  scores[currentDomain + '|' + currentQIndex] = selectedValue ?? 0;
+  if (selectedValue === null) return;
+  scores[currentDomain + '|' + currentQIndex] = selectedValue;
   const total = DATA[currentDomain].length;
   if (currentQIndex < total - 1) {
     currentQIndex++;
-    selectedValue = scores[currentDomain + '|' + currentQIndex] ?? 0;
+    selectedValue = scores[currentDomain + '|' + currentQIndex] ?? null;
     renderQuestion();
   } else {
     completedDomains.add(currentDomain);
@@ -2531,7 +2535,7 @@ function showDomainTransition(domain) {
 function quizPrev() {
   if (currentQIndex > 0) {
     currentQIndex--;
-    selectedValue = scores[currentDomain + '|' + currentQIndex] ?? 0;
+    selectedValue = scores[currentDomain + '|' + currentQIndex] ?? null;
     renderQuestion();
   } else {
     showDomains();
@@ -3366,8 +3370,9 @@ function continuerVersAvatar() {
 }
 
 function quitQuiz() {
-  if (!currentUser && completedDomains.size >= 1) {
-    // Guest with progress: prompt to register so they can come back
+  const hasAnyAnswer = Object.keys(scores).length > 0;
+  if (!currentUser && (completedDomains.size >= 1 || hasAnyAnswer)) {
+    // Guest with progress (even mid-domain, before completing any): prompt to register so they can come back
     _authGateQuit = true;
     const m = document.getElementById('authGateModal');
     const h = m?.querySelector('h3');
@@ -3384,7 +3389,7 @@ function quitQuiz() {
     goTo('s-landing');
     return;
   }
-  const hasProgress = completedDomains.size > 0;
+  const hasProgress = completedDomains.size > 0 || hasAnyAnswer;
   showConfirm({
     title: 'Quitter le quiz ?',
     message: hasProgress ? 'Votre progression sera sauvegardée.' : 'Êtes-vous sûr de vouloir quitter le quiz ?',
@@ -3501,7 +3506,7 @@ function modifyCurrentBilan() {
   const history = getHistory();
   const last = history[history.length - 1];
   top3Domains = [];
-  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  scores = {};
   if (last?.questionScores) Object.assign(scores, last.questionScores);
   isRetake = true;
   isModify = true;
@@ -3519,7 +3524,7 @@ function retakeFromLastBilan() {
   const history = getHistory();
   const last = history[history.length - 1];
   top3Domains = [];
-  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  scores = {};
   if (last?.questionScores) Object.assign(scores, last.questionScores);
   isRetake = true;
   DOMAINS.forEach(d => {
@@ -3534,7 +3539,7 @@ function retakeFromLastBilan() {
 
 function retakeFromScratch() {
   top3Domains = [];
-  DOMAINS.forEach(d => DATA[d].forEach((_, i) => scores[d + '|' + i] = 0));
+  scores = {};
   completedDomains.clear();
   isRetake = false;
   pendingColorIdx = getNextColorIdx();
