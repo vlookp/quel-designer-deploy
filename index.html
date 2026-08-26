@@ -262,6 +262,16 @@
   @media (min-width: 768px) {
     .btn-hamburger { display: none !important; }
     body.sidebar-active .screen { padding-left: 220px; }
+    /* Screens set their own ID-scoped padding shorthand (incl. padding-left),
+       which otherwise beats the class-based rule above on specificity. */
+    body.sidebar-active #s-home,
+    body.sidebar-active #s-results,
+    body.sidebar-active #s-avatar,
+    body.sidebar-active #s-progression,
+    body.sidebar-active #s-dashboard,
+    body.sidebar-active #s-profile,
+    body.sidebar-active #s-mon-profil,
+    body.sidebar-active #s-skills { padding-left: 220px; }
     body.sidebar-active .app-footer { margin-left: 220px; }
   }
 
