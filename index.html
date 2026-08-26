@@ -123,6 +123,14 @@
   }
   .quiz-topbar-quit:hover { border-color: var(--ink); color: var(--ink); }
   .quiz-topbar-title { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+  .quiz-topbar-save {
+    margin-left: auto; background: var(--ink); color: #fff; border: none;
+    border-radius: 20px; padding: 8px 16px; font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .quiz-topbar-save:hover { opacity: 0.85; }
+  @media (max-width: 480px) { .quiz-topbar-save { padding: 8px 12px; font-size: 0.72rem; } }
   .topbar-brand { display: flex; align-items: center; gap: 12px; }
   .topbar-appname { font-size: 0.78rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
   .topbar-right { display: flex; gap: 10px; align-items: center; }
@@ -400,13 +408,13 @@
   .btn-primary:hover { opacity: 0.8; }
   .btn-primary:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
   .btn-secondary {
-    background: var(--bg); color: var(--ink-soft);
-    border: 1.5px solid var(--border);
+    background: var(--bg); color: var(--ink);
+    border: 1.5px solid var(--ink);
     padding: 12px 28px; border-radius: 40px;
     font-size: 0.88rem; font-weight: 600; cursor: pointer;
-    transition: border-color .15s, color .15s;
+    transition: border-color .15s, color .15s, background .15s;
   }
-  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-secondary:hover { background: var(--fill-dim); }
 
   /* ── DOMAIN BARS ── */
   #s-domains { padding: 70px 20px 48px; max-width: 600px; margin: 0 auto; width: 100%; }
@@ -1185,6 +1193,7 @@
   <div class="topbar-quiz">
     <button class="quiz-topbar-quit" onclick="quitQuiz()" title="Quitter le quiz">×</button>
     <span class="quiz-topbar-title" id="quizTopbarDate"></span>
+    <button class="quiz-topbar-save" id="quizTopbarSave" style="display:none;" onclick="openSaveProgressModal()">Sauvegarder ma progression</button>
   </div>
   </div>
 </nav>
@@ -2033,6 +2042,20 @@ function updateQuizTopbar() {
   } else {
     el.textContent = 'Nouveau bilan du ' + today;
   }
+  const saveBtn = document.getElementById('quizTopbarSave');
+  if (saveBtn) {
+    const hasAnyAnswer = Object.keys(scores).length > 0;
+    saveBtn.style.display = (!currentUser && hasAnyAnswer) ? 'inline-block' : 'none';
+  }
+}
+
+function openSaveProgressModal() {
+  const m = document.getElementById('authGateModal');
+  const h = m?.querySelector('h3');
+  const p = m?.querySelector('p');
+  if (h) h.textContent = 'Enregistrez votre progression 💾';
+  if (p) p.textContent = 'Créez un compte gratuit pour sauvegarder votre avancement et reprendre le bilan plus tard.';
+  if (m) m.classList.add('open');
 }
 
 function updateDomainsIntro() {
@@ -2466,14 +2489,12 @@ function renderQuestion() {
   nextBtn.textContent = currentQIndex === total - 1 ? 'Terminer' : 'Suivant';
   nextBtn.disabled = selectedValue === null;
   const backBtn = document.getElementById('quizBack');
+  backBtn.textContent = '← Retour';
+  backBtn.style.visibility = 'visible';
   if (currentQIndex === 0) {
-    backBtn.textContent = '← Domaines';
     backBtn.onclick = showContinue;
-    backBtn.style.visibility = 'visible';
   } else {
-    backBtn.textContent = '← Retour';
     backBtn.onclick = quizPrev;
-    backBtn.style.visibility = 'visible';
   }
 }
 
@@ -2485,6 +2506,7 @@ function selectOption(value) {
   const idx = OPTIONS.findIndex(o => o.value === value);
   document.querySelectorAll('#quizOptions .option')[idx]?.classList.add('selected');
   document.getElementById('quizNext').disabled = false;
+  updateQuizTopbar();
 }
 
 async function quizNext() {
@@ -3374,12 +3396,7 @@ function quitQuiz() {
   if (!currentUser && (completedDomains.size >= 1 || hasAnyAnswer)) {
     // Guest with progress (even mid-domain, before completing any): prompt to register so they can come back
     _authGateQuit = true;
-    const m = document.getElementById('authGateModal');
-    const h = m?.querySelector('h3');
-    const p = m?.querySelector('p');
-    if (h) h.textContent = 'Enregistrez votre progression 💾';
-    if (p) p.textContent = 'Créez un compte gratuit pour sauvegarder votre avancement et reprendre le bilan plus tard.';
-    if (m) m.classList.add('open');
+    openSaveProgressModal();
     return;
   }
   if (!currentUser) {
