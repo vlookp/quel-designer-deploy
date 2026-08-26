@@ -154,7 +154,6 @@
   .btn-small.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
   @media (max-width: 480px) {
     #btnFaireBilan { display: none !important; }
-    #quizProgress { display: none !important; }
   }
   .sidebar-bilan-btn { display: none; }
   @media (max-width: 480px) {
@@ -276,12 +275,7 @@
   .padtop { padding-top: 70px; }
   body.quiz-active #s-domains,
   body.quiz-active #s-quiz,
-  body.quiz-active #s-continue { padding-top: 110px; }
-  @media (min-width: 560px) {
-    body.quiz-active #s-domains,
-    body.quiz-active #s-quiz,
-    body.quiz-active #s-continue { padding-top: 86px; }
-  }
+  body.quiz-active #s-continue { padding-top: 70px; }
 
   /* ── AUTH ── */
   #s-landing {
@@ -801,28 +795,6 @@
   .badge-progress { display: inline-block; background: var(--fill-dim); color: var(--ink); font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
   .dash-refresh { display: flex; justify-content: flex-end; max-width: 960px; width: 100%; margin-bottom: 10px; }
 
-  /* ── GLOBAL QUIZ PROGRESS BAR ── */
-  #quizProgress {
-    position: fixed; top: 50px; left: 0; right: 0; z-index: 98;
-    display: none; padding: 8px 12px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap; gap: 5px;
-    justify-content: center;
-  }
-  #quizProgress.visible { display: flex; }
-  .qp-chip {
-    font-size: 0.68rem; font-weight: 700; letter-spacing: .02em;
-    padding: 3px 9px; border-radius: 20px;
-    background: var(--fill-dim); color: var(--ink-soft);
-    border: 1px solid transparent;
-    transition: background .3s, color .3s, border-color .3s;
-    white-space: nowrap;
-  }
-  .qp-chip.done {
-    background: var(--ink); color: var(--white);
-  }
-
   /* ── DOMAIN TRANSITION OVERLAY ── */
   #domainTransition {
     position: fixed; inset: 0; z-index: 300;
@@ -1139,9 +1111,6 @@
 </style>
 </head>
 <body>
-
-<!-- GLOBAL QUIZ PROGRESS BAR -->
-<div id="quizProgress"></div>
 
 <!-- DOMAIN TRANSITION OVERLAY -->
 <div id="domainTransition">
@@ -2047,17 +2016,10 @@ async function submitFeedback() {
 
 function updateGlobalProgress(screenId) {
   const quizScreens = ['s-domains', 's-quiz', 's-continue'];
-  const bar = document.getElementById('quizProgress');
-  if (!bar) return;
   if (quizScreens.includes(screenId)) {
-    bar.classList.add('visible');
     document.body.classList.add('quiz-active');
-    bar.innerHTML = DOMAINS.map(d =>
-      `<span class="qp-chip${completedDomains.has(d) ? ' done' : ''}">${d}</span>`
-    ).join('');
     if (screenId === 's-domains') updateDomainsIntro();
   } else {
-    bar.classList.remove('visible');
     document.body.classList.remove('quiz-active');
   }
 }
@@ -2655,7 +2617,6 @@ function showContinue() {
   if (continueQuitBtn) continueQuitBtn.style.display = (canSave && !canEnregistrer) ? 'inline-block' : 'none';
   goTo('s-continue');
   if (allDone) {
-    document.getElementById('quizProgress')?.classList.remove('visible');
     document.body.classList.remove('quiz-active');
   }
 }
