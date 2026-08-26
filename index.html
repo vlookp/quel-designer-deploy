@@ -1082,6 +1082,7 @@
   .conseil-widget.visible { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
   .conseil-widget-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 0.9rem; cursor: pointer; color: var(--ink-soft); line-height: 1; padding: 4px; }
   .conseil-widget-close:hover { color: var(--ink); }
+  .conseil-widget-logo { width: 32px; height: auto; display: block; margin-bottom: 10px; }
   .conseil-widget-title { font-size: 0.95rem; font-weight: 800; font-family: Georgia, serif; margin-bottom: 8px; padding-right: 16px; }
   .conseil-widget-text { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.5; margin-bottom: 12px; }
   .conseil-widget-btn { display: inline-block; background: var(--ink); color: #fff; border-radius: 10px; padding: 9px 16px; font-size: 0.8rem; font-weight: 700; text-decoration: none; }
@@ -1547,6 +1548,7 @@
 <!-- Floating "Besoin de conseil" widget -->
 <div id="conseilWidget" class="conseil-widget">
   <button class="conseil-widget-close" onclick="dismissConseilWidget()" title="Fermer">✕</button>
+  <img id="conseilWidgetLogo" alt="Popup Design Lab" class="conseil-widget-logo">
   <div class="conseil-widget-title">Besoin de conseil ?</div>
   <div class="conseil-widget-text">Réservez un call gratuit de 30 min avec notre équipe pour faire le point sur votre progression.</div>
   <a class="conseil-widget-btn" href="https://calendly.com/valeriekoplewicz-popupdesignlab/30-minute-meeting-clone" target="_blank" rel="noopener" onclick="dismissConseilWidget()">Réserver un call gratuit →</a>
@@ -4149,6 +4151,8 @@ let _conseilWidgetBound = false;
 function setupConseilWidget() {
   const widget = document.getElementById('conseilWidget');
   if (!widget) return;
+  const logoImg = document.getElementById('conseilWidgetLogo');
+  if (logoImg && !logoImg.src) logoImg.src = LOGO_B64;
   if (sessionStorage.getItem('qd_conseil_dismissed')) return;
   if (_conseilWidgetBound) return;
   _conseilWidgetBound = true;
