@@ -1291,7 +1291,7 @@
   <div class="landing-wrap">
     <img id="landingLogo" alt="Popup Design Lab" style="width:96px;height:auto;display:block;margin:0 auto 32px;">
     <h1>Quel designer<br>êtes-vous ?</h1>
-    <p class="landing-sub">Faites le point sur ce que vous savez vraiment faire —<br>pour savoir où vous concentrer ensuite.</p>
+    <p class="landing-sub">Faites le point sur ce que vous savez vraiment faire,<br>pour savoir où vous concentrer ensuite.</p>
     <p class="landing-meta">~10 minutes · 8 domaines du design</p>
     <button class="btn-primary" style="width:100%;max-width:320px;" onclick="startGuestQuiz()">Commencer mon bilan</button>
     <p class="landing-login">Vous avez déjà fait un bilan ? <button onclick="goTo('s-auth');switchTab('login')">Connectez-vous</button></p>
@@ -1927,7 +1927,7 @@ function showHome() {
       const doneDomains = (draft?.completedDomains || []).length;
       const userName = document.getElementById('topbarUser')?.textContent || '';
       if (h1) h1.innerHTML = `Bienvenue dans ton espace&nbsp;👋`;
-      if (sub) sub.textContent = `Tu as déjà démarré — tu es à ${doneDomains} domaine${doneDomains > 1 ? 's' : ''} sur 8. Continue pour obtenir ton profil designer et des recommandations personnalisées.`;
+      if (sub) sub.textContent = `Tu as déjà démarré : tu es à ${doneDomains} domaine${doneDomains > 1 ? 's' : ''} sur 8. Continue pour obtenir ton profil designer et des recommandations personnalisées.`;
       cards.innerHTML = '';
       cards.appendChild(draftCard);
       tl.style.display = 'block';
@@ -2372,7 +2372,7 @@ function buildDomainBars(containerId, clickable) {
       row.onclick = () => startQuiz(domain);
     } else if (clickable && isDone) {
       // Allow re-doing a domain from continue screen
-      row.title = `${domain} — ${pct}% — Cliquez pour refaire`;
+      row.title = `${domain} · ${pct}% · Cliquez pour refaire`;
       row.style.cursor = 'pointer';
       row.onclick = () => startQuiz(domain);
     }
@@ -2637,7 +2637,7 @@ function showContinue() {
     ? 'Vous avez évalué tous les domaines !'
     : isRetake
       ? 'Cliquez sur un domaine pour mettre à jour votre évaluation.'
-      : `Plus que ${remaining} domaine${remaining > 1 ? 's' : ''} à évaluer — cliquez sur un pour continuer.`;
+      : `Plus que ${remaining} domaine${remaining > 1 ? 's' : ''} à évaluer. Cliquez sur un pour continuer.`;
   buildDomainBars('continueGrid', true);
   document.getElementById('btnResults').style.display = allDone ? 'inline-block' : 'none';
   const continueSaveBtn = document.getElementById('continueSaveBtn');
@@ -4104,7 +4104,7 @@ function renderSkillsRecommendations() {
 
     const requestBlock = `
       <div class="pos-request" style="margin-top:20px;">
-        <div class="pos-request-label">Vous ne trouvez pas la formation qu'il vous faut ? Dites-nous ce que vous cherchez — nous vous préviendrons dès qu'elle sera disponible.</div>
+        <div class="pos-request-label">Vous ne trouvez pas la formation qu'il vous faut ? Dites-nous ce que vous cherchez, nous vous préviendrons dès qu'elle sera disponible.</div>
         <div class="pos-request-row">
           <input class="pos-request-input" id="posRequestInput" type="text" placeholder="Ex : formation Design System avancé">
           <button class="pos-request-btn" id="posRequestBtn" onclick="submitFormationRequest()">Envoyer</button>
@@ -4113,7 +4113,7 @@ function renderSkillsRecommendations() {
       </div>`;
 
     const emptyMsg = (allFormations.length === 0 && allWorkshops.length === 0)
-      ? `<div class="skills-all-good"><span>🔍</span>Pas encore de formation pour ce filtre — dites-nous ce qui vous intéresse ci-dessous.</div>` : '';
+      ? `<div class="skills-all-good"><span>🔍</span>Pas encore de formation pour ce filtre, dites-nous ce qui vous intéresse ci-dessous.</div>` : '';
 
     container.innerHTML = `<h3 class="skills-reco-title">Recommandations</h3><p class="reco-sub">Sélectionnez les événements qui vous intéressent</p><div class="reco-filters">${filtersHtml}</div>${formationSection}${workshopSection}${emptyMsg}${requestBlock}`;
     return;
@@ -4123,7 +4123,7 @@ function renderSkillsRecommendations() {
   const domainScores = getDomainScores();
   const weakDomains = domainScores.filter(d => Math.round(d.sum / d.max * 100) < 60);
   if (weakDomains.length === 0) {
-    container.innerHTML = `<div class="skills-all-good"><span>🎉</span>Tous vos domaines sont au-dessus de 60% — continuez comme ça !</div>`;
+    container.innerHTML = `<div class="skills-all-good"><span>🎉</span>Tous vos domaines sont au-dessus de 60%, continuez comme ça !</div>`;
     return;
   }
   const seen = new Set();
