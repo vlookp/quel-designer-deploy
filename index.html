@@ -3477,18 +3477,9 @@ function quitQuiz() {
 }
 
 async function saveDomainProgress() {
-  // When retaking, ask: new bilan or update existing?
-  if (isRetake && getHistory().length > 0) {
-    showChoiceModal({
-      title: 'Enregistrer mon bilan',
-      message: 'Souhaitez-vous créer un nouveau bilan ou mettre à jour votre bilan actuel ?',
-      primaryLabel: 'Créer un nouveau bilan',
-      primaryAction: () => { isModify = false; _doSaveDomainProgress(); },
-      secondaryLabel: 'Modifier mon bilan actuel',
-      secondaryAction: () => { isModify = true; _doSaveDomainProgress(); }
-    });
-    return;
-  }
+  // The new-bilan-vs-modify choice was already made upstream (retakeQuiz →
+  // modifyCurrentBilan sets isModify=true, retakeFromLastBilan/retakeFromScratch
+  // leave it false) — don't ask again here.
   await _doSaveDomainProgress();
 }
 
@@ -3604,6 +3595,7 @@ function retakeFromLastBilan() {
   scores = {};
   if (last?.questionScores) Object.assign(scores, last.questionScores);
   isRetake = true;
+  isModify = false;
   DOMAINS.forEach(d => {
     const sum = DATA[d].reduce((acc, _, i) => acc + (scores[d + '|' + i] || 0), 0);
     if (sum > 0) completedDomains.add(d);
@@ -3619,6 +3611,7 @@ function retakeFromScratch() {
   scores = {};
   completedDomains.clear();
   isRetake = false;
+  isModify = false;
   pendingColorIdx = getNextColorIdx();
   saveSession(false);
   showContinue();
