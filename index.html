@@ -9,7 +9,7 @@
 <style>
   :root {
     --ink: #111111;
-    --ink-soft: #888888;
+    --ink-soft: #666666;
     --bg: #f5f5f3;
     --card: #ffffff;
     --white: #ffffff;
@@ -1123,6 +1123,7 @@
   }
   #bookmarkToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
+<script defer data-domain="quel-designer-etes-vous.popupdesignlab.fr" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
 
@@ -1311,15 +1312,15 @@
       </div>
       <div class="auth-msg" id="authMsg"></div>
       <div class="auth-field" id="field-name">
-        <label>Prénom</label>
+        <label for="authName">Prénom</label>
         <input type="text" id="authName" placeholder="Votre prénom">
       </div>
       <div class="auth-field">
-        <label>Email</label>
+        <label for="authEmail">Email</label>
         <input type="email" id="authEmail" placeholder="votre@email.com">
       </div>
       <div class="auth-field">
-        <label>Mot de passe <span style="color:var(--ink-soft);font-weight:400">(min. 6 caractères)</span></label>
+        <label for="authPassword">Mot de passe <span style="color:var(--ink-soft);font-weight:400">(min. 6 caractères)</span></label>
         <input type="password" id="authPassword" placeholder="••••••••">
       </div>
       <div class="auth-field" id="field-rgpd" style="flex-direction:column;gap:10px;padding:0;">
@@ -1348,11 +1349,11 @@
       <p style="font-size:0.88rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.5;">Votre lien est valide. Entrez votre nouveau mot de passe.</p>
       <div class="auth-msg" id="resetMsg"></div>
       <div class="auth-field">
-        <label>Nouveau mot de passe</label>
+        <label for="resetPassword1">Nouveau mot de passe</label>
         <input type="password" id="resetPassword1" placeholder="••••••••" oninput="document.getElementById('resetMsg').className='auth-msg'">
       </div>
       <div class="auth-field">
-        <label>Confirmer le mot de passe</label>
+        <label for="resetPassword2">Confirmer le mot de passe</label>
         <input type="password" id="resetPassword2" placeholder="••••••••">
       </div>
       <button class="btn-auth" onclick="submitResetPassword()">Mettre à jour</button>
@@ -1369,7 +1370,7 @@
       <p style="font-size:0.88rem;color:var(--ink-soft);margin-bottom:24px;line-height:1.5;">Entrez votre email pour recevoir un lien de réinitialisation.</p>
       <div class="auth-msg" id="forgotMsg"></div>
       <div class="auth-field">
-        <label>Email</label>
+        <label for="forgotEmail">Email</label>
         <input type="email" id="forgotEmail" placeholder="votre@email.com">
       </div>
       <button class="btn-auth" onclick="forgotPassword()">Envoyer le lien</button>
