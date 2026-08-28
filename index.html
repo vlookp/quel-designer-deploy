@@ -196,14 +196,6 @@
     text-align: left; transition: color .12s;
   }
   .footer-col a:hover, .footer-col button:hover { color: #fff; }
-  .footer-rdv-title { font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,.9); line-height: 1.4; margin-bottom: 2px; }
-  .footer-rdv-sub { font-size: 0.75rem; color: rgba(255,255,255,.4); margin-bottom: 12px; }
-  .footer-rdv-btn {
-    display: inline-block; padding: 9px 20px; background: #fff; color: var(--ink);
-    border-radius: 30px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-    text-decoration: none; border: none; transition: opacity .12s;
-  }
-  .footer-rdv-btn:hover { opacity: 0.85; }
   .footer-legal {
     border-top: 1px solid rgba(255,255,255,.08); margin-top: 22px; padding-top: 14px;
     display: flex; gap: 16px; justify-content: center;
@@ -277,7 +269,11 @@
 
   /* ── SCREENS ── */
   .screen { display: none; }
-  .screen.active { display: flex; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; flex-direction: column; flex: 1; animation: screenFadeIn .3s ease; }
+  @keyframes screenFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .padtop { padding-top: 70px; }
   body.quiz-active #s-domains,
   body.quiz-active #s-quiz,
@@ -1017,7 +1013,7 @@
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
   /* positionnement */
-  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; align-items: start; }
+  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
   @media (max-width: 640px) { #positionnementWrap { grid-template-columns: 1fr; } }
   .pos-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 20px; text-align: left; }
   .pos-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
@@ -4375,17 +4371,14 @@ init();
       <span class="footer-col-label">Popup Design Lab</span>
       <a href="https://popupdesignlab.fr/equipe/" target="_blank" rel="noopener">À propos</a>
       <a href="https://popupdesignlab.fr/nos-formations/" target="_blank" rel="noopener">Les formations du Popup Design Lab</a>
+    </div>
+    <!-- Col 3 : Contact & social -->
+    <div class="footer-col">
       <a href="mailto:contact@popupdesignlab.com">Nous contacter</a>
       <a href="https://www.linkedin.com/company/105179785/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         Suivez notre actualité
       </a>
-    </div>
-    <!-- Col 3 : RDV -->
-    <div class="footer-col">
-      <p class="footer-rdv-title">Échangeons sur vos enjeux</p>
-      <p class="footer-rdv-sub">Échange de 30 min</p>
-      <button class="footer-rdv-btn" style="font-family:inherit;" onclick="openBilanGratuitModal()">Prendre rendez-vous</button>
     </div>
   </div>
   <div class="footer-legal">
