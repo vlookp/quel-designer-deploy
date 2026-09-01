@@ -4261,11 +4261,13 @@ function triggerDownload() {
 
 // ── DASHBOARD ──
 async function showDashboard() {
+  if (currentUser?.email !== TEACHER_EMAIL) { showHome(); return; }
   goTo('s-dashboard');
   await loadDashboard();
 }
 
 async function loadDashboard() {
+  if (currentUser?.email !== TEACHER_EMAIL) return;
   document.getElementById('dashBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--ink-soft);padding:24px">Chargement…</td></tr>';
   let profiles, sessions;
   try {
