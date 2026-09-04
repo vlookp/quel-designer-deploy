@@ -1048,7 +1048,7 @@
   .pos-levier-box .pos-bilan-atout-label { color: var(--ink-soft); }
   .pos-levier-box .pos-card-text { margin-top: 6px; }
   .pos-avatar-col { display: flex; align-items: stretch; justify-content: flex-start; }
-  .pos-avatar-col .avatar-card { width: 100%; max-width: 100% !important; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; }
+  .pos-avatar-col .avatar-card { width: 100%; max-width: 100% !important; height: 100%; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; }
   .pos-others-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
   .pos-other-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .pos-other-row span:first-child { color: var(--ink-soft); }
@@ -4034,9 +4034,11 @@ function buildBilanCardHtml() {
     <div class="avatar-card" style="position:relative;width:100%;max-width:220px;margin:0 auto;background:${col.bg};">
       <button class="card-download-btn" onclick="event.stopPropagation();triggerDownload()" title="Télécharger ma carte"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v8M4 6l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div style="font-size:0.6rem;color:#888;text-align:center;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;">${cardDate}</div>
-      ${cardAvatar ? `<img src="${cardAvatar}" alt="avatar" style="display:inline-block;">` : ''}
+      <div style="display:flex;align-items:flex-end;justify-content:center;gap:10px;">
+        ${cardAvatar ? `<img src="${cardAvatar}" alt="avatar" style="display:inline-block;">` : ''}
+        <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:40px;height:auto;display:inline-block;">
+      </div>
       ${cardSentence ? `<p style="font-size:0.82rem;font-weight:500;color:#111;margin-top:8px;line-height:1.4;">${cardSentence}</p>` : ''}
-      <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;margin-top:auto;">
     </div>` : '';
 
   return bilanCard;
