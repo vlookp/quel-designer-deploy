@@ -967,6 +967,26 @@
   .skills-type-tag.domain { background: var(--border); color: var(--ink-soft); }
   .skills-formation-card:hover .skills-type-tag { background: rgba(255,255,255,0.2); color: var(--white); }
 
+  /* intervenant band */
+  .card-band {
+    display: flex; align-items: center; gap: 8px;
+    padding-bottom: 10px; margin-bottom: 10px;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+  .skills-formation-card:hover .card-band { border-bottom-color: rgba(255,255,255,.18); }
+  .card-avatar {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    object-fit: cover; background: var(--avatar-bg);
+  }
+  .card-avatar-initials {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 800; color: var(--white);
+  }
+  .card-intervenant-info { min-width: 0; flex: 1; }
+  .card-intervenant-name { font-size: 0.78rem; font-weight: 700; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-intervenant-title { font-size: 0.68rem; color: var(--ink-soft); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .skills-formation-card:hover .card-intervenant-title { color: rgba(255,255,255,.65); }
+
   /* workshop card */
   .skills-workshop-card {
     display: flex; align-items: flex-start; gap: 10px; text-decoration: none; color: var(--ink);
@@ -1663,6 +1683,7 @@
 </section>
 
 <script src="avatars_data.js" defer></script>
+<script src="intervenants_data.js" defer></script>
 <script>
 // ── MODAL ──
 function toggleProfileDropdown() {
@@ -3090,35 +3111,8 @@ function refreshMonProfilBookmarks() {
   const formations = items.filter(f => f.type === 'formation');
   const workshops  = items.filter(f => f.type === 'workshop');
 
-  const formCards = formations.map(f => `
-    <div class="skills-card-wrap">
-      <div class="skills-formation-card" style="padding-right:32px;">
-        <div class="skills-formation-info">
-          <div class="skills-formation-name">${f.nom}</div>
-          <div class="skills-formation-desc">${f.desc || ''}</div>
-          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span class="skills-type-tag formation">Formation · ${f.duree}</span>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
-        </div>
-      </div>
-      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
-    </div>`).join('');
-
-  const workshopCards = workshops.map(f => `
-    <div class="skills-card-wrap">
-      <div class="skills-workshop-card" style="padding-right:32px;">
-        <span class="skills-workshop-icon">🗓</span>
-        <div class="skills-workshop-info">
-          <div class="skills-workshop-name">${f.nom}</div>
-          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
-            <span class="skills-type-tag workshop">Atelier · ${f.duree}</span>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
-        </div>
-      </div>
-      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="Retirer des favoris">★</button>
-    </div>`).join('');
+  const formCards = formations.map(makeFormationCardHtml).join('');
+  const workshopCards = workshops.map(makeWorkshopCardHtml).join('');
 
   const formSection = formations.length > 0 ? `<div class="skills-grid-2">${formCards}</div>` : '';
   const wsSection  = workshops.length  > 0 ? `<div class="skills-grid-2" style="margin-top:${formations.length > 0 ? '12px' : '0'}">${workshopCards}</div>` : '';
@@ -3699,25 +3693,36 @@ document.getElementById('nameInput').addEventListener('input', updateAvatarCardT
 
 // ── FORMATIONS CATALOG ──
 // Only formations checked "Recommandations pour l'application" in the Notion catalogue
+const INTERVENANTS = {
+  boillot:    { name: "Nicolas Boillot",     titre: "Lead designer UX/Produit",                photo: "nicolas" },
+  merson:     { name: "Mathieu Merson",      titre: "Senior Product Designer e-commerce",      photo: "merson" },
+  touati:     { name: "Morane Touati",       titre: "UX Writer",                               photo: "morane" },
+  koplewicz:  { name: "Valérie Koplewicz",   titre: "Directrice design",                       photo: "valerie" },
+  baudonnat:  { name: "Mathieu Baudonnat",   titre: "Senior User Researcher",                  photo: "baudonnat" },
+  delgado:    { name: "Luz Delgado",         titre: "Designer Stratégique - Inclusion Advocate", photo: null },
+  soussi:     { name: "Nahema Soussi",       titre: "Designer & Accessibility specialist",     photo: null },
+  margoux:    { name: "Benjamin Margoux",    titre: "Senior Product & DS Designer",            photo: null },
+};
+
 const FORMATIONS = [
-  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/ia_uxr/",                      desc: "Augmentez votre capacité de recherche utilisateur grâce aux outils d'intelligence artificielle adaptés à chaque phase.", moduleIA: true },
-  { nom: "User Research - Atelier 1 : User Research assistée par IA", type: "workshop", duree: "3h",   domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/userresearch_ia/",            desc: "Intégrez l'IA dans votre processus de recherche utilisateur à travers des exercices pratiques et des cas concrets.", moduleIA: true },
-  { nom: "User Research - Atelier 2 : Analyse avancée et synthèse avec IA", type: "workshop", duree: "3h", domaines: ["User Research"],        lien: "https://popupdesignlab.fr/formations/userresearch_ia_analyse_synthese/", desc: "Approfondissez l'analyse et la synthèse de vos données de recherche utilisateur avec l'aide de l'IA.", moduleIA: true },
-  { nom: "Design inclusif",                                        type: "formation", duree: "1 jour",  domaines: ["Service Design","UX Design","UI Design"],     lien: "https://popupdesignlab.fr/formations/design-inclusif/",       desc: "Concevez des expériences accessibles et adaptées à tous les profils, en intégrant les standards d'accessibilité dès la conception." },
-  { nom: "Eco-conception",                                         type: "formation", duree: "1 jour",  domaines: ["Service Design","UX Design"],                 lien: "https://popupdesignlab.fr/formations/ecoconception/",       desc: "Réduisez l'empreinte environnementale de vos interfaces numériques en adoptant les bonnes pratiques d'éco-conception." },
-  { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe-coding/",       desc: "Générez du code fonctionnel par le langage naturel et intégrez l'IA dans votre workflow créatif de designer.", moduleIA: true },
-  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs.", moduleIA: true },
-  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_prototypage_ia/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA.", moduleIA: true },
-  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/ia_uxwritting/",              desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact.", moduleIA: true },
-  { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/", desc: "Posez les bases du UX Writing avec l'IA pour produire des micro-copies claires, utiles et adaptées au contexte.", moduleIA: true },
-  { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/", desc: "Construisez une stratégie de contenu cohérente et évolutive en tirant parti des capacités des outils IA.", moduleIA: true },
-  { nom: "Accessibilité",                                          type: "formation", duree: "1 jour",  domaines: ["Service Design","UI Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/accessibilite/",       desc: "Apprenez les standards WCAG et les bonnes pratiques pour rendre vos interfaces accessibles à tous les utilisateurs." },
-  { nom: "Design Ops 2 jours",                                     type: "formation", duree: "2 jours", domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/design-ops/",                 desc: "Parcours complet pour structurer, piloter et faire évoluer votre pratique Design Ops de A à Z." },
-  { nom: "Design Ops - Atelier 1 : Audit & Organisation design",   type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_audit/",            desc: "Auditez et réorganisez votre pratique design pour identifier les frictions et gagner en clarté." },
-  { nom: "Design Ops - Atelier 2 : Process Design & IA",           type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_processdesign_ia/", desc: "Optimisez vos processus de production design avec l'IA pour livrer plus vite et avec plus de cohérence.", moduleIA: true },
-  { nom: "Design Ops - Atelier 3 : Documentation & Rituels design",type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_documentation_rituels/", desc: "Créez une documentation vivante et des rituels d'équipe qui maintiennent la cohésion et la qualité dans le temps." },
-  { nom: "Design Ops - Atelier 4 : Metrics & Performance",         type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_metrics_performance/", desc: "Définissez et suivez les indicateurs clés pour mesurer l'impact et la performance de votre design." },
-  { nom: "Design System",                                          type: "formation", duree: "1 jour",  domaines: ["Design System"],             lien: "https://popupdesignlab.fr/formations/design-system/",       desc: "Créez et maintenez un système de composants cohérent et scalable pour accélérer vos productions et unifier l'expérience." },
+  { nom: "User Research et IA",                                    type: "formation", duree: "1 jour",  domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/ia_uxr/",                      desc: "Augmentez votre capacité de recherche utilisateur grâce aux outils d'intelligence artificielle adaptés à chaque phase.", moduleIA: true, intervenant: "baudonnat" },
+  { nom: "User Research - Atelier 1 : User Research assistée par IA", type: "workshop", duree: "3h",   domaines: ["User Research"],             lien: "https://popupdesignlab.fr/formations/userresearch_ia/",            desc: "Intégrez l'IA dans votre processus de recherche utilisateur à travers des exercices pratiques et des cas concrets.", moduleIA: true, intervenant: "baudonnat" },
+  { nom: "User Research - Atelier 2 : Analyse avancée et synthèse avec IA", type: "workshop", duree: "3h", domaines: ["User Research"],        lien: "https://popupdesignlab.fr/formations/userresearch_ia_analyse_synthese/", desc: "Approfondissez l'analyse et la synthèse de vos données de recherche utilisateur avec l'aide de l'IA.", moduleIA: true, intervenant: "baudonnat" },
+  { nom: "Design inclusif",                                        type: "formation", duree: "1 jour",  domaines: ["Service Design","UX Design","UI Design"],     lien: "https://popupdesignlab.fr/formations/design-inclusif/",       desc: "Concevez des expériences accessibles et adaptées à tous les profils, en intégrant les standards d'accessibilité dès la conception.", intervenant: "delgado" },
+  { nom: "Eco-conception",                                         type: "formation", duree: "1 jour",  domaines: ["Service Design","UX Design"],                 lien: "https://popupdesignlab.fr/formations/ecoconception/",       desc: "Réduisez l'empreinte environnementale de vos interfaces numériques en adoptant les bonnes pratiques d'éco-conception.", intervenant: "boillot" },
+  { nom: "Vibe Coding",                                            type: "formation", duree: "1 jour",  domaines: ["UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe-coding/",       desc: "Générez du code fonctionnel par le langage naturel et intégrez l'IA dans votre workflow créatif de designer.", moduleIA: true, intervenant: "merson" },
+  { nom: "Vibe-coding - Atelier 1 : Introduction à la pratique",  type: "workshop",  duree: "3h",      domaines: ["UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_introduction_pratique_ia/", desc: "Découvrez la génération de code assistée par IA à travers des exercices pratiques accessibles aux non-développeurs.", moduleIA: true, intervenant: "merson" },
+  { nom: "Vibe-coding - Atelier 2 : Prototypage avancé avec IA",  type: "workshop",  duree: "3h",      domaines: ["UI Engineer"],   lien: "https://popupdesignlab.fr/formations/vibe_coding_prototypage_ia/", desc: "Allez plus loin avec le prototypage haute-fidélité assisté par IA et les techniques de collaboration designer-IA.", moduleIA: true, intervenant: "merson" },
+  { nom: "UX Writing & IA",                                        type: "formation", duree: "1 jour",  domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/ia_uxwritting/",              desc: "Rédigez des contenus UX percutants en exploitant les outils d'écriture augmentée par IA pour chaque point de contact.", moduleIA: true, intervenant: "touati" },
+  { nom: "Content - Atelier 1 : Fondamentaux UX Writing avec IA", type: "workshop",  duree: "3h",      domaines: ["UX Writing"],                lien: "https://popupdesignlab.fr/formations/uxwriting_fondamentaux_ia/", desc: "Posez les bases du UX Writing avec l'IA pour produire des micro-copies claires, utiles et adaptées au contexte.", moduleIA: true, intervenant: "touati" },
+  { nom: "Content - Atelier 2 : Stratégie de contenu augmentée par IA", type: "workshop", duree: "3h", domaines: ["UX Writing"],               lien: "https://popupdesignlab.fr/formations/uxwriting_strategiecontenu_ia/", desc: "Construisez une stratégie de contenu cohérente et évolutive en tirant parti des capacités des outils IA.", moduleIA: true, intervenant: "touati" },
+  { nom: "Accessibilité",                                          type: "formation", duree: "1 jour",  domaines: ["Service Design","UI Design","UI Engineer"],   lien: "https://popupdesignlab.fr/formations/accessibilite/",       desc: "Apprenez les standards WCAG et les bonnes pratiques pour rendre vos interfaces accessibles à tous les utilisateurs.", intervenant: "soussi" },
+  { nom: "Design Ops 2 jours",                                     type: "formation", duree: "2 jours", domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/design-ops/",                 desc: "Parcours complet pour structurer, piloter et faire évoluer votre pratique Design Ops de A à Z.", intervenant: "koplewicz" },
+  { nom: "Design Ops - Atelier 1 : Audit & Organisation design",   type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_audit/",            desc: "Auditez et réorganisez votre pratique design pour identifier les frictions et gagner en clarté.", intervenant: "koplewicz" },
+  { nom: "Design Ops - Atelier 2 : Process Design & IA",           type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_processdesign_ia/", desc: "Optimisez vos processus de production design avec l'IA pour livrer plus vite et avec plus de cohérence.", moduleIA: true, intervenant: "koplewicz" },
+  { nom: "Design Ops - Atelier 3 : Documentation & Rituels design",type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_documentation_rituels/", desc: "Créez une documentation vivante et des rituels d'équipe qui maintiennent la cohésion et la qualité dans le temps.", intervenant: "koplewicz" },
+  { nom: "Design Ops - Atelier 4 : Metrics & Performance",         type: "workshop",  duree: "3h",      domaines: ["Design Ops"],                lien: "https://popupdesignlab.fr/formations/designops_metrics_performance/", desc: "Définissez et suivez les indicateurs clés pour mesurer l'impact et la performance de votre design.", intervenant: "koplewicz" },
+  { nom: "Design System",                                          type: "formation", duree: "1 jour",  domaines: ["Design System"],             lien: "https://popupdesignlab.fr/formations/design-system/",       desc: "Créez et maintenez un système de composants cohérent et scalable pour accélérer vos productions et unifier l'expérience.", intervenant: "margoux" },
 ];
 
 // ── PROFILE ──
@@ -3824,40 +3829,10 @@ function showMesFormations() {
   const formations = items.filter(f => f.type === 'formation');
   const workshops  = items.filter(f => f.type === 'workshop');
 
-  const makeFormCard = f => `
-    <div class="skills-card-wrap">
-      <div class="skills-formation-card" style="padding-right:32px;">
-        <div class="skills-formation-info">
-          <div class="skills-formation-name">${f.nom}</div>
-          <div class="skills-formation-desc">${f.desc || ''}</div>
-          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span class="skills-type-tag formation">Formation · ${f.duree}</span>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
-        </div>
-      </div>
-      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
-    </div>`;
-
-  const makeWsCard = f => `
-    <div class="skills-card-wrap">
-      <div class="skills-workshop-card" style="padding-right:32px;">
-        <span class="skills-workshop-icon">🗓</span>
-        <div class="skills-workshop-info">
-          <div class="skills-workshop-name">${f.nom}</div>
-          <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
-            <span class="skills-type-tag workshop">Atelier · ${f.duree}</span>
-            <a class="btn-plus-info" href="${f.lien}" target="_blank" rel="noopener">Plus d'info →</a>
-          </div>
-        </div>
-      </div>
-      <button class="bookmark-btn bookmarked" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event);showMesFormations()" title="Retirer des favoris">★</button>
-    </div>`;
-
   const formSection = formations.length > 0
-    ? `<div class="skills-section-label">Formations · 1 journée</div><div class="skills-grid-2">${formations.map(makeFormCard).join('')}</div>` : '';
+    ? `<div class="skills-section-label">Formations · 1 journée</div><div class="skills-grid-2">${formations.map(f => makeFormationCardHtml(f, 'showMesFormations()')).join('')}</div>` : '';
   const wsSection = workshops.length > 0
-    ? `<div class="skills-section-label">Ateliers · 3h</div><div class="skills-grid-2">${workshops.map(makeWsCard).join('')}</div>` : '';
+    ? `<div class="skills-section-label">Ateliers · 3h</div><div class="skills-grid-2">${workshops.map(f => makeWorkshopCardHtml(f, 'showMesFormations()')).join('')}</div>` : '';
 
   container.innerHTML = formSection + wsSection;
   goTo('s-mes-formations');
@@ -4067,12 +4042,35 @@ function buildBilanCardHtml() {
   return bilanCard;
 }
 
-function makeFormationCardHtml(f) {
+const INTERVENANT_COLORS = ['#1B6FA0','#5B21B6','#B45309','#0F766E','#BE185D'];
+
+function intervenantBandHtml(f) {
+  const iv = INTERVENANTS[f.intervenant];
+  if (!iv) return '';
+  const initials = iv.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const hash = [...iv.name].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const bg = INTERVENANT_COLORS[hash % INTERVENANT_COLORS.length];
+  const photoUri = iv.photo && typeof INTERVENANT_PHOTOS !== 'undefined' ? INTERVENANT_PHOTOS[iv.photo] : null;
+  const avatarHtml = photoUri
+    ? `<img class="card-avatar" src="${photoUri}" alt="${iv.name}">`
+    : `<div class="card-avatar card-avatar-initials" style="background:${bg};">${initials}</div>`;
+  return `
+    <div class="card-band">
+      ${avatarHtml}
+      <div class="card-intervenant-info">
+        <div class="card-intervenant-name">${iv.name}</div>
+        <div class="card-intervenant-title">${iv.titre}</div>
+      </div>
+    </div>`;
+}
+
+function makeFormationCardHtml(f, afterToggle) {
   const bm = getBookmarks();
   const saved = bm.includes(f.nom);
   return `
     <div class="skills-card-wrap">
       <div class="skills-formation-card" style="padding-right:32px;">
+        ${intervenantBandHtml(f)}
         <div class="skills-formation-info">
           <div class="skills-formation-name">${f.nom}</div>
           <div class="skills-formation-desc">${f.desc || ''}</div>
@@ -4082,17 +4080,17 @@ function makeFormationCardHtml(f) {
           </div>
         </div>
       </div>
-      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
+      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)${afterToggle ? ';' + afterToggle : ''}" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
 }
 
-function makeWorkshopCardHtml(f) {
+function makeWorkshopCardHtml(f, afterToggle) {
   const bm = getBookmarks();
   const saved = bm.includes(f.nom);
   return `
     <div class="skills-card-wrap">
       <div class="skills-workshop-card" style="padding-right:32px;">
-        <span class="skills-workshop-icon">🗓</span>
+        ${intervenantBandHtml(f)}
         <div class="skills-workshop-info">
           <div class="skills-workshop-name">${f.nom}</div>
           <div class="skills-formation-type" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
@@ -4101,7 +4099,7 @@ function makeWorkshopCardHtml(f) {
           </div>
         </div>
       </div>
-      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
+      <button class="bookmark-btn${saved ? ' bookmarked' : ''}" data-nom="${f.nom.replace(/"/g,'&quot;')}" onclick="toggleBookmark(this.dataset.nom,event)${afterToggle ? ';' + afterToggle : ''}" title="${saved ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${saved ? '★' : '☆'}</button>
     </div>`;
 }
 
