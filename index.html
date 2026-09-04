@@ -1034,7 +1034,7 @@
   .skills-all-good { text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.95rem; }
   .skills-all-good span { font-size: 2rem; display: block; margin-bottom: 12px; }
   /* positionnement */
-  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 2fr; gap: 12px; align-items: start; }
+  #positionnementWrap { width: 100%; max-width: 800px; margin: 4px auto 24px; display: grid; grid-template-columns: 1fr 2fr; gap: 12px; align-items: stretch; }
   @media (max-width: 640px) { #positionnementWrap { grid-template-columns: 1fr; } }
   .pos-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 20px; text-align: left; }
   .pos-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
@@ -1047,8 +1047,8 @@
   .pos-levier-box { background: var(--fill-dim); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
   .pos-levier-box .pos-bilan-atout-label { color: var(--ink-soft); }
   .pos-levier-box .pos-card-text { margin-top: 6px; }
-  .pos-avatar-col { display: flex; align-items: flex-start; justify-content: flex-start; }
-  .pos-avatar-col .avatar-card { width: 100%; max-width: 100% !important; }
+  .pos-avatar-col { display: flex; align-items: stretch; justify-content: flex-start; }
+  .pos-avatar-col .avatar-card { width: 100%; max-width: 100% !important; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; }
   .pos-others-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
   .pos-other-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
   .pos-other-row span:first-child { color: var(--ink-soft); }
@@ -4036,7 +4036,7 @@ function buildBilanCardHtml() {
       <div style="font-size:0.6rem;color:#888;text-align:center;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;">${cardDate}</div>
       ${cardAvatar ? `<img src="${cardAvatar}" alt="avatar" style="display:inline-block;">` : ''}
       ${cardSentence ? `<p style="font-size:0.82rem;font-weight:500;color:#111;margin-top:8px;line-height:1.4;">${cardSentence}</p>` : ''}
-      <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;">
+      <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;margin-top:auto;">
     </div>` : '';
 
   return bilanCard;
