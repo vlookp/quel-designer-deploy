@@ -932,9 +932,10 @@
   }
   .reco-sub { font-size: 0.86rem; color: var(--ink-soft); margin-bottom: 12px; }
   .skills-section-label {
-    font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--ink-soft); margin-bottom: 12px; margin-top: 24px;
+    font-size: 0.72rem; line-height: 1.2; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 12px; margin-top: 12px;
   }
+  .skills-section-label:first-child { margin-top: 0; }
   /* two-column grids */
   .skills-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
   @media (max-width: 540px) { .skills-grid-2 { grid-template-columns: 1fr; } }
@@ -3857,7 +3858,7 @@ function showMesFormations() {
   const formSection = formations.length > 0
     ? `<div class="skills-section-label">Formations · 1 journée</div><div class="skills-grid-2">${formations.map(makeFormCard).join('')}</div>` : '';
   const wsSection = workshops.length > 0
-    ? `<div class="skills-section-label" style="margin-top:20px;">Ateliers · 3h</div><div class="skills-grid-2">${workshops.map(makeWsCard).join('')}</div>` : '';
+    ? `<div class="skills-section-label">Ateliers · 3h</div><div class="skills-grid-2">${workshops.map(makeWsCard).join('')}</div>` : '';
 
   container.innerHTML = formSection + wsSection;
   goTo('s-mes-formations');
