@@ -4034,11 +4034,9 @@ function buildBilanCardHtml() {
     <div class="avatar-card" style="position:relative;width:100%;max-width:220px;margin:0 auto;background:${col.bg};">
       <button class="card-download-btn" onclick="event.stopPropagation();triggerDownload()" title="Télécharger ma carte"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v8M4 6l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div style="font-size:0.6rem;color:#888;text-align:center;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;">${cardDate}</div>
-      <div style="position:relative;display:inline-block;">
-        ${cardAvatar ? `<img src="${cardAvatar}" alt="avatar" style="display:inline-block;">` : ''}
-        <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:32px;height:auto;display:inline-block;position:absolute;bottom:4px;right:-10px;">
-      </div>
+      ${cardAvatar ? `<img src="${cardAvatar}" alt="avatar" style="display:inline-block;">` : ''}
       ${cardSentence ? `<p style="font-size:0.82rem;font-weight:500;color:#111;margin-top:8px;line-height:1.4;">${cardSentence}</p>` : ''}
+      <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:inline-block;margin:12px auto 0;">
     </div>` : '';
 
   return bilanCard;
