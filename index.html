@@ -2729,7 +2729,8 @@ function updateResultsPreview() {
         <img src="${LOGO_B64}" alt="Popup Design Lab" style="width:48px;height:auto;display:block;margin:12px auto 0;">
       </div>`;
     preview.style.display = 'block';
-    preview.onclick = null;
+    preview.onclick = openAvatarModal;
+    preview.title = 'Cliquez pour changer votre avatar';
     btn.textContent = 'Voir ma progression';
   } else {
     preview.style.display = 'none';
@@ -3447,6 +3448,9 @@ function applyAvatarFromModal() {
     // Update Mon profil avatar if visible
     const monProfilAv = document.getElementById('monProfilAvatar');
     if (monProfilAv) monProfilAv.innerHTML = `<img src="${selectedAvatar}" alt="avatar" style="width:88px;height:88px;border-radius:50%;object-fit:cover;">`;
+    // Refresh the results-screen avatar card if that's where the modal was opened from
+    const resultsPreview = document.getElementById('avatarPreview');
+    if (resultsPreview && resultsPreview.style.display !== 'none') updateResultsPreview();
   }
   const fromQuiz = _avatarModalFromQuiz;
   _avatarModalFromQuiz = false;
